@@ -1,85 +1,111 @@
-/* Configuración básica */
-body, html {
+/* Estructura General */
+body {
     margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: Arial, sans-serif;
-    background-color: #121212; /* Color oscuro como tu referencia */
+    font-family: sans-serif;
+    background-color: #1a1a1a;
     color: white;
 }
 
-/* Contenedor principal dividido en dos */
-.main-container {
+.simulator-layout {
     display: flex;
     height: 100vh;
+}
+
+/* Área del Simulador (Izquierda) */
+.viewport {
+    flex: 1;
+    position: relative;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
 }
 
-/* Área del simulador (Izquierda) */
-.simulator {
-    flex: 1; /* Toma el espacio restante */
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #222;
-}
-
-#canvas-container {
-    position: relative;
-    width: 90%;
-    max-width: 800px;
-}
-
-#canvas-container img {
-    width: 100%;
+#bg-room {
+    max-width: 100%;
+    max-height: 100%;
     display: block;
 }
 
-/* Catálogo (Derecha) */
+/* El Canvas donde se dibujará el piso */
+#floor-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none; /* Para que no estorbe al mover los puntos */
+}
+
+/* Los Puntos de Control (P1-P4) */
+.dot {
+    width: 15px;
+    height: 15px;
+    background-color: #007bff;
+    border: 2px solid white;
+    border-radius: 50%;
+    position: absolute;
+    cursor: move;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+}
+
+/* Área del Catálogo (Derecha) */
 .catalog {
-    width: 350px; /* Ancho fijo para el catálogo */
-    background-color: #1e1e1e;
-    border-left: 1px solid #333;
+    width: 380px;
+    background-color: #252525;
     display: flex;
     flex-direction: column;
+    border-left: 1px solid #444;
 }
 
-.catalog h3 {
+.brand-filters {
     padding: 15px;
-    margin: 0;
-    text-align: center;
-    border-bottom: 1px solid #333;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid #444;
 }
 
-/* Cuadrícula de productos con scroll */
-#grid-productos {
+.brand-filters button {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.brand-filters button:hover {
+    background: #007bff;
+}
+
+#catalog-container {
     flex: 1;
     overflow-y: auto;
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas */
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     padding: 15px;
 }
 
 .tile-card {
+    background: #333;
+    padding: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: transform 0.2s;
     text-align: center;
-}
-
-.tile-card:hover {
-    transform: scale(1.05);
 }
 
 .tile-card img {
     width: 100%;
-    border-radius: 4px;
-    border: 2px solid transparent;
+    border-radius: 2px;
 }
 
-.tile-card span {
+.tile-card p {
     font-size: 10px;
-    display: block;
-    margin-top: 5px;
+    margin: 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

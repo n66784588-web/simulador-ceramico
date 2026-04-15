@@ -8,15 +8,23 @@
 <body>
 
 <div class="simulator-layout">
-    <div class="viewport" id="viewport">
-        <img src="img/habitaciones/sala-vacia.jpg" id="bg-room">
-        <canvas id="floor-canvas"></canvas>
-
-        <div class="dot" id="p1" style="top: 70%; left: 20%;"></div>
-        <div class="dot" id="p2" style="top: 70%; left: 80%;"></div>
-        <div class="dot" id="p3" style="top: 90%; left: 90%;"></div>
-        <div class="dot" id="p4" style="top: 90%; left: 10%;"></div>
+   <div class="viewport" id="viewport">
+    <div class="room-selector">
+        <button onclick="cambiarHabitacion('sala-vacia.jpg')">Sala</button>
+        <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
+        <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
+        <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
+        <button onclick="cambiarHabitacion('fachada.jpg')">Fachada</button>
     </div>
+
+    <img src="img/habitaciones/sala-vacia.jpg" id="bg-room">
+    <canvas id="floor-canvas"></canvas>
+
+    <div class="dot" id="p1" style="top: 70%; left: 20%;"></div>
+    <div class="dot" id="p2" style="top: 70%; left: 80%;"></div>
+    <div class="dot" id="p3" style="top: 90%; left: 90%;"></div>
+    <div class="dot" id="p4" style="top: 90%; left: 10%;"></div>
+</div>
 
     <aside class="catalog">
         <div class="brand-filters">

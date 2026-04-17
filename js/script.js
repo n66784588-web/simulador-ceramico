@@ -46,7 +46,7 @@ const misProductos = [
     { nombre: "cuzco-blanco-50x50", marca: "nitropiso" },
     { nombre: "cuzco-rojo-50x50", marca: "nitropiso" },
     { nombre: "diamante-blanco-30x60", marca: "nitropiso" },
-    { nombre: "elegacnce-nieve-33x33", marca: "nitropiso" },
+    { nombre: "elegance-nieve-33x33", marca: "nitropiso" },
     { nombre: "grecia-30x60", marca: "nitropiso" },
     { nombre: "greytech-30x60", marca: "nitropiso" },
     { nombre: "hita-beige-59.5x59.5", marca: "nitropiso" },

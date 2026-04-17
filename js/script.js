@@ -258,7 +258,7 @@ const misProductos = [
     { nombre: "timberwood-cafe-18x55", marca: "porcelanite" },
     { nombre: "tribe-glossy-gris-18x55", marca: "porcelanite" },
     { nombre: "tribe-glossy-natura-18x55", marca: "porcelanite" },
-    { nombre: "tribe-glosyy-cerezo-18x55", marca: "porcelanite" },
+    { nombre: "tribe-glossy-cerezo-18x55", marca: "porcelanite" },
     { nombre: "venecia-azul-20x20", marca: "porcelanite" },
     { nombre: "venecia-cobalto-20x20", marca: "porcelanite" },
     { nombre: "venecia-rosa-20x20", marca: "porcelanite" },

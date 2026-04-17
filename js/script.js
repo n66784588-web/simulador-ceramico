@@ -368,43 +368,16 @@ const misProductos = [
     { nombre: "zenia-black-36x50", marca: "vitromex" }
  
 ];
-
-// --- 2. MOTOR DE PROYECCIÓN ---
-function renderizarTextura(canvasId) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas || !texturaActual) return;
-    
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.src = texturaActual;
-
-    img.onload = () => {
-        const pts = [
-            { x: document.getElementById('p1').offsetLeft, y: document.getElementById('p1').offsetTop },
-            { x: document.getElementById('p2').offsetLeft, y: document.getElementById('p2').offsetTop },
-            { x: document.getElementById('p3').offsetLeft, y: document.getElementById('p3').offsetTop },
-            { x: document.getElementById('p4').offsetLeft, y: document.getElementById('p4').offsetTop }
-        ];
-
-        const viewport = document.getElementById('viewport');
-        canvas.width = viewport.clientWidth;
-        canvas.height = viewport.clientHeight;
-
-        const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
-        const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
-        
-        const transform = PerspectiveTransform(srcPts, dstPts);
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        canvas.style.transform = transform.getCSS();
-        canvas.style.transformOrigin = "0 0";
-        canvas.style.mixBlendMode = "multiply"; 
-        
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-    };
+function setModo(modo) {
+    modoEdicion = modo;
+    console.log("Modo cambiado a: " + modo);
 }
 
-// --- 3. INTERFAZ Y BOTONES ---
+function cambiarHabitacion(archivo) {
+    const bg = document.getElementById('bg-room');
+    if (bg) bg.src = 'img/habitaciones/' + archivo;
+}
+
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
@@ -416,29 +389,25 @@ function mostrarProductos(marca) {
             const card = document.createElement('div');
             card.className = 'tile-card';
             
+            // Ruta basada en tu estructura de carpetas
             const ruta = `img/ceramicas/${producto.nombre}.jpg`;
 
             card.innerHTML = `
-                <img src="${ruta}" onerror="this.src='img/ceramicas/${producto.nombre}.png'">
-                <p>${producto.nombre.replace(/-/g, ' ')}</p>
+                <img src="${ruta}" style="width:100%; cursor:pointer;">
+                <p style="color:white; font-size:12px;">${producto.nombre}</p>
             `;
 
             card.onclick = () => {
-                texturaActual = card.querySelector('img').src;
-                renderizarTextura('floor-canvas');
+                texturaActual = ruta;
+                renderizarTextura(modoEdicion === 'piso' ? 'floor-canvas' : 'wall-canvas');
             };
             contenedor.appendChild(card);
         }
     });
 }
 
-function cambiarHabitacion(archivo) {
-    const bg = document.getElementById('bg-room');
-    if (bg) bg.src = 'img/habitaciones/' + archivo;
-}
-
-// --- 4. INICIO ---
+// Inicializar el catálogo al cargar
 window.onload = () => {
-    console.log("Simulador cargado correctamente");
     mostrarProductos('todas');
 };
+

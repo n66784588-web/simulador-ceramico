@@ -1,6 +1,8 @@
-let texturaActual = 'img/ceramicas/acatlan-30x60.jpg';
+// 1. VARIABLES GLOBALES
+let texturaActual = 'img/ceramicas/parma-noce-44x44.jpg'; // Imagen por defecto
 let modoEdicion = 'piso';
 
+// 2. BASE DE DATOS (Asegúrate que el nombre sea misProductos)
 const misProductos = [
     // --- NITROPISO ---
     { nombre: "acatlan-30x60", marca: "nitropiso" },
@@ -369,6 +371,35 @@ const misProductos = [
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
     { nombre: "zenia-black-36x50", marca: "vitromex" }
 ];
+// 3. FUNCIÓN PARA MOSTRAR LAS IMÁGENES EN EL PANEL
+function mostrarProductos(marca) {
+    const contenedor = document.getElementById('catalog-container');
+    contenedor.innerHTML = ''; 
+
+    misProductos.forEach(foto => {
+        if (marca === 'todas' || foto.marca === marca) {
+            const card = document.createElement('div');
+            card.className = 'tile-card';
+            // Importante: agregar el .jpg aquí si tus nombres no lo tienen
+            card.innerHTML = `
+                <img src="img/ceramicas/${foto.nombre}.jpg" alt="${foto.nombre}">
+                <p>${foto.nombre}</p>
+            `;
+            
+            card.onclick = () => {
+                texturaActual = `img/ceramicas/${foto.nombre}.jpg`;
+                // Llamamos a la función de dibujo
+                dibujarPerspectiva('floor-canvas', ['p1', 'p2', 'p3', 'p4']);
+            };
+            contenedor.appendChild(card);
+        }
+    });
+}
+
+// Iniciar el catálogo al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    mostrarProductos('todas');
+});
 document.addEventListener('DOMContentLoaded', () => {
     const dots = document.querySelectorAll('.dot');
     let activeDot = null;

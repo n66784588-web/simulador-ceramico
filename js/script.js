@@ -144,7 +144,7 @@ const misProductos = [
     { nombre: "carson-gris-44x44", marca: "porcelanite" },
     { nombre: "carson-oxford-25x40", marca: "porcelanite" },
     { nombre: "carson-oxford-44x44", marca: "porcelanite" },
-    { nombre: "cassalorru-brillante-44x44", marca: "porcelanite" },
+    { nombre: "cassalotti-brillante-44x44", marca: "porcelanite" },
     { nombre: "cassalotti-mate-44x44", marca: "porcelanite" },
     { nombre: "creel-glossy-blanco-30x60", marca: "porcelanite" },
     { nombre: "croce-cafe-33x33", marca: "porcelanite" },

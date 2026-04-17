@@ -395,7 +395,15 @@ function mostrarProductos(marca) {
             `;
 card.onclick = () => {
     texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
-    console.log("Nueva textura: " + texturaActual);
+    console.log("Cambiando textura a: " + texturaActual);
+    
+    // Si elegiste 'piso', dibujamos en el floor-canvas
+    if (modoEdicion === 'piso') {
+        renderizarTextura('floor-canvas');
+    } else {
+        renderizarTextura('wall-canvas');
+    }
+};
     
     // ESTA LÍNEA ES LA QUE HACE LA MAGIA:
     const piso = document.getElementById('bg-room'); // O el ID de tu capa de piso

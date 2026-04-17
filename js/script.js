@@ -90,7 +90,7 @@ const misProductos = [
     { nombre: "quartz-gris-60x60", marca: "nitropiso" },
     { nombre: "quartz-negro-60x60", marca: "nitropiso" },
     { nombre: "rivalta-cafe-20x60", marca: "nitropiso" },
-    { nombre: "rock-clover-60x60", marca: "nitropiso" },
+    { nombre: "rock-clover-negro-60x60", marca: "nitropiso" },
     { nombre: "rock-clover-gris-60x60", marca: "nitropiso" },
     { nombre: "san-diego-50x50", marca: "nitropiso" },
     { nombre: "shangai-33x33", marca: "nitropiso" },

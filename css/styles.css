@@ -1,172 +1,36 @@
-/* Estructura General */
-body {
-    margin: 0;
-    font-family: sans-serif;
-    background-color: #1a1a1a;
-    color: white;
-}
+body { margin: 0; display: flex; background: #121212; font-family: sans-serif; height: 100vh; overflow: hidden; }
 
-.simulator-layout {
-    display: flex;
-    height: 100vh;
-}
+#viewport { position: relative; width: 75%; height: 100%; background: #000; overflow: hidden; }
+#bg-room { width: 100%; height: 100%; object-fit: cover; }
 
-/* Área del Simulador (Izquierda) */
-.viewport {
-    flex: 1;
-    position: relative;
-    background-color: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
+canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 
-#bg-room {
-    max-width: 100%;
-    max-height: 100%;
-    display: block;
-}
+.dot { position: absolute; width: 12px; height: 12px; background: #007bff; border: 2px solid white; border-radius: 50%; cursor: move; z-index: 10; }
 
-/* El Canvas donde se dibujará el piso */
-#floor-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    pointer-events: none; /* Para que no estorbe al mover los puntos */
-}
+/* Botones de Habitaciones (Izquierda) */
+.room-controls { position: absolute; top: 20px; left: 20px; display: flex; gap: 10px; }
+.room-controls button { padding: 10px 15px; background: rgba(0,0,0,0.7); color: white; border: 1px solid #fff; border-radius: 5px; cursor: pointer; }
 
-/* Los Puntos de Control (P1-P4) */
-.dot {
-    width: 15px;
-    height: 15px;
-    background-color: #007bff;
-    border: 2px solid white;
-    border-radius: 50%;
-    position: absolute;
-    cursor: move;
-    z-index: 10;
-    transform: translate(-50%, -50%);
-}
+/* Panel de Catálogo (Derecha) */
+.catalog-panel { width: 25%; background: #1a1a1a; display: flex; flex-direction: column; border-left: 2px solid #333; }
 
-/* Área del Catálogo (Derecha) */
-.catalog {
-    width: 380px;
-    background-color: #252525;
-    display: flex;
-    flex-direction: column;
-    border-left: 1px solid #444;
-}
-
-.brand-filters {
-    padding: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    border-bottom: 1px solid #444;
-}
-
-.brand-filters button {
-    background: #444;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.brand-filters button:hover {
-    background: #007bff;
-}
-
-#catalog-container {
-    flex: 1;
-    overflow-y: auto;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    padding: 15px;
-}
-.tile-card {
-    width: 120px; /* Tamaño de la miniatura */
-    margin: 10px;
-    text-align: center;
-    color: white;
-    cursor: pointer;
-    display: inline-block;
-}
-
-.tile-card img {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 2px solid transparent;
-}
-
-.tile-card:hover img {
-    border-color: #007bff;
-}
-
-.tile-card p {
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-
-.room-selector {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    z-index: 100;
-    display: flex;
-    gap: 8px;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 8px;
-    border-radius: 8px;
-}
-
-.room-selector button {
-    background: #333;
-    color: white;
-    border: 1px solid #555;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
+.brand-filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: #222; justify-content: center; }
+.brand-filters button { 
+    padding: 12px 18px; 
+    font-size: 14px; 
+    font-weight: bold; 
+    text-transform: uppercase; 
+    background: #444; 
+    color: white; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
     transition: 0.3s;
 }
+.brand-filters button:hover { background: #007bff; }
 
-.room-selector button:hover {
-    background: #007bff;
-    border-color: white;
-}
-/* Contenedor de botones de marcas */
-.brand-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 15px;
-    justify-content: center;
-    background: #222; /* Fondo para que resalten */
-}
+#catalog-container { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; }
 
-/* Estilo de los botones */
-.brand-filters button {
-    padding: 12px 20px;
-    font-size: 16px; /* Letra más grande */
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    background-color: #444;
-    color: white;
-    transition: background 0.3s;
-}
-
-/* Color al pasar el mouse */
-.brand-filters button:hover {
-    background-color: #007bff;
-}
+.tile-card { background: #2a2a2a; padding: 8px; border-radius: 8px; cursor: pointer; text-align: center; }
+.tile-card img { width: 100%; border-radius: 4px; height: 100px; object-fit: cover; }
+.tile-card p { color: #eee; font-size: 11px; margin-top: 5px; word-break: break-all; }

@@ -1,8 +1,8 @@
-// 1. VARIABLES GLOBALES
-let texturaActual = 'img/ceramicas/parma-noce-44x44.jpg'; // Imagen por defecto
+// 1. CONFIGURACIÓN Y VARIABLES GLOBALES
+let texturaActual = 'img/ceramicas/acatlan-30x60.jpg';
 let modoEdicion = 'piso';
 
-// 2. BASE DE DATOS (Asegúrate que el nombre sea misProductos)
+// 2. BASE DE DATOS DE PRODUCTOS
 const misProductos = [
     // --- NITROPISO ---
     { nombre: "acatlan-30x60", marca: "nitropiso" },
@@ -371,35 +371,7 @@ const misProductos = [
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
     { nombre: "zenia-black-36x50", marca: "vitromex" }
 ];
-// 3. FUNCIÓN PARA MOSTRAR LAS IMÁGENES EN EL PANEL
-function mostrarProductos(marca) {
-    const contenedor = document.getElementById('catalog-container');
-    contenedor.innerHTML = ''; 
 
-    misProductos.forEach(foto => {
-        if (marca === 'todas' || foto.marca === marca) {
-            const card = document.createElement('div');
-            card.className = 'tile-card';
-            // Importante: agregar el .jpg aquí si tus nombres no lo tienen
-            card.innerHTML = `
-                <img src="img/ceramicas/${foto.nombre}.jpg" alt="${foto.nombre}">
-                <p>${foto.nombre}</p>
-            `;
-            
-            card.onclick = () => {
-                texturaActual = `img/ceramicas/${foto.nombre}.jpg`;
-                // Llamamos a la función de dibujo
-                dibujarPerspectiva('floor-canvas', ['p1', 'p2', 'p3', 'p4']);
-            };
-            contenedor.appendChild(card);
-        }
-    });
-}
-
-// Iniciar el catálogo al cargar
-document.addEventListener('DOMContentLoaded', () => {
-    mostrarProductos('todas');
-});
 document.addEventListener('DOMContentLoaded', () => {
     const dots = document.querySelectorAll('.dot');
     let activeDot = null;
@@ -424,8 +396,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function dibujarActual() {
-    if (modoEdicion === 'piso') dibujarPerspectiva('floor-canvas', ['p1','p2','p3','p4']);
-    else dibujarPerspectiva('wall-canvas', ['w1','w2','w3','w4']);
+    if (modoEdicion === 'piso') {
+        dibujarPerspectiva('floor-canvas', ['p1', 'p2', 'p3', 'p4']);
+    } else {
+        dibujarPerspectiva('wall-canvas', ['w1', 'w2', 'w3', 'w4']);
+    }
 }
 
 function dibujarPerspectiva(canvasId, dotIds) {
@@ -440,17 +415,19 @@ function dibujarPerspectiva(canvasId, dotIds) {
     img.onload = () => {
         const puntos = dotIds.map(id => {
             const el = document.getElementById(id);
-            return [parseFloat(el.style.left) * canvas.width / 100, parseFloat(el.style.top) * canvas.height / 100];
+            return [
+                (parseFloat(el.style.left) * canvas.width) / 100,
+                (parseFloat(el.style.top) * canvas.height) / 100
+            ];
         });
 
-        // Aquí se requiere la librería perspective-transform cargada en el HTML
         const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
         const dstPts = puntos.flat();
         const p = perspectiveTransform(srcPts, dstPts);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // Lógica simplificada de dibujado
-        p.draw(img); // Esto requiere que la librería esté bien vinculada
+        p.update();
+        ctx.drawImage(img, 0, 0); // Nota: Aquí la librería hace la magia
     };
 }
 
@@ -472,8 +449,4 @@ function mostrarProductos(marca) {
             contenedor.appendChild(card);
         }
     });
-}
-
-function cambiarHabitacion(archivo) {
-    document.getElementById('bg-room').src = 'img/habitaciones/' + archivo;
 }

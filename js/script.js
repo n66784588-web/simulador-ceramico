@@ -450,3 +450,14 @@ function mostrarProductos(marca) {
         }
     });
 }
+// Función para cambiar la imagen de fondo (la habitación)
+function cambiarHabitacion(nombreArchivo) {
+    const bg = document.getElementById('bg-room');
+    if (bg) {
+        // Esta línea busca la foto dentro de tu carpeta img/habitaciones/
+        bg.src = 'img/habitaciones/' + nombreArchivo;
+        console.log("Cambiando a: " + nombreArchivo);
+    } else {
+        console.error("No se encontró el elemento bg-room");
+    }
+}

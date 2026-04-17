@@ -1,8 +1,8 @@
-// --- CONFIGURACIÓN Y ESTADO ---
+// --- 1. CONFIGURACIÓN Y ESTADO ---
 let texturaActual = 'img/ceramicas/acatlan-30x60.jpg';
 let modoEdicion = 'piso';
 
-// --- BASE DE DATOS DE PRODUCTOS ---
+// --- 2. BASE DE DATOS DE PRODUCTOS ---
 const misProductos = [
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
@@ -369,8 +369,7 @@ const misProductos = [
     { nombre: "zenia-black-36x50", marca: "vitromex" }
 ]; // <--- ESTE CORCHETE Y PUNTO Y COMA FALTABAN
 
-
-// --- FUNCIONES DEL SIMULADOR ---
+// --- 3. FUNCIONES DE NAVEGACIÓN ---
 function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) {
@@ -379,6 +378,7 @@ function cambiarHabitacion(archivo) {
     }
 }
 
+// --- 4. CATÁLOGO ---
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
@@ -393,17 +393,23 @@ function mostrarProductos(marca) {
                 <img src="img/ceramicas/${producto.nombre}.jpg" onerror="this.src='img/error.png'">
                 <p>${producto.nombre.replace(/-/g, ' ')}</p>
             `;
-card.onclick = () => {
-    texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
-    console.log("Cambiando textura a: " + texturaActual);
-    
-    // Si elegiste 'piso', dibujamos en el floor-canvas
-    if (modoEdicion === 'piso') {
-        renderizarTextura('floor-canvas');
-    } else {
-        renderizarTextura('wall-canvas');
-    }
-};
+
+            card.onclick = () => {
+                texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
+                console.log("Cambiando textura a: " + texturaActual);
+                
+                if (modoEdicion === 'piso') {
+                    renderizarTextura('floor-canvas');
+                } else {
+                    renderizarTextura('wall-canvas');
+                }
+            };
+            contenedor.appendChild(card);
+        }
+    }); // Cierre del forEach
+} // Cierre de mostrarProductos
+
+// --- 5. LÓGICA DEL RENDERIZADO (PERSPECTIVA) ---
 function renderizarTextura(canvasId) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
@@ -411,7 +417,6 @@ function renderizarTextura(canvasId) {
     img.src = texturaActual;
 
     img.onload = () => {
-        // Obtenemos los 4 puntos de las esquinas (los puntos azules)
         const pts = [
             { x: document.getElementById('p1').offsetLeft, y: document.getElementById('p1').offsetTop },
             { x: document.getElementById('p2').offsetLeft, y: document.getElementById('p2').offsetTop },
@@ -419,23 +424,26 @@ function renderizarTextura(canvasId) {
             { x: document.getElementById('p4').offsetLeft, y: document.getElementById('p4').offsetTop }
         ];
 
-        // Esto usa la librería perspective-transform que pusiste en el HTML
         const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
         const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
+        
+        // PerspectiveTransform viene de la librería externa en tu HTML
         const transform = PerspectiveTransform(srcPts, dstPts);
 
-        // Ajustamos el canvas y dibujamos
         canvas.width = canvas.parentElement.clientWidth;
         canvas.height = canvas.parentElement.clientHeight;
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Aplicamos la transformación visual
         canvas.style.transform = transform.getCSS();
         canvas.style.transformOrigin = "0 0";
+        canvas.style.mixBlendMode = "multiply"; 
         
         ctx.drawImage(img, 0, 0, img.width, img.height);
     };
-}    
-    
+}
 
+// Inicializar el catálogo al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    mostrarProductos('todas');
+});

@@ -1,6 +1,6 @@
 // --- 1. CONFIGURACIÓN Y ESTADO ---
 let texturaActual = ''; 
-let modoEdicion = 'piso'; // Por defecto empezamos configurando el piso
+let modoEdicion = 'piso';
 
 // --- 2. BASE DE DATOS DE PRODUCTOS ---
 const misProductos = [
@@ -369,7 +369,7 @@ const misProductos = [
     { nombre: "zenia-black-36x50", marca: "vitromex" }
 ]; // <--- ESTE CORCHETE Y PUNTO Y COMA FALTABAN
 
-// --- 3. FUNCIONES DE RENDERIZADO (LA MAGIA) ---
+// --- 3. FUNCIONES DE RENDERIZADO ---
 function renderizarTextura(canvasId) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
@@ -385,7 +385,6 @@ function renderizarTextura(canvasId) {
             { x: document.getElementById('p4').offsetLeft, y: document.getElementById('p4').offsetTop }
         ];
 
-        // Ajustamos el canvas al contenedor principal
         const viewport = document.getElementById('viewport');
         canvas.width = viewport ? viewport.clientWidth : window.innerWidth;
         canvas.height = viewport ? viewport.clientHeight : window.innerHeight;
@@ -409,27 +408,18 @@ function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) bg.src = 'img/habitaciones/' + archivo;
 }
+
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
-    if (!contenedor) {
-        console.error("No se encontró el contenedor del catálogo");
-        return;
-    }
+    if (!contenedor) return;
     
-    contenedor.innerHTML = ''; // Limpiamos el panel
-
-    // Verifica que misProductos exista y tenga datos
-    if (typeof misProductos === 'undefined' || misProductos.length === 0) {
-        contenedor.innerHTML = '<p style="color:white; padding:20px;">No hay productos cargados</p>';
-        return;
-    }
+    contenedor.innerHTML = ''; 
 
     misProductos.forEach(producto => {
         if (marca === 'todas' || producto.marca === marca) {
             const card = document.createElement('div');
             card.className = 'tile-card';
             
-            // Usamos la ruta completa a tu carpeta de GitHub
             const nombreImagen = producto.nombre;
             const rutaImagen = `img/ceramicas/${nombreImagen}.jpg`;
 
@@ -442,8 +432,6 @@ function mostrarProductos(marca) {
 
             card.onclick = () => {
                 texturaActual = card.querySelector('img').src;
-                console.log("Cargando textura:", texturaActual);
-                
                 if (modoEdicion === 'piso') {
                     renderizarTextura('floor-canvas');
                 } else {
@@ -455,13 +443,7 @@ function mostrarProductos(marca) {
     });
 }
 
-
-// --- 5. ARRANQUE AL CARGAR ---
-window.onload = () => {
-    mostrarProductos('todas');
-};
-
-// --- 5. ARRANQUE ---
+// --- 5. ÚNICA FUNCIÓN DE ARRANQUE ---
 window.onload = () => {
     mostrarProductos('todas');
 };

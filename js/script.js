@@ -55,7 +55,7 @@ const misProductos = [
     { nombre: "huizache-cognac-33x33", marca: "nitropiso" },
     { nombre: "iguazu-miel-20x60", marca: "nitropiso" },
     { nombre: "iguazu-cafe-20x60", marca: "nitropiso" },
-    { nombre: "ipana-45x90", marca: "nitropiso" },
+    { nombre: "ipina-45x90", marca: "nitropiso" },
     { nombre: "liverpool-44x44", marca: "nitropiso" },
     { nombre: "loreto-beige-50x50", marca: "nitropiso" },
     { nombre: "lublin-blanco-30x60", marca: "nitropiso" },

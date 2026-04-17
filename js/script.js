@@ -409,23 +409,41 @@ function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) bg.src = 'img/habitaciones/' + archivo;
 }
-
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
-    if (!contenedor) return;
-    contenedor.innerHTML = ''; 
+    if (!contenedor) {
+        console.error("No se encontró el contenedor del catálogo");
+        return;
+    }
+    
+    contenedor.innerHTML = ''; // Limpiamos el panel
+
+    // Verifica que misProductos exista y tenga datos
+    if (typeof misProductos === 'undefined' || misProductos.length === 0) {
+        contenedor.innerHTML = '<p style="color:white; padding:20px;">No hay productos cargados</p>';
+        return;
+    }
 
     misProductos.forEach(producto => {
         if (marca === 'todas' || producto.marca === marca) {
             const card = document.createElement('div');
             card.className = 'tile-card';
+            
+            // Usamos la ruta completa a tu carpeta de GitHub
+            const nombreImagen = producto.nombre;
+            const rutaImagen = `img/ceramicas/${nombreImagen}.jpg`;
+
             card.innerHTML = `
-                <img src="img/ceramicas/${producto.nombre}.jpg" onerror="this.src='img/error.png'">
-                <p>${producto.nombre.replace(/-/g, ' ')}</p>
+                <img src="${rutaImagen}" 
+                     onerror="this.onerror=null; this.src='img/ceramicas/${nombreImagen}.png';" 
+                     style="width:100%; height:100px; object-fit:cover;">
+                <p style="color:white; font-size:10px;">${nombreImagen.replace(/-/g, ' ')}</p>
             `;
 
             card.onclick = () => {
-                texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
+                texturaActual = card.querySelector('img').src;
+                console.log("Cargando textura:", texturaActual);
+                
                 if (modoEdicion === 'piso') {
                     renderizarTextura('floor-canvas');
                 } else {
@@ -436,6 +454,7 @@ function mostrarProductos(marca) {
         }
     });
 }
+
 
 // --- 5. ARRANQUE AL CARGAR ---
 window.onload = () => {

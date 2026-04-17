@@ -368,6 +368,46 @@ const misProductos = [
     { nombre: "zenia-black-36x50", marca: "vitromex" }
  
 ];
+function renderizarTextura() {
+    // Determinamos en qué canvas dibujar según el botón de "Piso" o "Muro"
+    const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
+    const canvas = document.getElementById(canvasId);
+    
+    if (!canvas || !texturaActual) return;
+    
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = texturaActual;
+
+    img.onload = () => {
+        // Obtenemos la posición de tus puntos azules (p1, p2, p3, p4)
+        const pts = [
+            { x: document.getElementById('p1').offsetLeft, y: document.getElementById('p1').offsetTop },
+            { x: document.getElementById('p2').offsetLeft, y: document.getElementById('p2').offsetTop },
+            { x: document.getElementById('p3').offsetLeft, y: document.getElementById('p3').offsetTop },
+            { x: document.getElementById('p4').offsetLeft, y: document.getElementById('p4').offsetTop }
+        ];
+
+        const viewport = document.getElementById('viewport');
+        canvas.width = viewport.clientWidth;
+        canvas.height = viewport.clientHeight;
+
+        // Aplicamos la transformación de perspectiva
+        const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
+        const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
+        
+        const transform = PerspectiveTransform(srcPts, dstPts);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.style.transform = transform.getCSS();
+        canvas.style.transformOrigin = "0 0";
+        
+        // El modo multiply ayuda a que se vea la sombra real del piso debajo
+        canvas.style.mixBlendMode = "multiply"; 
+        
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+    };
+}
 function setModo(modo) {
     modoEdicion = modo;
     console.log("Modo cambiado a: " + modo);

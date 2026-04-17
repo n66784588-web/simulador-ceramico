@@ -471,3 +471,34 @@ function dibujarPerspectiva(canvasId, dotIds) {
         ]);
     };
 }
+function mostrarProductos(marca) {
+    const contenedor = document.getElementById('catalog-container');
+    contenedor.innerHTML = ''; // Limpia el catálogo antes de mostrar nuevos
+
+    // Filtramos los productos según la marca seleccionada
+    misProductos.forEach(foto => {
+        if (marca === 'todas' || foto.marca === marca) {
+            const card = document.createElement('div');
+            card.className = 'tile-card';
+            
+            // Creamos la imagen de la miniatura
+            card.innerHTML = `
+                <img src="img/ceramicas/${foto.nombre}.jpg" alt="${foto.nombre}">
+                <p>${foto.nombre}</p>
+            `;
+
+            // Configuramos que al hacer clic se "pinte" el suelo o pared
+            card.onclick = () => {
+                texturaActual = `img/ceramicas/${foto.nombre}.jpg`;
+                
+                if (modoEdicion === 'piso') {
+                    dibujarPerspectiva('floor-canvas', ['p1', 'p2', 'p3', 'p4']);
+                } else {
+                    dibujarPerspectiva('wall-canvas', ['w1', 'w2', 'w3', 'w4']);
+                }
+            };
+
+            contenedor.appendChild(card);
+        }
+    });
+}

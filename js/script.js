@@ -1,8 +1,8 @@
-// 1. CONFIGURACIÓN INICIAL
+// --- CONFIGURACIÓN Y ESTADO ---
 let texturaActual = 'img/ceramicas/acatlan-30x60.jpg';
 let modoEdicion = 'piso';
 
-// 2. BASE DE DATOS
+// --- BASE DE DATOS DE PRODUCTOS ---
 const misProductos = [
 
     { nombre: "acatlan-30x60", marca: "nitropiso" },
@@ -379,27 +379,33 @@ function cambiarHabitacion(archivo) {
         console.log("Cargando: " + bg.src);
     }
 }
-
-// 4. MOSTRAR PRODUCTOS EN EL PANEL
+// --- FUNCIONES DE CATÁLOGO ---
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
-    contenedor.innerHTML = '';
-    misProductos.forEach(foto => {
-        if (marca === 'todas' || foto.marca === marca) {
+    
+    contenedor.innerHTML = ''; // Limpiar panel
+    
+    misProductos.forEach(producto => {
+        if (marca === 'todas' || producto.marca === marca) {
             const card = document.createElement('div');
             card.className = 'tile-card';
-            card.innerHTML = `<img src="img/ceramicas/${foto.nombre}.jpg"><p>${foto.nombre}</p>`;
+            card.innerHTML = `
+                <img src="img/ceramicas/${producto.nombre}.jpg">
+                <p>${producto.nombre}</p>
+            `;
             card.onclick = () => {
-                texturaActual = `img/ceramicas/${foto.nombre}.jpg`;
-                console.log("Piso seleccionado: " + texturaActual);
+                texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
+                console.log("Nueva textura: " + texturaActual);
             };
             contenedor.appendChild(card);
         }
     });
 }
 
-// Inicializar al cargar
+// --- INICIALIZACIÓN AL CARGAR LA PÁGINA ---
 document.addEventListener('DOMContentLoaded', () => {
     mostrarProductos('todas');
+    console.log("Simulador listo.");
 });
+

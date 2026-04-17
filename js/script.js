@@ -371,30 +371,8 @@ const misProductos = [
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
     { nombre: "zenia-black-36x50", marca: "vitromex" }
 ];
-// 3. INICIO DEL SISTEMA
-document.addEventListener('DOMContentLoaded', () => {
-    const dots = document.querySelectorAll('.dot');
-    let activeDot = null;
 
-    dots.forEach(dot => {
-        dot.addEventListener('mousedown', () => activeDot = dot);
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!activeDot) return;
-        const rect = document.getElementById('viewport').getBoundingClientRect();
-        let x = ((e.clientX - rect.left) / rect.width) * 100;
-        let y = ((e.clientY - rect.top) / rect.height) * 100;
-        activeDot.style.left = Math.max(0, Math.min(100, x)) + '%';
-        activeDot.style.top = Math.max(0, Math.min(100, y)) + '%';
-        dibujarActual();
-    });
-
-    document.addEventListener('mouseup', () => activeDot = null);
-    mostrarProductos('todas');
-});
-
-// 4. FUNCIONES DE CATÁLOGO Y HABITACIÓN
+// 3. FUNCIONES PRINCIPALES
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
@@ -406,21 +384,24 @@ function mostrarProductos(marca) {
             card.innerHTML = `<img src="img/ceramicas/${foto.nombre}.jpg"><p>${foto.nombre}</p>`;
             card.onclick = () => {
                 texturaActual = `img/ceramicas/${foto.nombre}.jpg`;
-                dibujarActual();
+                console.log("Seleccionado: " + texturaActual);
             };
             contenedor.appendChild(card);
         }
     });
 }
 
+// ESTA ES LA FUNCIÓN QUE TE FALTA PARA LAS HABITACIONES
 function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
-    if (bg) bg.src = 'img/habitaciones/' + archivo;
+    if (bg) {
+        // Buscamos en la carpeta img/habitaciones/
+        bg.src = 'img/habitaciones/' + archivo;
+        console.log("Cambiando a: " + archivo);
+    }
 }
 
-function dibujarActual() {
-    // Aquí iría tu lógica de perspectiva
-    console.log("Dibujando con: " + texturaActual);
-}
-
-   
+// 4. INICIALIZACIÓN
+document.addEventListener('DOMContentLoaded', () => {
+    mostrarProductos('todas');
+});

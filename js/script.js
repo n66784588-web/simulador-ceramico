@@ -1,6 +1,6 @@
 // --- 1. CONFIGURACIÓN Y ESTADO ---
-let texturaActual = 'img/ceramicas/acatlan-30x60.jpg';
-let modoEdicion = 'piso';
+let texturaActual = ''; 
+let modoEdicion = 'piso'; // Por defecto empezamos configurando el piso
 
 // --- 2. BASE DE DATOS DE PRODUCTOS ---
 const misProductos = [

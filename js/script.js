@@ -385,13 +385,14 @@ function renderizarTextura(canvasId) {
             { x: document.getElementById('p4').offsetLeft, y: document.getElementById('p4').offsetTop }
         ];
 
-        canvas.width = document.getElementById('viewport').clientWidth;
-        canvas.height = document.getElementById('viewport').clientHeight;
+        // Ajustamos el canvas al contenedor principal
+        const viewport = document.getElementById('viewport');
+        canvas.width = viewport ? viewport.clientWidth : window.innerWidth;
+        canvas.height = viewport ? viewport.clientHeight : window.innerHeight;
 
         const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
         const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
         
-        // PerspectiveTransform viene de la librería externa en tu HTML
         const transform = PerspectiveTransform(srcPts, dstPts);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -435,6 +436,11 @@ function mostrarProductos(marca) {
         }
     });
 }
+
+// --- 5. ARRANQUE AL CARGAR ---
+window.onload = () => {
+    mostrarProductos('todas');
+};
 
 // --- 5. ARRANQUE ---
 window.onload = () => {

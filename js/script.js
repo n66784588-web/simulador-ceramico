@@ -368,8 +368,10 @@ const misProductos = [
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
     { nombre: "zenia-black-36x50", marca: "vitromex" }
 ]; // <--- ESTE CORCHETE Y PUNTO Y COMA FALTABAN
+{ nombre: "zenia-black-36x50", marca: "vitromex" }
+]; // <--- ESTO ES LO QUE CIERRA LA LISTA
 
-// --- 3. CAMBIAR HABITACIÓN ---
+// --- FUNCIONES DEL SIMULADOR ---
 function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) {
@@ -378,12 +380,11 @@ function cambiarHabitacion(archivo) {
     }
 }
 
-// --- FUNCIONES DE CATÁLOGO ---
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
     
-    contenedor.innerHTML = ''; // Limpiar panel
+    contenedor.innerHTML = ''; 
     
     misProductos.forEach(producto => {
         if (marca === 'todas' || producto.marca === marca) {
@@ -395,16 +396,13 @@ function mostrarProductos(marca) {
             `;
             card.onclick = () => {
                 texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
-                console.log("Nueva textura seleccionada: " + texturaActual);
+                console.log("Nueva textura: " + texturaActual);
             };
             contenedor.appendChild(card);
         }
     });
 }
 
-// --- INICIALIZACIÓN AL CARGAR LA PÁGINA ---
 document.addEventListener('DOMContentLoaded', () => {
     mostrarProductos('todas');
-    console.log("Simulador listo.");
 });
-

@@ -224,7 +224,7 @@ const misProductos = [
     { nombre: "naturawood-caoba-18x55", marca: "porcelanite" },
     { nombre: "naturawood-natura-18x55", marca: "porcelanite" },
     { nombre: "naturawood-natura-brillante-18x55", marca: "porcelanite" },
-    { nombre: "nevada-balnco-brillante-2da-25x40", marca: "porcelanite" },
+    { nombre: "nevada-blanco-brillante-2da-25x40", marca: "porcelanite" },
     { nombre: "nival-blanco-20x30", marca: "porcelanite" },
     { nombre: "nival-carrara-white-20x20", marca: "porcelanite" },
     { nombre: "nival-oxford-20x20", marca: "porcelanite" },

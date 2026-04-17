@@ -1,10 +1,8 @@
-// 1. CONFIGURACIÓN Y ESTADO
+// --- CONFIGURACIÓN Y ESTADO ---
 let texturaActual = 'img/ceramicas/acatlan-30x60.jpg';
 let modoEdicion = 'piso';
-let imagenTextura = new Image();
-imagenTextura.src = texturaActual;
 
-// 2. TU BASE DE DATOS (Lista optimizada)
+// --- BASE DE DATOS DE PRODUCTOS ---
 const misProductos = [
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
@@ -369,121 +367,44 @@ const misProductos = [
     { nombre: "yukon-cream-55x55", marca: "vitromex" },
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
     { nombre: "zenia-black-36x50", marca: "vitromex" }
-];
+]; // <--- ESTE CORCHETE Y PUNTO Y COMA FALTABAN
 
-// --- FUNCIONES DE LÓGICA ---
-
-// 3. CAMBIAR HABITACIÓN
+// --- 3. CAMBIAR HABITACIÓN ---
 function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) {
         bg.src = 'img/habitaciones/' + archivo;
-        // Al cambiar de cuarto, limpiamos los lienzos para evitar basura visual
-        limpiarCanvas();
+        console.log("Cargando habitación: " + bg.src);
     }
 }
 
-// 4. MOSTRAR PRODUCTOS
+// --- FUNCIONES DE CATÁLOGO ---
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
-    contenedor.innerHTML = '';
     
-    misProductos.forEach(p => {
-        if (marca === 'todas' || p.marca === marca) {
+    contenedor.innerHTML = ''; // Limpiar panel
+    
+    misProductos.forEach(producto => {
+        if (marca === 'todas' || producto.marca === marca) {
             const card = document.createElement('div');
             card.className = 'tile-card';
-            card.innerHTML = `<img src="img/ceramicas/${p.nombre}.jpg"><p>${p.nombre}</p>`;
+            card.innerHTML = `
+                <img src="img/ceramicas/${producto.nombre}.jpg" onerror="this.src='img/error.png'">
+                <p>${producto.nombre.replace(/-/g, ' ')}</p>
+            `;
             card.onclick = () => {
-                texturaActual = `img/ceramicas/${p.nombre}.jpg`;
-                imagenTextura.src = texturaActual;
-                imagenTextura.onload = () => dibujarActual();
+                texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
+                console.log("Nueva textura seleccionada: " + texturaActual);
             };
             contenedor.appendChild(card);
         }
     });
 }
 
-// 5. LÓGICA DE DIBUJO (PERSPECTIVA REAL)
-function dibujarPerspectiva(canvasId, dotsIds) {
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext('2d');
-    const rect = document.getElementById('viewport').getBoundingClientRect();
-
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-
-    // Obtener coordenadas de los puntos azules
-    const pts = dotsIds.map(id => {
-        const d = document.getElementById(id);
-        return {
-            x: (parseFloat(d.style.left) / 100) * canvas.width,
-            y: (parseFloat(d.style.top) / 100) * canvas.height
-        };
-    });
-
-    // Crear la transformación (Usando la librería perspective-transform cargada en el index)
-    const srcPts = [0, 0, imagenTextura.width, 0, imagenTextura.width, imagenTextura.height, 0, imagenTextura.height];
-    const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
-    
-    const perspT = PerspT(srcPts, dstPts);
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Dibujamos la textura pixel por pixel o mediante patrón si prefieres repetición
-    // Para simplificar y que rinda, usaremos un patrón repetido
-    const pattern = ctx.createPattern(imagenTextura, 'repeat');
-    ctx.fillStyle = pattern;
-    
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y);
-    ctx.lineTo(pts[1].x, pts[1].y);
-    ctx.lineTo(pts[2].x, pts[2].y);
-    ctx.lineTo(pts[3].x, pts[3].y);
-    ctx.closePath();
-
-    // Aplicar la transformación de perspectiva
-    ctx.save();
-    const transform = perspT.coeffs;
-    ctx.transform(transform[0], transform[3], transform[1], transform[4], transform[2], transform[5]);
-    ctx.fill();
-    ctx.restore();
-}
-
-function dibujarActual() {
-    if (modoEdicion === 'piso') {
-        dibujarPerspectiva('floor-canvas', ['p1', 'p2', 'p3', 'p4']);
-    } else {
-        dibujarPerspectiva('wall-canvas', ['p1', 'p2', 'p3', 'p4']);
-    }
-}
-
-function limpiarCanvas() {
-    document.getElementById('floor-canvas').getContext('2d').clearRect(0,0,2000,2000);
-    document.getElementById('wall-canvas').getContext('2d').clearRect(0,0,2000,2000);
-}
-
-// 6. EVENTOS DE MOVIMIENTO DE PUNTOS
+// --- INICIALIZACIÓN AL CARGAR LA PÁGINA ---
 document.addEventListener('DOMContentLoaded', () => {
-    const dots = document.querySelectorAll('.dot');
-    let activeDot = null;
-
-    dots.forEach(dot => {
-        dot.addEventListener('mousedown', () => activeDot = dot);
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!activeDot) return;
-        const rect = document.getElementById('viewport').getBoundingClientRect();
-        let x = ((e.clientX - rect.left) / rect.width) * 100;
-        let y = ((e.clientY - rect.top) / rect.height) * 100;
-        
-        activeDot.style.left = Math.max(0, Math.min(100, x)) + '%';
-        activeDot.style.top = Math.max(0, Math.min(100, y)) + '%';
-        dibujarActual();
-    });
-
-    document.addEventListener('mouseup', () => activeDot = null);
-    
     mostrarProductos('todas');
+    console.log("Simulador listo.");
 });
+

@@ -88,27 +88,33 @@ body {
     gap: 10px;
     padding: 15px;
 }
-
 .tile-card {
-    background: #333;
-    padding: 5px;
-    border-radius: 4px;
-    cursor: pointer;
+    width: 120px; /* Tamaño de la miniatura */
+    margin: 10px;
     text-align: center;
+    color: white;
+    cursor: pointer;
+    display: inline-block;
 }
 
 .tile-card img {
     width: 100%;
-    border-radius: 2px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 2px solid transparent;
+}
+
+.tile-card:hover img {
+    border-color: #007bff;
 }
 
 .tile-card p {
-    font-size: 10px;
-    margin: 5px 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 12px;
+    margin-top: 5px;
 }
+
+
 .room-selector {
     position: absolute;
     top: 15px;

@@ -368,8 +368,7 @@ const misProductos = [
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
     { nombre: "zenia-black-36x50", marca: "vitromex" }
 ]; // <--- ESTE CORCHETE Y PUNTO Y COMA FALTABAN
-{ nombre: "zenia-black-36x50", marca: "vitromex" }
-]; // <--- ESTO ES LO QUE CIERRA LA LISTA
+
 
 // --- FUNCIONES DEL SIMULADOR ---
 function cambiarHabitacion(archivo) {
@@ -394,14 +393,18 @@ function mostrarProductos(marca) {
                 <img src="img/ceramicas/${producto.nombre}.jpg" onerror="this.src='img/error.png'">
                 <p>${producto.nombre.replace(/-/g, ' ')}</p>
             `;
-            card.onclick = () => {
-                texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
-                console.log("Nueva textura: " + texturaActual);
-            };
-            contenedor.appendChild(card);
-        }
-    });
-}
+card.onclick = () => {
+    texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
+    console.log("Nueva textura: " + texturaActual);
+    
+    // ESTA LÍNEA ES LA QUE HACE LA MAGIA:
+    const piso = document.getElementById('bg-room'); // O el ID de tu capa de piso
+    if(piso) {
+        // Aquí aplicas la lógica para cambiar el piso en tu escenario virtual
+        console.log("Cambiando piso a: " + texturaActual);
+    }
+};            
+          
 
 document.addEventListener('DOMContentLoaded', () => {
     mostrarProductos('todas');

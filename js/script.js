@@ -42,7 +42,7 @@ const misProductos = [
     { nombre: "coban-44x44", marca: "nitropiso" },
     { nombre: "concrete-gris-30x60", marca: "nitropiso" },
     { nombre: "copacabana-blanco-30x60", marca: "nitropiso" },
-    { nombre: "copacabana-gris-3x60", marca: "nitropiso" },
+    { nombre: "copacabana-gris-30x60", marca: "nitropiso" },
     { nombre: "cuzcu-blanco-50x50", marca: "nitropiso" },
     { nombre: "cuzco-rojo-50x50", marca: "nitropiso" },
     { nombre: "diamante-blanco-30x60", marca: "nitropiso" },

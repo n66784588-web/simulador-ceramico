@@ -417,7 +417,12 @@ function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) bg.src = 'img/habitaciones/' + archivo;
 }
-
+card.onclick = () => {
+    // Usamos la ruta completa de la imagen que ya cargó
+    texturaActual = card.querySelector('img').src; 
+    console.log("Seleccionada: " + texturaActual);
+    renderizarTextura(); // ¡Esta llamada es la que activa la proyección!
+};
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;

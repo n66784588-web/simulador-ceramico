@@ -371,8 +371,16 @@ const misProductos = [
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
     { nombre: "zenia-black-36x50", marca: "vitromex" }
 ];
+// 3. CAMBIAR HABITACIÓN
+function cambiarHabitacion(archivo) {
+    const bg = document.getElementById('bg-room');
+    if (bg) {
+        bg.src = 'img/habitaciones/' + archivo;
+        console.log("Cargando: " + bg.src);
+    }
+}
 
-// 3. FUNCIONES PRINCIPALES
+// 4. MOSTRAR PRODUCTOS EN EL PANEL
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
@@ -384,24 +392,14 @@ function mostrarProductos(marca) {
             card.innerHTML = `<img src="img/ceramicas/${foto.nombre}.jpg"><p>${foto.nombre}</p>`;
             card.onclick = () => {
                 texturaActual = `img/ceramicas/${foto.nombre}.jpg`;
-                console.log("Seleccionado: " + texturaActual);
+                console.log("Piso seleccionado: " + texturaActual);
             };
             contenedor.appendChild(card);
         }
     });
 }
 
-// ESTA ES LA FUNCIÓN QUE TE FALTA PARA LAS HABITACIONES
-function cambiarHabitacion(archivo) {
-    const bg = document.getElementById('bg-room');
-    if (bg) {
-        // Buscamos en la carpeta img/habitaciones/
-        bg.src = 'img/habitaciones/' + archivo;
-        console.log("Cambiando a: " + archivo);
-    }
-}
-
-// 4. INICIALIZACIÓN
+// Inicializar al cargar
 document.addEventListener('DOMContentLoaded', () => {
     mostrarProductos('todas');
 });

@@ -219,7 +219,7 @@ const misProductos = [
     { nombre: "mystone-cafe-36x36", marca: "porcelanite" },
     { nombre: "nagara-gris-30x60", marca: "porcelanite" },
     { nombre: "nagara-beige-30x60", marca: "porcelanite" },
-    { nombre: "naica-pul-silver-29.3x119", marca: "porcelanite" },
+    { nombre: "naica-pul-silver-59.3x119", marca: "porcelanite" },
     { nombre: "napoles-beige-55x55", marca: "porcelanite" },
     { nombre: "naturawood-caoba-18x55", marca: "porcelanite" },
     { nombre: "naturawood-natura-18x55", marca: "porcelanite" },

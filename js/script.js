@@ -175,7 +175,7 @@ const misProductos = [
     { nombre: "garea-gris-36x36", marca: "porcelanite" },
     { nombre: "harper-blanco-60x1.20", marca: "porcelanite" },
     { nombre: "holbein-black-60x60", marca: "porcelanite" },
-    { nombre: "holbein-done-60x60", marca: "porcelanite" },
+    { nombre: "holbein-bone-60x60", marca: "porcelanite" },
     { nombre: "jasper-beige-33x33", marca: "porcelanite" },
     { nombre: "jasper-cafe-33x33", marca: "porcelanite" },
     { nombre: "jasper-carrara-white-33x33", marca: "porcelanite" },

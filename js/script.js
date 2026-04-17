@@ -1,10 +1,10 @@
-// 1. CONFIGURACIÓN Y VARIABLES GLOBALES
+// 1. CONFIGURACIÓN INICIAL
 let texturaActual = 'img/ceramicas/acatlan-30x60.jpg';
 let modoEdicion = 'piso';
 
-// 2. BASE DE DATOS DE PRODUCTOS
+// 2. BASE DE DATOS
 const misProductos = [
-    // --- NITROPISO ---
+
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
     { nombre: "alhambra-gris-44x44", marca: "nitropiso" },
@@ -371,7 +371,7 @@ const misProductos = [
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
     { nombre: "zenia-black-36x50", marca: "vitromex" }
 ];
-
+// 3. INICIO DEL SISTEMA
 document.addEventListener('DOMContentLoaded', () => {
     const dots = document.querySelectorAll('.dot');
     let activeDot = null;
@@ -387,7 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let y = ((e.clientY - rect.top) / rect.height) * 100;
         activeDot.style.left = Math.max(0, Math.min(100, x)) + '%';
         activeDot.style.top = Math.max(0, Math.min(100, y)) + '%';
-        
         dibujarActual();
     });
 
@@ -395,53 +394,16 @@ document.addEventListener('DOMContentLoaded', () => {
     mostrarProductos('todas');
 });
 
-function dibujarActual() {
-    if (modoEdicion === 'piso') {
-        dibujarPerspectiva('floor-canvas', ['p1', 'p2', 'p3', 'p4']);
-    } else {
-        dibujarPerspectiva('wall-canvas', ['w1', 'w2', 'w3', 'w4']);
-    }
-}
-
-function dibujarPerspectiva(canvasId, dotIds) {
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext('2d');
-    const viewport = document.getElementById('viewport');
-    canvas.width = viewport.clientWidth;
-    canvas.height = viewport.clientHeight;
-
-    const img = new Image();
-    img.src = texturaActual;
-    img.onload = () => {
-        const puntos = dotIds.map(id => {
-            const el = document.getElementById(id);
-            return [
-                (parseFloat(el.style.left) * canvas.width) / 100,
-                (parseFloat(el.style.top) * canvas.height) / 100
-            ];
-        });
-
-        const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
-        const dstPts = puntos.flat();
-        const p = perspectiveTransform(srcPts, dstPts);
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        p.update();
-        ctx.drawImage(img, 0, 0); // Nota: Aquí la librería hace la magia
-    };
-}
-
+// 4. FUNCIONES DE CATÁLOGO Y HABITACIÓN
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
+    if (!contenedor) return;
     contenedor.innerHTML = '';
     misProductos.forEach(foto => {
         if (marca === 'todas' || foto.marca === marca) {
             const card = document.createElement('div');
             card.className = 'tile-card';
-            card.innerHTML = `
-                <img src="img/ceramicas/${foto.nombre}.jpg">
-                <p>${foto.nombre}</p>
-            `;
+            card.innerHTML = `<img src="img/ceramicas/${foto.nombre}.jpg"><p>${foto.nombre}</p>`;
             card.onclick = () => {
                 texturaActual = `img/ceramicas/${foto.nombre}.jpg`;
                 dibujarActual();
@@ -450,14 +412,15 @@ function mostrarProductos(marca) {
         }
     });
 }
-// Función para cambiar la imagen de fondo (la habitación)
-function cambiarHabitacion(nombreArchivo) {
+
+function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
-    if (bg) {
-        // Esta línea busca la foto dentro de tu carpeta img/habitaciones/
-        bg.src = 'img/habitaciones/' + nombreArchivo;
-        console.log("Cambiando a: " + nombreArchivo);
-    } else {
-        console.error("No se encontró el elemento bg-room");
-    }
+    if (bg) bg.src = 'img/habitaciones/' + archivo;
 }
+
+function dibujarActual() {
+    // Aquí iría tu lógica de perspectiva
+    console.log("Dibujando con: " + texturaActual);
+}
+
+   

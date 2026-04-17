@@ -404,16 +404,38 @@ card.onclick = () => {
         renderizarTextura('wall-canvas');
     }
 };
-    
-    // ESTA LÍNEA ES LA QUE HACE LA MAGIA:
-    const piso = document.getElementById('bg-room'); // O el ID de tu capa de piso
-    if(piso) {
-        // Aquí aplicas la lógica para cambiar el piso en tu escenario virtual
-        console.log("Cambiando piso a: " + texturaActual);
-    }
-};            
-          
+function renderizarTextura(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = texturaActual;
 
-document.addEventListener('DOMContentLoaded', () => {
-    mostrarProductos('todas');
-});
+    img.onload = () => {
+        // Obtenemos los 4 puntos de las esquinas (los puntos azules)
+        const pts = [
+            { x: document.getElementById('p1').offsetLeft, y: document.getElementById('p1').offsetTop },
+            { x: document.getElementById('p2').offsetLeft, y: document.getElementById('p2').offsetTop },
+            { x: document.getElementById('p3').offsetLeft, y: document.getElementById('p3').offsetTop },
+            { x: document.getElementById('p4').offsetLeft, y: document.getElementById('p4').offsetTop }
+        ];
+
+        // Esto usa la librería perspective-transform que pusiste en el HTML
+        const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
+        const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
+        const transform = PerspectiveTransform(srcPts, dstPts);
+
+        // Ajustamos el canvas y dibujamos
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Aplicamos la transformación visual
+        canvas.style.transform = transform.getCSS();
+        canvas.style.transformOrigin = "0 0";
+        
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+    };
+}    
+    
+

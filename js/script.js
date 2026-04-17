@@ -342,7 +342,7 @@ const misProductos = [
     { nombre: "peregrino-terracota-35.7x35.7", marca: "vitromex" },
     { nombre: "porto-ceniza-20x20", marca: "vitromex" },
     { nombre: "ranch-lux-castano-35.7x35.7", marca: "vitromex" },
-    { nombre: "real-de-catorce-35.7x35.7", marca: "vitromex" },
+    { nombre: "real-de-catorce-35.7x50.2", marca: "vitromex" },
     { nombre: "roma-gris-35x35", marca: "vitromex" },
     { nombre: "rubik-arena-20x20", marca: "vitromex" },
     { nombre: "rubik-azul-20x20", marca: "vitromex" },

@@ -3,7 +3,7 @@ let texturaActual = '';
 let modoEdicion = 'piso'; 
 
 const misProductos = [
-      { nombre: "acatlan-30x60", marca: "nitropiso" },
+    { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
     { nombre: "alhambra-gris-44x44", marca: "nitropiso" },
     { nombre: "alhambra-rojo-44x44", marca: "nitropiso" },
@@ -366,10 +366,10 @@ const misProductos = [
     { nombre: "yukon-cream-55x55", marca: "vitromex" },
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
     { nombre: "zenia-black-36x50", marca: "vitromex" }
- 
 ];
+
+// --- 2. MOTOR DE PROYECCIÓN ---
 function renderizarTextura() {
-    // Determinamos en qué canvas dibujar según el botón de "Piso" o "Muro"
     const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
     const canvas = document.getElementById(canvasId);
     
@@ -380,7 +380,6 @@ function renderizarTextura() {
     img.src = texturaActual;
 
     img.onload = () => {
-        // Obtenemos la posición de tus puntos azules (p1, p2, p3, p4)
         const pts = [
             { x: document.getElementById('p1').offsetLeft, y: document.getElementById('p1').offsetTop },
             { x: document.getElementById('p2').offsetLeft, y: document.getElementById('p2').offsetTop },
@@ -392,7 +391,6 @@ function renderizarTextura() {
         canvas.width = viewport.clientWidth;
         canvas.height = viewport.clientHeight;
 
-        // Aplicamos la transformación de perspectiva
         const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
         const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
         
@@ -401,13 +399,13 @@ function renderizarTextura() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         canvas.style.transform = transform.getCSS();
         canvas.style.transformOrigin = "0 0";
-        
-        // El modo multiply ayuda a que se vea la sombra real del piso debajo
         canvas.style.mixBlendMode = "multiply"; 
         
         ctx.drawImage(img, 0, 0, img.width, img.height);
     };
 }
+
+// --- 3. FUNCIONES DE INTERFAZ ---
 function setModo(modo) {
     modoEdicion = modo;
     console.log("Modo cambiado a: " + modo);
@@ -417,12 +415,7 @@ function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) bg.src = 'img/habitaciones/' + archivo;
 }
-card.onclick = () => {
-    // Usamos la ruta completa de la imagen que ya cargó
-    texturaActual = card.querySelector('img').src; 
-    console.log("Seleccionada: " + texturaActual);
-    renderizarTextura(); // ¡Esta llamada es la que activa la proyección!
-};
+
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
@@ -434,25 +427,24 @@ function mostrarProductos(marca) {
             const card = document.createElement('div');
             card.className = 'tile-card';
             
-            // Ruta basada en tu estructura de carpetas
             const ruta = `img/ceramicas/${producto.nombre}.jpg`;
 
             card.innerHTML = `
-                <img src="${ruta}" style="width:100%; cursor:pointer;">
-                <p style="color:white; font-size:12px;">${producto.nombre}</p>
+                <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.parentElement.style.display='none'">
+                <p style="color:white; font-size:10px; margin-top:5px;">${producto.nombre}</p>
             `;
 
             card.onclick = () => {
                 texturaActual = ruta;
-                renderizarTextura(modoEdicion === 'piso' ? 'floor-canvas' : 'wall-canvas');
+                console.log("Seleccionada: " + texturaActual);
+                renderizarTextura();
             };
             contenedor.appendChild(card);
         }
     });
 }
 
-// Inicializar el catálogo al cargar
+// --- 4. INICIO ---
 window.onload = () => {
     mostrarProductos('todas');
 };
-

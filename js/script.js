@@ -369,49 +369,10 @@ const misProductos = [
     { nombre: "zenia-black-36x50", marca: "vitromex" }
 ]; // <--- ESTE CORCHETE Y PUNTO Y COMA FALTABAN
 
-// --- 3. FUNCIONES DE NAVEGACIÓN ---
-function cambiarHabitacion(archivo) {
-    const bg = document.getElementById('bg-room');
-    if (bg) {
-        bg.src = 'img/habitaciones/' + archivo;
-        console.log("Cargando habitación: " + bg.src);
-    }
-}
-
-// --- 4. CATÁLOGO ---
-function mostrarProductos(marca) {
-    const contenedor = document.getElementById('catalog-container');
-    if (!contenedor) return;
-    
-    contenedor.innerHTML = ''; 
-    
-    misProductos.forEach(producto => {
-        if (marca === 'todas' || producto.marca === marca) {
-            const card = document.createElement('div');
-            card.className = 'tile-card';
-            card.innerHTML = `
-                <img src="img/ceramicas/${producto.nombre}.jpg" onerror="this.src='img/error.png'">
-                <p>${producto.nombre.replace(/-/g, ' ')}</p>
-            `;
-
-            card.onclick = () => {
-                texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
-                console.log("Cambiando textura a: " + texturaActual);
-                
-                if (modoEdicion === 'piso') {
-                    renderizarTextura('floor-canvas');
-                } else {
-                    renderizarTextura('wall-canvas');
-                }
-            };
-            contenedor.appendChild(card);
-        }
-    }); // Cierre del forEach
-} // Cierre de mostrarProductos
-
-// --- 5. LÓGICA DEL RENDERIZADO (PERSPECTIVA) ---
+// --- 3. FUNCIONES DE RENDERIZADO (LA MAGIA) ---
 function renderizarTextura(canvasId) {
     const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.src = texturaActual;
@@ -424,17 +385,16 @@ function renderizarTextura(canvasId) {
             { x: document.getElementById('p4').offsetLeft, y: document.getElementById('p4').offsetTop }
         ];
 
+        canvas.width = document.getElementById('viewport').clientWidth;
+        canvas.height = document.getElementById('viewport').clientHeight;
+
         const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
         const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
         
         // PerspectiveTransform viene de la librería externa en tu HTML
         const transform = PerspectiveTransform(srcPts, dstPts);
 
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
-        
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
         canvas.style.transform = transform.getCSS();
         canvas.style.transformOrigin = "0 0";
         canvas.style.mixBlendMode = "multiply"; 
@@ -443,7 +403,40 @@ function renderizarTextura(canvasId) {
     };
 }
 
-// Inicializar el catálogo al cargar
-document.addEventListener('DOMContentLoaded', () => {
+// --- 4. FUNCIONES DE INTERFAZ ---
+function cambiarHabitacion(archivo) {
+    const bg = document.getElementById('bg-room');
+    if (bg) bg.src = 'img/habitaciones/' + archivo;
+}
+
+function mostrarProductos(marca) {
+    const contenedor = document.getElementById('catalog-container');
+    if (!contenedor) return;
+    contenedor.innerHTML = ''; 
+
+    misProductos.forEach(producto => {
+        if (marca === 'todas' || producto.marca === marca) {
+            const card = document.createElement('div');
+            card.className = 'tile-card';
+            card.innerHTML = `
+                <img src="img/ceramicas/${producto.nombre}.jpg" onerror="this.src='img/error.png'">
+                <p>${producto.nombre.replace(/-/g, ' ')}</p>
+            `;
+
+            card.onclick = () => {
+                texturaActual = `img/ceramicas/${producto.nombre}.jpg`;
+                if (modoEdicion === 'piso') {
+                    renderizarTextura('floor-canvas');
+                } else {
+                    renderizarTextura('wall-canvas');
+                }
+            };
+            contenedor.appendChild(card);
+        }
+    });
+}
+
+// --- 5. ARRANQUE ---
+window.onload = () => {
     mostrarProductos('todas');
-});
+};

@@ -26,10 +26,10 @@ canvas {
     position: absolute; 
     top: 0; 
     left: 0; 
-    /* Eliminamos width y height 100% para que el JS mande */
+    /* NO PONGAS WIDTH NI HEIGHT AQUÍ, el JS los calculará */
     pointer-events: none; 
+    z-index: 5;
 }
-
 
 
 /* Puntos Azules */

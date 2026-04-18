@@ -509,6 +509,12 @@ const misProductos = [
 
 // --- 2. MOTOR DE PROYECCIÓN (CORREGIDO) ---
 function renderizarTextura() {
+    console.log("Ejecutando renderizado...");
+    
+    if (typeof PerspectiveTransform === 'undefined') {
+        console.error("LA LIBRERÍA SIGUE SIN CARGAR EN EL HTML");
+        return;
+    }
     const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
     const canvas = document.getElementById(canvasId);
     const viewport = document.getElementById('viewport');

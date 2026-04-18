@@ -1,9 +1,10 @@
-// 1. Variables Globales (SOLO UNA VEZ)
+// --- 1. ESTADO GLOBAL ---
 let texturaActual = ''; 
 let modoEdicion = 'piso'; 
 
-// 2. Catálogo (Asegúrate de cerrar el array con ]; al final)
+// --- 2. CATÁLOGO COMPLETO POR MARCAS ---
 const misProductos = [
+    // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
     { nombre: "alhambra-gris-44x44", marca: "nitropiso" },
@@ -109,6 +110,7 @@ const misProductos = [
     { nombre: "vancouver-blanco-60x60", marca: "nitropiso" },
     { nombre: "zacapa-44x44", marca: "nitropiso" },
     { nombre: "zurich-20x60", marca: "nitropiso" },
+    // PORCELANITE
     { nombre: "alabaster-55x55", marca: "porcelanite" },
     { nombre: "andes-plus-blanco-20x30", marca: "porcelanite" },
     { nombre: "aramis-coral-20x30", marca: "porcelanite" },
@@ -270,6 +272,7 @@ const misProductos = [
     { nombre: "vetro-blanco-25x40", marca: "porcelanite" },
     { nombre: "yukon-beige-33x33", marca: "porcelanite" },
     { nombre: "yukon-cafe-33x33", marca: "porcelanite" },
+    // VITROMEX
     { nombre: "alpino-oro-brillo-50x100", marca: "vitromex" },
     { nombre: "arizpe-caoba-18x60", marca: "vitromex" },
     { nombre: "arizpe-ceniza-18x60", marca: "vitromex" },
@@ -367,6 +370,7 @@ const misProductos = [
     { nombre: "yukon-cream-55x55", marca: "vitromex" },
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
     { nombre: "zenia-black-36x50", marca: "vitromex" }
+    // DALTILE
     { nombre: "African-walnut-brown-20x90", marca: "daltile" },
     { nombre: "African-walnut-natural-20x90", marca: "daltile" },
 { nombre: "Alpha-gris-37x37", marca: "daltile" },
@@ -499,7 +503,7 @@ const misProductos = [
 { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
-// 3. Motor de Proyección (Ajustado para 8 puntos)
+// --- 3. MOTOR DE PROYECCIÓN (8 PUNTOS) ---
 function renderizarTextura() {
     const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
     const canvas = document.getElementById(canvasId);
@@ -510,11 +514,12 @@ function renderizarTextura() {
     img.src = texturaActual;
 
     img.onload = () => {
-        // Seleccionamos puntos según el modo: piso (p1-p4) o figura/muro (p5-p8)
+        // IDs según el modo activo: p1-p4 para piso, p5-p8 para figura/muro
         const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
         
         const pts = IDs.map(id => {
             const el = document.getElementById(id);
+            if (!el) return { x: 0, y: 0 };
             return { x: el.offsetLeft, y: el.offsetTop };
         });
 
@@ -533,19 +538,20 @@ function renderizarTextura() {
             canvas.style.mixBlendMode = "multiply"; 
             ctx.drawImage(img, 0, 0, img.width, img.height);
         } catch (e) {
-            console.error("Error en la transformación de perspectiva:", e);
+            console.error("Error en PerspectiveTransform:", e);
         }
     };
 }
 
-// 4. Funciones de Control
+// --- 4. FUNCIONES DE INTERFAZ ---
 function setModo(modo) {
     modoEdicion = modo;
-    console.log("Modo cambiado a: " + modo);
+    console.log("Modo activo: " + modoEdicion);
 }
 
 function cambiarHabitacion(archivo) {
-    document.getElementById('bg-room').src = 'img/habitaciones/' + archivo;
+    const bg = document.getElementById('bg-room');
+    if (bg) bg.src = 'img/habitaciones/' + archivo;
 }
 
 function mostrarProductos(marca) {
@@ -562,7 +568,7 @@ function mostrarProductos(marca) {
 
         card.innerHTML = `
             <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.src='img/error.jpg'">
-            <p style="color:white; font-size:10px;">${producto.nombre}</p>
+            <p style="color:white; font-size:10px; margin-top:5px;">${producto.nombre}</p>
         `;
 
         card.onclick = () => {
@@ -573,13 +579,17 @@ function mostrarProductos(marca) {
     });
 }
 
-// 5. Arrastre de puntos (Vital para armar la figura)
+// --- 5. ARRASTRE DE PUNTOS ---
 document.querySelectorAll('.dot').forEach(dot => {
     dot.onmousedown = function(e) {
         document.onmousemove = function(ev) {
             const viewport = document.getElementById('viewport');
-            dot.style.left = (ev.pageX - viewport.offsetLeft) + 'px';
-            dot.style.top = (ev.pageY - viewport.offsetTop) + 'px';
+            let x = ev.pageX - viewport.offsetLeft;
+            let y = ev.pageY - viewport.offsetTop;
+            
+            dot.style.left = x + 'px';
+            dot.style.top = y + 'px';
+            
             renderizarTextura(); 
         };
         document.onmouseup = function() {
@@ -588,4 +598,7 @@ document.querySelectorAll('.dot').forEach(dot => {
     };
 });
 
-window.onload = () => mostrarProductos('todas');
+// Carga inicial
+window.onload = () => {
+    mostrarProductos('todas');
+};

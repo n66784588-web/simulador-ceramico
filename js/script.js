@@ -507,93 +507,122 @@ const misProductos = [
     { nombre: "newbury-white-30x60", marca: "benadresa" },
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];
-// --- FUNCIÓN PARA MOSTRAR PRODUCTOS ---
+function cambiarHabitacion(img) {
+    document.getElementById("bg-room").src = "img/habitaciones/" + img;
+}
+
+// =============================
+// CAMBIAR MODO
+// =============================
+function setModo(nuevoModo) {
+    modo = nuevoModo;
+    console.log("Modo cambiado a:", modo);
+}
+
+// =============================
+// MOSTRAR PRODUCTOS
+// =============================
 function mostrarProductos(marca) {
-    const contenedor = document.getElementById('catalog-container');
-    contenedor.innerHTML = '';
+    const contenedor = document.getElementById("catalog-container");
+    contenedor.innerHTML = "";
 
-    const filtrados = misProductos.filter(p => marca === 'todas' || p.marca === marca);
+    const filtrados = marca === "todas"
+        ? productos
+        : productos.filter(p => p.marca === marca);
 
-    filtrados.forEach(producto => {
-        const card = document.createElement('div');
-        card.className = 'tile-card';
+    filtrados.forEach(prod => {
+        const div = document.createElement("div");
+        div.classList.add("producto");
 
-        const ruta = `img/ceramicas/${producto.nombre}.jpg`;
-
-        card.innerHTML = `
-            <img src="${ruta}">
-            <p>${producto.nombre}</p>
+        div.innerHTML = `
+            <img src="${prod.img}" />
+            <p>${prod.nombre}</p>
         `;
 
-        card.onclick = () => {
-            texturaActual = ruta;
-            renderizarTextura();
-        };
+        div.onclick = () => aplicarTextura(prod.img);
 
-        contenedor.appendChild(card);
+        contenedor.appendChild(div);
     });
 }
 
-// --- CAMBIAR HABITACIÓN ---
-function cambiarHabitacion(archivo) {
-    document.getElementById('bg-room').src = 'img/habitaciones/' + archivo;
+// =============================
+// APLICAR TEXTURA
+// =============================
+function aplicarTextura(imgSrc) {
+    texturaActual = imgSrc;
+    render();
 }
 
-// --- CAMBIAR MODO ---
-function setModo(modo) {
-    modoEdicion = modo;
+// =============================
+// OBTENER PUNTOS
+// =============================
+function getPuntos(ids) {
+    return ids.map(id => {
+        const el = document.getElementById(id);
+        return {
+            x: el.offsetLeft + el.offsetWidth / 2,
+            y: el.offsetTop + el.offsetHeight / 2
+        };
+    });
 }
 
-// --- RENDERIZAR TEXTURA ---
-function renderizarTextura() {
+// =============================
+// RENDER PRINCIPAL
+// =============================
+function render() {
     if (!texturaActual) return;
 
-    const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext('2d');
+    const canvas = modo === "piso"
+        ? document.getElementById("floor-canvas")
+        : document.getElementById("wall-canvas");
 
-    const viewport = document.getElementById('viewport');
+    const ctx = canvas.getContext("2d");
+
+    // Ajustar tamaño del canvas
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const puntos = modo === "piso"
+        ? getPuntos(["p1", "p2", "p3", "p4"])
+        : getPuntos(["p5", "p6", "p7", "p8"]);
 
     const img = new Image();
-    img.src = texturaActual + '?t=' + new Date().getTime();
+    img.src = texturaActual;
 
     img.onload = () => {
-        canvas.width = viewport.clientWidth;
-        canvas.height = viewport.clientHeight;
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // 🔥 ESCALA (AJUSTA AQUÍ)
+        const escala = 0.3;
 
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        // Crear patrón repetido
+        const pattern = ctx.createPattern(img, "repeat");
+
+        ctx.save();
+
+        // Aplicar escala
+        ctx.scale(escala, escala);
+
+        ctx.fillStyle = pattern;
+
+        // Dibujar área (ajustando escala)
+        ctx.beginPath();
+        ctx.moveTo(puntos[0].x / escala, puntos[0].y / escala);
+        ctx.lineTo(puntos[1].x / escala, puntos[1].y / escala);
+        ctx.lineTo(puntos[2].x / escala, puntos[2].y / escala);
+        ctx.lineTo(puntos[3].x / escala, puntos[3].y / escala);
+        ctx.closePath();
+
+        ctx.fill();
+
+        ctx.restore();
     };
 }
 
-// --- ARRASTRE DE PUNTOS ---
-document.querySelectorAll('.dot').forEach(dot => {
-    dot.addEventListener('mousedown', function(e) {
-        const viewport = document.getElementById('viewport');
-        const rect = viewport.getBoundingClientRect();
-
-        function mover(ev) {
-            let x = ev.clientX - rect.left;
-            let y = ev.clientY - rect.top;
-
-            dot.style.left = x + 'px';
-            dot.style.top = y + 'px';
-
-            if (texturaActual) renderizarTextura();
-        }
-
-        function soltar() {
-            document.removeEventListener('mousemove', mover);
-            document.removeEventListener('mouseup', soltar);
-        }
-
-        document.addEventListener('mousemove', mover);
-        document.addEventListener('mouseup', soltar);
-    });
-});
-
-// --- INICIO ---
+// =============================
+// INICIALIZAR
+// =============================
 window.onload = () => {
-    mostrarProductos('todas');
+    mostrarProductos("todas");
 };

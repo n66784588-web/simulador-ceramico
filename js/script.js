@@ -609,8 +609,3 @@ document.querySelectorAll('.dot').forEach(dot => {
 
 // Inicializar
 window.onload = () => mostrarProductos('todas');
-
-// Carga inicial
-window.onload = () => {
-    mostrarProductos('todas');
-};

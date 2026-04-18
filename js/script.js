@@ -1,4 +1,4 @@
-// --- 1. CONFIGURACIÓN ---
+// --- 1. ESTADO GLOBAL ---
 let texturaActual = ''; 
 let modoEdicion = 'piso'; 
 
@@ -498,25 +498,23 @@ const misProductos = [
 { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
-
 // --- 2. MOTOR DE PROYECCIÓN ---
 function renderizarTextura() {
     const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
     const canvas = document.getElementById(canvasId);
-    
     if (!canvas || !texturaActual) return;
-    
+
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.src = texturaActual;
 
     img.onload = () => {
-        const pts = [
-            { x: document.getElementById('p1').offsetLeft, y: document.getElementById('p1').offsetTop },
-            { x: document.getElementById('p2').offsetLeft, y: document.getElementById('p2').offsetTop },
-            { x: document.getElementById('p3').offsetLeft, y: document.getElementById('p3').offsetTop },
-            { x: document.getElementById('p4').offsetLeft, y: document.getElementById('p4').offsetTop }
-        ];
+        // Determinamos qué puntos usar según el modo
+        const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
+        const pts = IDs.map(id => {
+            const el = document.getElementById(id);
+            return { x: el.offsetLeft, y: el.offsetTop };
+        });
 
         const viewport = document.getElementById('viewport');
         canvas.width = viewport.clientWidth;
@@ -539,47 +537,51 @@ function renderizarTextura() {
 // --- 3. FUNCIONES DE INTERFAZ ---
 function setModo(modo) {
     modoEdicion = modo;
-    console.log("Modo cambiado a: " + modo);
+    console.log("Modo activo: " + modoEdicion);
 }
 
 function cambiarHabitacion(archivo) {
-    const bg = document.getElementById('bg-room');
-    if (bg) bg.src = 'img/habitaciones/' + archivo;
+    document.getElementById('bg-room').src = 'img/habitaciones/' + archivo;
 }
 
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
-    
     contenedor.innerHTML = ''; 
 
-    misProductos.forEach(producto => {
-        if (marca === 'todas' || producto.marca === marca) {
-            const card = document.createElement('div');
-            card.className = 'tile-card';
-            
-            const ruta = `img/ceramicas/${producto.nombre}.jpg`;
+    const filtrados = misProductos.filter(p => marca === 'todas' || p.marca === marca);
 
-            card.innerHTML = `
-                <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.parentElement.style.display='none'">
-                <p style="color:white; font-size:10px; margin-top:5px;">${producto.nombre}</p>
-            `;
+    filtrados.forEach(producto => {
+        const card = document.createElement('div');
+        card.className = 'tile-card';
+        const ruta = `img/ceramicas/${producto.nombre}.jpg`;
 
-            card.onclick = () => {
-                texturaActual = ruta;
-                console.log("Seleccionada: " + texturaActual);
-                renderizarTextura();
-            };
-            contenedor.appendChild(card);
-        }
+        card.innerHTML = `
+            <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.style.display='none'">
+            <p style="color:white; font-size:10px;">${producto.nombre}</p>
+        `;
+
+        card.onclick = () => {
+            texturaActual = ruta;
+            renderizarTextura();
+        };
+        contenedor.appendChild(card);
     });
 }
 
-// --- 4. INICIO ---
-window.onload = () => {
-    mostrarProductos('todas');
-    // Dentro de img.onload en tu función renderizarTextura:
-const pattern = ctx.createPattern(img, 'repeat');
-ctx.fillStyle = pattern;
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-};
+// --- 4. DRAG & DROP PARA LOS PUNTOS ---
+document.querySelectorAll('.dot').forEach(dot => {
+    dot.onmousedown = function(e) {
+        document.onmousemove = function(ev) {
+            const viewport = document.getElementById('viewport');
+            dot.style.left = (ev.pageX - viewport.offsetLeft) + 'px';
+            dot.style.top = (ev.pageY - viewport.offsetTop) + 'px';
+            renderizarTextura(); 
+        };
+        document.onmouseup = function() {
+            document.onmousemove = null;
+        };
+    };
+});
+
+window.onload = () => mostrarProductos('todas');

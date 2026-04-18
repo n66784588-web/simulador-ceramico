@@ -15,44 +15,54 @@ const misProductos = [
     // BENADRESA
     { nombre: "avenue-beige-30x90", marca: "benadresa" },
     { nombre: "stryn-30x90", marca: "benadresa" }
-    // IMPORTANTE: Asegúrate de que el último objeto NO tenga coma después de la llave si cierras aquí
 ];
 
-// --- 2. MOTOR DE PROYECCIÓN (Ajustado para 8 puntos) ---
+// --- 2. MOTOR DE PROYECCIÓN ---
 function renderizarTextura() {
-    const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
+    const esPiso = (modoEdicion === 'piso');
+    const canvasId = esPiso ? 'floor-canvas' : 'wall-canvas';
+    const IDs = esPiso ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
+    
     const canvas = document.getElementById(canvasId);
-    if (!canvas || !texturaActual) return;
+    const viewport = document.getElementById('viewport');
+    
+    if (!canvas || !texturaActual || !viewport) return;
 
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.src = texturaActual;
 
     img.onload = () => {
-        // Seleccionamos puntos según el modo: piso (p1-p4) o figura/muro (p5-p8)
-        const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
-        
+        // Ajustar resolución del canvas al contenedor
+        canvas.width = viewport.clientWidth;
+        canvas.height = viewport.clientHeight;
+
+        // Obtener coordenadas de los puntos de control
         const pts = IDs.map(id => {
             const el = document.getElementById(id);
             return { x: el.offsetLeft, y: el.offsetTop };
         });
 
-        const viewport = document.getElementById('viewport');
-        canvas.width = viewport.clientWidth;
-        canvas.height = viewport.clientHeight;
-
+        // Definir puntos de origen (esquinas de la imagen original)
         const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
+        // Definir puntos de destino (posición de los puntos rojos)
         const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
         
-        // Ejecutamos la transformación con la librería externa
-        const transform = PerspectiveTransform(srcPts, dstPts);
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        canvas.style.transform = transform.getCSS();
-        canvas.style.transformOrigin = "0 0";
-        canvas.style.mixBlendMode = "multiply"; 
-        
-        ctx.drawImage(img, 0, 0, img.width, img.height);
+        try {
+            // Transformación de perspectiva
+            const transform = PerspectiveTransform(srcPts, dstPts);
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.transform = transform.getCSS();
+            canvas.style.transformOrigin = "0 0";
+            
+            // Modo multiply para realismo (conserva sombras del fondo)
+            canvas.style.mixBlendMode = "multiply"; 
+            
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+        } catch (e) {
+            console.error("Error en PerspectiveTransform:", e);
+        }
     };
 }
 
@@ -60,6 +70,16 @@ function renderizarTextura() {
 function setModo(modo) {
     modoEdicion = modo;
     console.log("Modo activo: " + modoEdicion);
+    
+    // Opcional: Resaltar visualmente qué puntos están activos
+    document.querySelectorAll('.dot').forEach(dot => {
+        dot.style.border = "none";
+    });
+    const IDs = (modo === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
+    IDs.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.style.border = "2px solid white";
+    });
 }
 
 function cambiarHabitacion(archivo) {
@@ -80,8 +100,8 @@ function mostrarProductos(marca) {
         const ruta = `img/ceramicas/${producto.nombre}.jpg`;
 
         card.innerHTML = `
-            <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.src='img/error.jpg'">
-            <p style="color:white; font-size:10px; margin-top:5px;">${producto.nombre}</p>
+            <img src="${ruta}" style="width:100%; height:80px; object-fit:cover; cursor:pointer;" onerror="this.src='img/error.jpg'">
+            <p style="color:white; font-size:10px; margin-top:5px; text-align:center;">${producto.nombre}</p>
         `;
 
         card.onclick = () => {
@@ -92,27 +112,40 @@ function mostrarProductos(marca) {
     });
 }
 
-// --- 4. ARRASTRE DE PUNTOS (Drag & Drop) ---
+// --- 4. ARRASTRE DE PUNTOS (Drag & Drop Preciso) ---
 document.querySelectorAll('.dot').forEach(dot => {
-    dot.onmousedown = function(e) {
-        document.onmousemove = function(ev) {
-            const viewport = document.getElementById('viewport');
-            // Calculamos posición relativa al viewport
-            let x = ev.pageX - viewport.offsetLeft;
-            let y = ev.pageY - viewport.offsetTop;
-            
+    dot.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        const viewport = document.getElementById('viewport');
+        const rect = viewport.getBoundingClientRect();
+
+        function moverPunto(ev) {
+            // Calcular posición relativa al viewport considerando el scroll
+            let x = ev.clientX - rect.left;
+            let y = ev.clientY - rect.top;
+
+            // Limitar movimiento dentro del área visible
+            x = Math.max(0, Math.min(x, rect.width));
+            y = Math.max(0, Math.min(y, rect.height));
+
             dot.style.left = x + 'px';
             dot.style.top = y + 'px';
             
-            // Renderizamos mientras movemos para ver el cambio en vivo
             renderizarTextura(); 
-        };
-        document.onmouseup = function() {
-            document.onmousemove = null;
-        };
-    };
+        }
+
+        function detenerMovimiento() {
+            document.removeEventListener('mousemove', moverPunto);
+            document.removeEventListener('mouseup', detenerMovimiento);
+        }
+
+        document.addEventListener('mousemove', moverPunto);
+        document.addEventListener('mouseup', detenerMovimiento);
+    });
 });
 
 // Inicializar catálogo al cargar
-window.onload = () => mostrarProductos('todas');
-
+window.onload = () => {
+    mostrarProductos('todas');
+    setModo('piso'); // Iniciar por defecto en modo piso
+};

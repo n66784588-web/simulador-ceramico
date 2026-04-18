@@ -578,7 +578,6 @@ function render() {
 
     const ctx = canvas.getContext("2d");
 
-    // Ajustar tamaño del canvas
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
 
@@ -593,28 +592,36 @@ function render() {
 
     img.onload = () => {
 
-        // 🔥 ESCALA (AJUSTA AQUÍ)
+        // 🔥 ESCALA REAL (ajusta aquí)
         const escala = 0.3;
 
-        // Crear patrón repetido
         const pattern = ctx.createPattern(img, "repeat");
+
+        // 🔥 CLAVE: escalar SOLO el patrón
+        if (pattern.setTransform) {
+            pattern.setTransform(new DOMMatrix([
+                escala, 0,
+                0, escala,
+                0, 0
+            ]));
+        }
 
         ctx.save();
 
-        // Aplicar escala
-        ctx.scale(escala, escala);
+        // 🔥 RECORTAR ÁREA (MUY IMPORTANTE)
+        ctx.beginPath();
+        ctx.moveTo(puntos[0].x, puntos[0].y);
+        ctx.lineTo(puntos[1].x, puntos[1].y);
+        ctx.lineTo(puntos[2].x, puntos[2].y);
+        ctx.lineTo(puntos[3].x, puntos[3].y);
+        ctx.closePath();
+
+        ctx.clip(); // ← esto evita que se pinte toda la pantalla
 
         ctx.fillStyle = pattern;
 
-        // Dibujar área (ajustando escala)
-        ctx.beginPath();
-        ctx.moveTo(puntos[0].x / escala, puntos[0].y / escala);
-        ctx.lineTo(puntos[1].x / escala, puntos[1].y / escala);
-        ctx.lineTo(puntos[2].x / escala, puntos[2].y / escala);
-        ctx.lineTo(puntos[3].x / escala, puntos[3].y / escala);
-        ctx.closePath();
-
-        ctx.fill();
+        // Rellenar SOLO el área recortada
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.restore();
     };

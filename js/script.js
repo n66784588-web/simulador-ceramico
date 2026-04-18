@@ -480,6 +480,7 @@ const misProductos = [
 { nombre: "roomy-black-60x1.20", marca: "mise" },
 { nombre: "stavario-ascent-grey-60x1.20", marca: "mise" },
 { nombre: "titanium-blue-60x1.20", marca: "mise" }
+{ nombre: "titanium-blue-60x60", marca: "mise" }
 ];
 
 // --- 2. MOTOR DE PROYECCIÓN ---

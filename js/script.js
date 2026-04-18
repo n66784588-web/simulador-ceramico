@@ -555,7 +555,6 @@ function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) bg.src = 'img/habitaciones/' + archivo;
 }
-
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
@@ -566,15 +565,19 @@ function mostrarProductos(marca) {
     filtrados.forEach(producto => {
         const card = document.createElement('div');
         card.className = 'tile-card';
+        
+        // RUTA CORREGIDA: Agregamos la carpeta donde están tus fotos
         const ruta = `img/ceramicas/${producto.nombre}.jpg`;
 
         card.innerHTML = `
-            <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.src='img/error.jpg'">
-            <p style="color:white; font-size:10px; margin-top:5px;">${producto.nombre}</p>
+            <img src="${ruta}" style="width:100%; height:80px; object-fit:cover; cursor:pointer;" onerror="this.src='img/error.jpg'">
+            <p style="color:white; font-size:10px; margin-top:5px; text-align:center;">${producto.nombre}</p>
         `;
 
+        // Al hacer clic, enviamos la ruta correcta al motor de proyección
         card.onclick = () => {
             texturaActual = ruta;
+            console.log("Cargando textura:", texturaActual); // Esto aparecerá en tu consola (F12)
             renderizarTextura();
         };
         contenedor.appendChild(card);

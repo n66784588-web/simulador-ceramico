@@ -23,15 +23,16 @@ body {
     height: 100%; 
     object-fit: cover; 
 }
-
-canvas { 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    pointer-events: none; /* Permite tocar los puntos detrás del canvas */
-    z-index: 5;
-    /* La transformación se aplica vía JS */
+#viewport canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none; /* Para que no bloquee el arrastre de los puntos */
+    width: 100%;
+    height: 100%;
+    z-index: 5; /* Asegúrate de que esté por encima de la imagen de fondo */
 }
+
 
 /* --- PUNTOS DE CONTROL --- */
 .dot { 

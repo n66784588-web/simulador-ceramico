@@ -1,84 +1,92 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Cerámicos</title>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/styles.css">
+```
+<!-- CSS -->
+<link rel="stylesheet" href="css/styles.css">
+```
 
-    <!-- Librería (SOLO UNA VEZ) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/perspective-transform/1.1.3/perspective-transform.min.js"></script>
 </head>
 
 <body>
 
-    <!-- ============================= -->
-    <!-- VISOR PRINCIPAL -->
-    <!-- ============================= -->
-    <div id="viewport">
+```
+<!-- ============================= -->
+<!-- VISOR PRINCIPAL -->
+<!-- ============================= -->
+<div id="viewport">
 
-        <!-- Fondo -->
-        <img id="bg-room" src="img/habitaciones/sala.jpg" alt="Habitación">
+    <!-- Fondo -->
+    <img id="bg-room" src="img/habitaciones/sala.jpg" alt="Habitación">
 
-        <!-- Capas de simulación -->
-        <canvas id="floor-canvas"></canvas>
-        <canvas id="wall-canvas"></canvas>
+    <!-- Capas -->
+    <canvas id="floor-canvas"></canvas>
+    <canvas id="wall-canvas"></canvas>
 
-        <!-- CONTROLES DE HABITACIÓN -->
-        <div class="room-controls">
-            <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
-            <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
-            <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
-            <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
-            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
-        </div>
-
-        <!-- CONTROLES DE MODO -->
-        <div class="config-controls">
-            <button onclick="setModo('piso')">Editar Piso</button>
-            <button onclick="setModo('pared')">Editar Pared</button>
-        </div>
-
-        <!-- ============================= -->
-        <!-- PUNTOS DE PISO (AZUL) -->
-        <!-- ============================= -->
-        <div id="p1" class="dot blue" style="top: 70%; left: 20%;"></div>
-        <div id="p2" class="dot blue" style="top: 70%; left: 80%;"></div>
-        <div id="p3" class="dot blue" style="top: 90%; left: 90%;"></div>
-        <div id="p4" class="dot blue" style="top: 90%; left: 10%;"></div>
-
-        <!-- ============================= -->
-        <!-- PUNTOS DE MURO (ROJO) -->
-        <!-- ============================= -->
-        <div id="p5" class="dot red" style="top: 20%; left: 30%;"></div>
-        <div id="p6" class="dot red" style="top: 20%; left: 70%;"></div>
-        <div id="p7" class="dot red" style="top: 60%; left: 70%;"></div>
-        <div id="p8" class="dot red" style="top: 60%; left: 30%;"></div>
-
+    <!-- CONTROLES HABITACIÓN -->
+    <div class="room-controls">
+        <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
+        <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
+        <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
+        <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
+        <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
     </div>
 
-    <!-- ============================= -->
-    <!-- PANEL DE CATÁLOGO -->
-    <!-- ============================= -->
-    <div class="catalog-panel">
-
-        <div class="brand-filters">
-            <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
-            <button onclick="mostrarProductos('daltile')">Daltile</button>
-            <button onclick="mostrarProductos('mise')">Mise</button>
-            <button onclick="mostrarProductos('benadresa')">Benadresa</button>
-            <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
-            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
-            <button onclick="mostrarProductos('todas')">Todas</button>
-        </div>
-
-        <div id="catalog-container"></div>
-
+    <!-- CONTROLES MODO -->
+    <div class="config-controls">
+        <button onclick="setModo('piso')">Editar Piso</button>
+        <button onclick="setModo('pared')">Editar Pared</button>
     </div>
 
-    <!-- JS AL FINAL (IMPORTANTE) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/perspective-transform/1.1.3/perspective-transform.min.js"></script>
+    <!-- PUNTOS PISO -->
+    <div id="p1" class="dot blue" style="top: 70%; left: 20%;"></div>
+    <div id="p2" class="dot blue" style="top: 70%; left: 80%;"></div>
+    <div id="p3" class="dot blue" style="top: 90%; left: 90%;"></div>
+    <div id="p4" class="dot blue" style="top: 90%; left: 10%;"></div>
+
+    <!-- PUNTOS MURO -->
+    <div id="p5" class="dot red" style="top: 20%; left: 30%;"></div>
+    <div id="p6" class="dot red" style="top: 20%; left: 70%;"></div>
+    <div id="p7" class="dot red" style="top: 60%; left: 70%;"></div>
+    <div id="p8" class="dot red" style="top: 60%; left: 30%;"></div>
+
+</div>
+
+<!-- ============================= -->
+<!-- PANEL CATÁLOGO -->
+<!-- ============================= -->
+<div class="catalog-panel">
+
+    <div class="brand-filters">
+        <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
+        <button onclick="mostrarProductos('daltile')">Daltile</button>
+        <button onclick="mostrarProductos('mise')">Mise</button>
+        <button onclick="mostrarProductos('benadresa')">Benadresa</button>
+        <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
+        <button onclick="mostrarProductos('vitromex')">Vitromex</button>
+        <button onclick="mostrarProductos('todas')">Todas</button>
+    </div>
+
+    <div id="catalog-container"></div>
+
+</div>
+
+<!-- ============================= -->
+<!-- SCRIPTS (ORDEN CORRECTO) -->
+<!-- ============================= -->
+
+<!-- Librería de perspectiva -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/perspective-transform/1.1.3/perspective-transform.min.js"></script>
+
+<!-- Tu lógica -->
+<script src="js/script.js"></script>
+```
+
 </body>
 </html>
+

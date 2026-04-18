@@ -481,7 +481,23 @@ const misProductos = [
 { nombre: "stavario-ascent-grey-60x1.20", marca: "mise" },
 { nombre: "titanium-blue-60x1.20", marca: "mise" }
 { nombre: "titanium-blue-60x60", marca: "mise" }
+// --- BENADRESA ---
+{ nombre: "avenue-beige-30x90", marca: "benadresa" },
+{ nombre: "blanco-brillo-30x90", marca: "benadresa" },
+{ nombre: "cascais-30x90", marca: "benadresa" },
+{ nombre: "decor-dune-newbury-white-30x60", marca: "benadresa" },
+{ nombre: "gothel-cream-30x60", marca: "benadresa" },
+{ nombre: "gothel-moka-30x90", marca: "benadresa" },
+{ nombre: "keid-gothel-cream-30x90", marca: "benadresa" },
+{ nombre: "keid-gothel-moka-30x90", marca: "benadresa" },
+{ nombre: "leaves-avenue-beige-30x90", marca: "benadresa" },
+{ nombre: "leaves-blanco-brillo-30x90", marca: "benadresa" },
+{ nombre: "leaves-cascais-30x90", marca: "benadresa" },
+{ nombre: "leaves-stryn-30x90", marca: "benadresa" },
+{ nombre: "newbury-white-30x60", marca: "benadresa" },
+{ nombre: "stryn-30x90", marca: "benadresa" }
 ];
+
 
 // --- 2. MOTOR DE PROYECCIÓN ---
 function renderizarTextura() {

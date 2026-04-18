@@ -459,6 +459,27 @@ const misProductos = [
 { nombre: "Whisper-oak-cherry-15x66", marca: "daltile" },
 { nombre: "Whisper-oak-gray-15x66", marca: "daltile" },
 { nombre: "Zenwood-brown-45x45", marca: "daltile" }
+// --- MISE ---
+{ nombre: "abstrac-gold-60x1.20", marca: "mise" },
+{ nombre: "alistonia-gold-60x1.20", marca: "mise" },
+{ nombre: "calacatta-renoirse-60x60", marca: "mise" },
+{ nombre: "castor-blue-60x1.20", marca: "mise" },
+{ nombre: "cracovia-high-glossy-60x1.20", marca: "mise" },
+{ nombre: "eloy-satvario-60x1.20", marca: "mise" },
+{ nombre: "flicker-white-60x1.20", marca: "mise" },
+{ nombre: "frize-gold-60x1.20", marca: "mise" },
+{ nombre: "glassia-wood-60x1.20", marca: "mise" },
+{ nombre: "iron-gold-60x1.20", marca: "mise" },
+{ nombre: "lublin-60x1.20", marca: "mise" },
+{ nombre: "luccano-dark-60x1.20", marca: "mise" },
+{ nombre: "luccano-light-60x1.20", marca: "mise" },
+{ nombre: "ollin-marble-60x1.20", marca: "mise" },
+{ nombre: "onice-chiaro-glossy-60x60", marca: "mise" },
+{ nombre: "onice-scuro-60x60", marca: "mise" },
+{ nombre: "praga-60x1.20", marca: "mise" },
+{ nombre: "roomy-black-60x1.20", marca: "mise" },
+{ nombre: "stavario-ascent-grey-60x1.20", marca: "mise" },
+{ nombre: "titanium-blue-60x1.20", marca: "mise" }
 ];
 
 // --- 2. MOTOR DE PROYECCIÓN ---

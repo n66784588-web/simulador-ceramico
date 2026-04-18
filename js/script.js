@@ -510,6 +510,11 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
+// 🔥 GENERAR RUTA AUTOMÁTICA DE IMAGEN
+misProductos.forEach(p => {
+    p.img = `img/productos/${p.nombre}.jpg`;
+});
+
 // =============================
 // HABITACIÓN
 // =============================
@@ -525,22 +530,22 @@ function setModo(m) {
 }
 
 // =============================
-// CATÁLOGO
+// CATÁLOGO (CORREGIDO)
 // =============================
 function mostrarProductos(marca) {
     const contenedor = document.getElementById("catalog-container");
     contenedor.innerHTML = "";
 
     const lista = marca === "todas"
-        ? productos
-        : productos.filter(p => p.marca === marca);
+        ? misProductos
+        : misProductos.filter(p => p.marca === marca);
 
     lista.forEach(p => {
         const div = document.createElement("div");
         div.classList.add("producto");
 
         div.innerHTML = `
-            <img src="${p.img}">
+            <img src="${p.img}" onerror="this.src='img/error.jpg'">
             <p>${p.nombre}</p>
         `;
 
@@ -572,7 +577,7 @@ function getPuntos(ids) {
 }
 
 // =============================
-// RENDER
+// RENDER (ESCALA REAL)
 // =============================
 function render() {
     if (!texturaActual) return;
@@ -597,7 +602,8 @@ function render() {
 
     img.onload = () => {
 
-        const escala = 0.3;
+        // 🔥 ESCALA REAL AJUSTABLE
+        const escala = 0.15; // MÁS CHICO = MÁS REALISTA
 
         const pattern = ctx.createPattern(img, "repeat");
 

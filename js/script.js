@@ -389,7 +389,7 @@ const misProductos = [
     { nombre: "blender-stone-30x45", marca: "daltile" },
     { nombre: "breccia-ligh-gray-60.5x60.5", marca: "daltile" },
     { nombre: "breccia-marfil-60x60", marca: "daltile" },
-    { nombre: "cantavria-avorio-60.5x60.5", marca: "daltile" },
+    { nombre: "cantabria-avorio-60.5x60.5", marca: "daltile" },
     { nombre: "colonial-frida-37x37", marca: "daltile" },
     { nombre: "corintia-oxford-60.5x60.5", marca: "daltile" },
     { nombre: "dannes-blanco-30x45", marca: "daltile" },

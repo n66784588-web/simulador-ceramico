@@ -1,58 +1,118 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Cerámicos</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <div id="viewport">
-        <img id="bg-room" src="img/habitaciones/sala.jpg" alt="Habitación">
+// --- 1. ESTADO GLOBAL ---
+let texturaActual = ''; 
+let modoEdicion = 'piso'; 
+
+const misProductos = [
+    // NITROPISO
+    { nombre: "acatlan-30x60", marca: "nitropiso" },
+    { nombre: "neiva-60x60", marca: "nitropiso" },
+    // DALTILE
+    { nombre: "African-walnut-brown-20x90", marca: "daltile" },
+    { nombre: "Avenza-blanco-60x1.20", marca: "daltile" },
+    // MISE
+    { nombre: "abstrac-gold-60x1.20", marca: "mise" },
+    { nombre: "titanium-blue-60x1.20", marca: "mise" },
+    // BENADRESA
+    { nombre: "avenue-beige-30x90", marca: "benadresa" },
+    { nombre: "stryn-30x90", marca: "benadresa" }
+    // IMPORTANTE: Asegúrate de que el último objeto NO tenga coma después de la llave si cierras aquí
+];
+
+// --- 2. MOTOR DE PROYECCIÓN (Ajustado para 8 puntos) ---
+function renderizarTextura() {
+    const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !texturaActual) return;
+
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = texturaActual;
+
+    img.onload = () => {
+        // Seleccionamos puntos según el modo: piso (p1-p4) o figura/muro (p5-p8)
+        const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
         
-        <canvas id="floor-canvas"></canvas>
-        <canvas id="wall-canvas"></canvas>
+        const pts = IDs.map(id => {
+            const el = document.getElementById(id);
+            return { x: el.offsetLeft, y: el.offsetTop };
+        });
 
-        <div class="dot blue" id="p1" style="left: 20%; top: 70%;"></div>
-        <div class="dot blue" id="p2" style="left: 80%; top: 70%;"></div>
-        <div class="dot blue" id="p3" style="left: 90%; top: 90%;"></div>
-        <div class="dot blue" id="p4" style="left: 10%; top: 90%;"></div>
+        const viewport = document.getElementById('viewport');
+        canvas.width = viewport.clientWidth;
+        canvas.height = viewport.clientHeight;
 
-        <div class="dot red" id="p5" style="left: 30%; top: 30%;"></div>
-        <div class="dot red" id="p6" style="left: 50%; top: 30%;"></div>
-        <div class="dot red" id="p7" style="left: 50%; top: 50%;"></div>
-        <div class="dot red" id="p8" style="left: 30%; top: 50%;"></div>
+        const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
+        const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
+        
+        // Ejecutamos la transformación con la librería externa
+        const transform = PerspectiveTransform(srcPts, dstPts);
 
-        <div class="room-controls">
-            <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
-            <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
-            <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
-            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
-            <button onclick="cambiarHabitacion('fachada.jpg')">Fachada</button>
-            <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
-        </div>
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.style.transform = transform.getCSS();
+        canvas.style.transformOrigin = "0 0";
+        canvas.style.mixBlendMode = "multiply"; 
+        
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+    };
+}
 
-        <div class="config-controls" style="position: absolute; bottom: 20px; left: 20px;">
-            <button onclick="setModo('piso')">Configurar Piso</button>
-            <button onclick="setModo('muro')">Configurar Figura/Muro</button>
-        </div>
-    </div>
+// --- 3. FUNCIONES DE INTERFAZ ---
+function setModo(modo) {
+    modoEdicion = modo;
+    console.log("Modo activo: " + modoEdicion);
+}
 
-    <aside class="catalog-panel">
-        <div class="brand-filters">
-            <button onclick="mostrarProductos('todas')">Todas</button>
-            <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
-            <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
-            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
-            <button onclick="mostrarProductos('daltile')">Daltile</button>
-            <button onclick="mostrarProductos('benadresa')">Benadresa</button>
-            <button onclick="mostrarProductos('mise')">Mise</button>
-        </div>
-        <div id="catalog-container"></div>
-    </aside>
+function cambiarHabitacion(archivo) {
+    const bg = document.getElementById('bg-room');
+    if (bg) bg.src = 'img/habitaciones/' + archivo;
+}
 
-    <script src="https://cdn.jsdelivr.net/npm/perspective-transform@1.1.3/dist/perspective-transform.min.js"></script>
-    <script src="js/script.js"></script>
-</body>
-</html>
+function mostrarProductos(marca) {
+    const contenedor = document.getElementById('catalog-container');
+    if (!contenedor) return;
+    contenedor.innerHTML = ''; 
+
+    const filtrados = misProductos.filter(p => marca === 'todas' || p.marca === marca);
+
+    filtrados.forEach(producto => {
+        const card = document.createElement('div');
+        card.className = 'tile-card';
+        const ruta = `img/ceramicas/${producto.nombre}.jpg`;
+
+        card.innerHTML = `
+            <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.src='img/error.jpg'">
+            <p style="color:white; font-size:10px; margin-top:5px;">${producto.nombre}</p>
+        `;
+
+        card.onclick = () => {
+            texturaActual = ruta;
+            renderizarTextura();
+        };
+        contenedor.appendChild(card);
+    });
+}
+
+// --- 4. ARRASTRE DE PUNTOS (Drag & Drop) ---
+document.querySelectorAll('.dot').forEach(dot => {
+    dot.onmousedown = function(e) {
+        document.onmousemove = function(ev) {
+            const viewport = document.getElementById('viewport');
+            // Calculamos posición relativa al viewport
+            let x = ev.pageX - viewport.offsetLeft;
+            let y = ev.pageY - viewport.offsetTop;
+            
+            dot.style.left = x + 'px';
+            dot.style.top = y + 'px';
+            
+            // Renderizamos mientras movemos para ver el cambio en vivo
+            renderizarTextura(); 
+        };
+        document.onmouseup = function() {
+            document.onmousemove = null;
+        };
+    };
+});
+
+// Inicializar catálogo al cargar
+window.onload = () => mostrarProductos('todas');
 

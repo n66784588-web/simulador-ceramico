@@ -1,7 +1,8 @@
-// --- 1. ESTADO GLOBAL ---
+// 1. Variables Globales (SOLO UNA VEZ)
 let texturaActual = ''; 
 let modoEdicion = 'piso'; 
 
+// 2. Catálogo (Asegúrate de cerrar el array con ]; al final)
 const misProductos = [
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
@@ -498,7 +499,7 @@ const misProductos = [
 { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
-// --- 2. MOTOR DE PROYECCIÓN ---
+// 3. Motor de Proyección (Ajustado para 8 puntos)
 function renderizarTextura() {
     const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
     const canvas = document.getElementById(canvasId);
@@ -509,8 +510,9 @@ function renderizarTextura() {
     img.src = texturaActual;
 
     img.onload = () => {
-        // Determinamos qué puntos usar según el modo
+        // Seleccionamos puntos según el modo: piso (p1-p4) o figura/muro (p5-p8)
         const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
+        
         const pts = IDs.map(id => {
             const el = document.getElementById(id);
             return { x: el.offsetLeft, y: el.offsetTop };
@@ -523,21 +525,23 @@ function renderizarTextura() {
         const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
         const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
         
-        const transform = PerspectiveTransform(srcPts, dstPts);
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        canvas.style.transform = transform.getCSS();
-        canvas.style.transformOrigin = "0 0";
-        canvas.style.mixBlendMode = "multiply"; 
-        
-        ctx.drawImage(img, 0, 0, img.width, img.height);
+        try {
+            const transform = PerspectiveTransform(srcPts, dstPts);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.transform = transform.getCSS();
+            canvas.style.transformOrigin = "0 0";
+            canvas.style.mixBlendMode = "multiply"; 
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+        } catch (e) {
+            console.error("Error en la transformación de perspectiva:", e);
+        }
     };
 }
 
-// --- 3. FUNCIONES DE INTERFAZ ---
+// 4. Funciones de Control
 function setModo(modo) {
     modoEdicion = modo;
-    console.log("Modo activo: " + modoEdicion);
+    console.log("Modo cambiado a: " + modo);
 }
 
 function cambiarHabitacion(archivo) {
@@ -557,7 +561,7 @@ function mostrarProductos(marca) {
         const ruta = `img/ceramicas/${producto.nombre}.jpg`;
 
         card.innerHTML = `
-            <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.style.display='none'">
+            <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.src='img/error.jpg'">
             <p style="color:white; font-size:10px;">${producto.nombre}</p>
         `;
 
@@ -569,7 +573,7 @@ function mostrarProductos(marca) {
     });
 }
 
-// --- 4. DRAG & DROP PARA LOS PUNTOS ---
+// 5. Arrastre de puntos (Vital para armar la figura)
 document.querySelectorAll('.dot').forEach(dot => {
     dot.onmousedown = function(e) {
         document.onmousemove = function(ev) {

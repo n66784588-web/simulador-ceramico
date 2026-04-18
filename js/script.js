@@ -578,4 +578,8 @@ function mostrarProductos(marca) {
 // --- 4. INICIO ---
 window.onload = () => {
     mostrarProductos('todas');
+    // Dentro de img.onload en tu función renderizarTextura:
+const pattern = ctx.createPattern(img, 'repeat');
+ctx.fillStyle = pattern;
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 };

@@ -2,7 +2,6 @@
 let texturaActual = ''; 
 let modoEdicion = 'piso'; 
 
-// --- 2. CATÁLOGO COMPLETO POR MARCAS ---
 const misProductos = [
     // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
@@ -508,11 +507,12 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
-// --- 3. MOTOR DE PROYECCIÓN ---
+// --- 2. MOTOR DE PROYECCIÓN ---
 function renderizarTextura() {
     const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
     const canvas = document.getElementById(canvasId);
     const viewport = document.getElementById('viewport');
+    
     if (!canvas || !texturaActual || !viewport) return;
 
     const ctx = canvas.getContext('2d');
@@ -520,41 +520,60 @@ function renderizarTextura() {
     img.src = texturaActual;
 
     img.onload = () => {
+        // IDs de los puntos según el modo
         const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
+        
+        // Obtener coordenadas de los puntos
         const pts = IDs.map(id => {
             const el = document.getElementById(id);
             return el ? { x: el.offsetLeft, y: el.offsetTop } : { x: 0, y: 0 };
         });
 
+        // Ajustar resolución del canvas
         canvas.width = viewport.clientWidth;
         canvas.height = viewport.clientHeight;
 
+        // Puntos de origen y destino
         const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
         const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
         
         try {
+            // Aplicar perspectiva
             const transform = PerspectiveTransform(srcPts, dstPts);
+            
+            // Limpiar canvas anterior
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Aplicar estilos de transformación al elemento canvas
             canvas.style.transform = transform.getCSS();
             canvas.style.transformOrigin = "0 0";
             canvas.style.mixBlendMode = "multiply"; 
+            
+            // Dibujar la imagen en el canvas
             ctx.drawImage(img, 0, 0, img.width, img.height);
         } catch (e) {
             console.error("Error en la transformación:", e);
         }
     };
+
+    img.onerror = () => {
+        console.error("Error cargando la imagen en:", img.src);
+    };
 }
 
-// --- 4. FUNCIONES DE INTERFAZ ---
+// --- 3. FUNCIONES DE INTERFAZ ---
 function setModo(modo) {
     modoEdicion = modo;
-    console.log("Modo activo: " + modoEdicion);
+    document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active'));
+    const IDs = (modo === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
+    IDs.forEach(id => document.getElementById(id)?.classList.add('active'));
 }
 
 function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) bg.src = 'img/habitaciones/' + archivo;
 }
+
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
@@ -565,8 +584,7 @@ function mostrarProductos(marca) {
     filtrados.forEach(producto => {
         const card = document.createElement('div');
         card.className = 'tile-card';
-        
-        // RUTA CORREGIDA: Agregamos la carpeta donde están tus fotos
+        // RUTA CORREGIDA: Apunta a la carpeta de tus imágenes
         const ruta = `img/ceramicas/${producto.nombre}.jpg`;
 
         card.innerHTML = `
@@ -574,52 +592,44 @@ function mostrarProductos(marca) {
             <p style="color:white; font-size:10px; margin-top:5px; text-align:center;">${producto.nombre}</p>
         `;
 
-        // Al hacer clic, enviamos la ruta correcta al motor de proyección
         card.onclick = () => {
             texturaActual = ruta;
-            console.log("Cargando textura:", texturaActual); // Esto aparecerá en tu consola (F12)
             renderizarTextura();
         };
         contenedor.appendChild(card);
     });
 }
-// ... dentro de renderizarTextura ...
-img.onload = () => {
-    console.log("¡Imagen cargada con éxito!"); // Si no ves esto en la consola, la ruta sigue mal
-    
-    const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
-    // ... resto del código
-}
 
-img.onerror = () => {
-    console.error("No se pudo cargar la imagen en:", img.src); // Esto te dirá la ruta exacta que está fallando
-};
-// --- 5. ARRASTRE DE PUNTOS (CORREGIDO) ---
+// --- 4. ARRASTRE DE PUNTOS ---
 document.querySelectorAll('.dot').forEach(dot => {
-    dot.onmousedown = function(e) {
+    dot.addEventListener('mousedown', function(e) {
         e.preventDefault();
         const viewport = document.getElementById('viewport');
         const rect = viewport.getBoundingClientRect();
 
-        function mover(ev) {
+        function moverPunto(ev) {
             let x = ev.clientX - rect.left;
             let y = ev.clientY - rect.top;
-            
-            dot.style.left = x + 'px';
-            dot.style.top = y + 'px';
-            
-            if (texturaActual) renderizarTextura();
+            dot.style.left = Math.max(0, Math.min(x, rect.width)) + 'px';
+            dot.style.top = Math.max(0, Math.min(y, rect.height)) + 'px';
+            renderizarTextura(); 
         }
 
-        document.addEventListener('mousemove', mover);
-        
-        document.onmouseup = function() {
-            document.removeEventListener('mousemove', mover);
-            document.onmouseup = null;
-        };
-    };
+        function detenerMovimiento() {
+            document.removeEventListener('mousemove', moverPunto);
+            document.removeEventListener('mouseup', detenerMovimiento);
+        }
+
+        document.addEventListener('mousemove', moverPunto);
+        document.addEventListener('mouseup', detenerMovimiento);
+    });
 });
 
-
 // Inicializar
-window.onload = () => mostrarProductos('todas');
+window.onload = () => {
+    mostrarProductos('todas');
+    setModo('piso');
+};
+
+
+

@@ -1,4 +1,5 @@
 // --- ESTADO GLOBAL ---
+console.log("JS cargado");
 let texturaActual = '';
 let modoEdicion = 'piso';
 

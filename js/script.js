@@ -1,6 +1,10 @@
-// --- ESTADO GLOBAL ---
 console.log("JS cargado");
 
+// =============================
+// VARIABLES
+// =============================
+let modo = "piso";
+let texturaActual = null;
 // --- LISTA DE PRODUCTOS (SÍ SE NECESITA) ---
 const misProductos = [
     { nombre: "acatlan-30x60", marca: "nitropiso" },
@@ -505,66 +509,70 @@ const misProductos = [
     { nombre: "newbury-white-30x60", marca: "benadresa" },
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];
+
+// =============================
+// HABITACIÓN
+// =============================
 function cambiarHabitacion(img) {
     document.getElementById("bg-room").src = "img/habitaciones/" + img;
 }
 
 // =============================
-// CAMBIAR MODO
+// MODO
 // =============================
-function setModo(nuevoModo) {
-    modo = nuevoModo;
-    console.log("Modo cambiado a:", modo);
+function setModo(m) {
+    modo = m;
 }
 
 // =============================
-// MOSTRAR PRODUCTOS
+// CATÁLOGO
 // =============================
 function mostrarProductos(marca) {
     const contenedor = document.getElementById("catalog-container");
     contenedor.innerHTML = "";
 
-    const filtrados = marca === "todas"
+    const lista = marca === "todas"
         ? productos
         : productos.filter(p => p.marca === marca);
 
-    filtrados.forEach(prod => {
+    lista.forEach(p => {
         const div = document.createElement("div");
+        div.classList.add("producto");
 
         div.innerHTML = `
-            <img src="${prod.img}">
-            <p>${prod.nombre}</p>
+            <img src="${p.img}">
+            <p>${p.nombre}</p>
         `;
 
-        div.onclick = () => aplicarTextura(prod.img);
+        div.onclick = () => aplicarTextura(p.img);
 
         contenedor.appendChild(div);
     });
 }
 
 // =============================
-// APLICAR TEXTURA
+// TEXTURA
 // =============================
-function aplicarTextura(imgSrc) {
-    texturaActual = imgSrc;
+function aplicarTextura(img) {
+    texturaActual = img;
     render();
 }
 
 // =============================
-// OBTENER PUNTOS
+// PUNTOS
 // =============================
 function getPuntos(ids) {
     return ids.map(id => {
         const el = document.getElementById(id);
         return {
-            x: el.offsetLeft + el.offsetWidth / 2,
-            y: el.offsetTop + el.offsetHeight / 2
+            x: el.offsetLeft,
+            y: el.offsetTop
         };
     });
 }
 
 // =============================
-// RENDER PRINCIPAL
+// RENDER
 // =============================
 function render() {
     if (!texturaActual) return;
@@ -581,20 +589,18 @@ function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const puntos = modo === "piso"
-        ? getPuntos(["p1", "p2", "p3", "p4"])
-        : getPuntos(["p5", "p6", "p7", "p8"]);
+        ? getPuntos(["p1","p2","p3","p4"])
+        : getPuntos(["p5","p6","p7","p8"]);
 
     const img = new Image();
     img.src = texturaActual;
 
     img.onload = () => {
 
-        // 🔥 ESCALA REAL (ajusta aquí)
         const escala = 0.3;
 
         const pattern = ctx.createPattern(img, "repeat");
 
-        // 🔥 CLAVE: escalar SOLO el patrón
         if (pattern.setTransform) {
             pattern.setTransform(new DOMMatrix([
                 escala, 0,
@@ -605,7 +611,6 @@ function render() {
 
         ctx.save();
 
-        // 🔥 RECORTAR ÁREA (MUY IMPORTANTE)
         ctx.beginPath();
         ctx.moveTo(puntos[0].x, puntos[0].y);
         ctx.lineTo(puntos[1].x, puntos[1].y);
@@ -613,11 +618,9 @@ function render() {
         ctx.lineTo(puntos[3].x, puntos[3].y);
         ctx.closePath();
 
-        ctx.clip(); // ← esto evita que se pinte toda la pantalla
+        ctx.clip();
 
         ctx.fillStyle = pattern;
-
-        // Rellenar SOLO el área recortada
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.restore();
@@ -625,7 +628,7 @@ function render() {
 }
 
 // =============================
-// INICIALIZAR
+// INIT
 // =============================
 window.onload = () => {
     mostrarProductos("todas");

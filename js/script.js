@@ -508,11 +508,12 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
-// --- 3. MOTOR DE PROYECCIÓN (8 PUNTOS) ---
+// --- 3. MOTOR DE PROYECCIÓN ---
 function renderizarTextura() {
     const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
     const canvas = document.getElementById(canvasId);
-    if (!canvas || !texturaActual) return;
+    const viewport = document.getElementById('viewport');
+    if (!canvas || !texturaActual || !viewport) return;
 
     const ctx = canvas.getContext('2d');
     const img = new Image();
@@ -522,11 +523,9 @@ function renderizarTextura() {
         const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
         const pts = IDs.map(id => {
             const el = document.getElementById(id);
-            if (!el) return { x: 0, y: 0 };
-            return { x: el.offsetLeft, y: el.offsetTop };
+            return el ? { x: el.offsetLeft, y: el.offsetTop } : { x: 0, y: 0 };
         });
 
-        const viewport = document.getElementById('viewport');
         canvas.width = viewport.clientWidth;
         canvas.height = viewport.clientHeight;
 
@@ -541,7 +540,7 @@ function renderizarTextura() {
             canvas.style.mixBlendMode = "multiply"; 
             ctx.drawImage(img, 0, 0, img.width, img.height);
         } catch (e) {
-            console.error("Error en PerspectiveTransform:", e);
+            console.error("Error en la transformación:", e);
         }
     };
 }
@@ -582,24 +581,34 @@ function mostrarProductos(marca) {
     });
 }
 
-// --- 5. ARRASTRE DE PUNTOS ---
+// --- 5. ARRASTRE DE PUNTOS (CORREGIDO) ---
 document.querySelectorAll('.dot').forEach(dot => {
     dot.onmousedown = function(e) {
-        document.onmousemove = function(ev) {
-            const viewport = document.getElementById('viewport');
-            let x = ev.pageX - viewport.offsetLeft;
-            let y = ev.pageY - viewport.offsetTop;
+        e.preventDefault();
+        const viewport = document.getElementById('viewport');
+        const rect = viewport.getBoundingClientRect();
+
+        function mover(ev) {
+            let x = ev.clientX - rect.left;
+            let y = ev.clientY - rect.top;
             
             dot.style.left = x + 'px';
             dot.style.top = y + 'px';
             
-            renderizarTextura(); 
-        };
+            if (texturaActual) renderizarTextura();
+        }
+
+        document.addEventListener('mousemove', mover);
+        
         document.onmouseup = function() {
-            document.onmousemove = null;
+            document.removeEventListener('mousemove', mover);
+            document.onmouseup = null;
         };
     };
 });
+
+// Inicializar
+window.onload = () => mostrarProductos('todas');
 
 // Carga inicial
 window.onload = () => {

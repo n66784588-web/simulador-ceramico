@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Cerámicos</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="css/styles.css">
+    
     <script src="https://cdn.rawgit.com/edankwan/PerspectiveTransform.js/master/dist/perspective-transform.min.js"></script>
 </head>
 <body>
 
     <div id="viewport">
-        <img id="bg-room" src="img/habitaciones/sala.jpg" alt="Habitación">
+        <img id="bg-room" src="img/habitaciones/sala.jpg" alt="Habitación" onerror="this.src='img/error.jpg'">
         
         <canvas id="floor-canvas"></canvas>
         <canvas id="wall-canvas"></canvas>
@@ -49,6 +51,6 @@
             </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>

@@ -1,7 +1,5 @@
 // --- ESTADO GLOBAL ---
 console.log("JS cargado");
-let texturaActual = '';
-let modoEdicion = 'piso';
 
 // --- LISTA DE PRODUCTOS (SÍ SE NECESITA) ---
 const misProductos = [
@@ -532,10 +530,9 @@ function mostrarProductos(marca) {
 
     filtrados.forEach(prod => {
         const div = document.createElement("div");
-        div.classList.add("producto");
 
         div.innerHTML = `
-            <img src="${prod.img}" />
+            <img src="${prod.img}">
             <p>${prod.nombre}</p>
         `;
 

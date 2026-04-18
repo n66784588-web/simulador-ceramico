@@ -471,7 +471,7 @@ const misProductos = [
     // MISE
     { nombre: "abstrac-gold-60x1.20", marca: "mise" },
     { nombre: "alistonia-gold-60x1.20", marca: "mise" },
-    { nombre: "calacatta-renoirse-60x60", marca: "mise" },
+    { nombre: "calacatta-renoire-60x60", marca: "mise" },
     { nombre: "castor-blue-60x1.20", marca: "mise" },
     { nombre: "cracovia-high-glossy-60x1.20", marca: "mise" },
     { nombre: "eloy-satvario-60x1.20", marca: "mise" },

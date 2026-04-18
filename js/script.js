@@ -573,7 +573,6 @@ function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) bg.src = 'img/habitaciones/' + archivo;
 }
-
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
@@ -584,21 +583,24 @@ function mostrarProductos(marca) {
     filtrados.forEach(producto => {
         const card = document.createElement('div');
         card.className = 'tile-card';
-        // RUTA CORREGIDA: Apunta a la carpeta de tus imágenes
+        
+        // CORRECCIÓN CLAVE: Ruta relativa para GitHub
         const ruta = `img/ceramicas/${producto.nombre}.jpg`;
 
         card.innerHTML = `
-            <img src="${ruta}" style="width:100%; height:80px; object-fit:cover; cursor:pointer;" onerror="this.src='img/error.jpg'">
-            <p style="color:white; font-size:10px; margin-top:5px; text-align:center;">${producto.nombre}</p>
+            <img src="${ruta}" onerror="this.src='img/error.jpg'">
+            <p>${producto.nombre}</p>
         `;
 
         card.onclick = () => {
             texturaActual = ruta;
+            console.log("Intentando cargar:", texturaActual);
             renderizarTextura();
         };
         contenedor.appendChild(card);
     });
 }
+
 
 // --- 4. ARRASTRE DE PUNTOS ---
 document.querySelectorAll('.dot').forEach(dot => {

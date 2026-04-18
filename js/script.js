@@ -507,7 +507,7 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
-// --- 2. MOTOR DE PROYECCIÓN ---
+// --- 2. MOTOR DE PROYECCIÓN (CORREGIDO) ---
 function renderizarTextura() {
     const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
     const canvas = document.getElementById(canvasId);
@@ -517,62 +517,61 @@ function renderizarTextura() {
 
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    img.src = texturaActual;
+    
+    // Forzamos que la imagen cargue desde cero para evitar errores de cache
+    img.src = texturaActual + '?t=' + new Date().getTime();
 
     img.onload = () => {
-        // IDs de los puntos según el modo
         const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
         
-        // Obtener coordenadas de los puntos
         const pts = IDs.map(id => {
             const el = document.getElementById(id);
             return el ? { x: el.offsetLeft, y: el.offsetTop } : { x: 0, y: 0 };
         });
 
-        // Ajustar resolución del canvas
         canvas.width = viewport.clientWidth;
         canvas.height = viewport.clientHeight;
 
-        // Puntos de origen y destino
         const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
         const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
         
         try {
-            // Aplicar perspectiva
+            // Verificamos si la librería existe
+            if (typeof PerspectiveTransform === 'undefined') {
+                console.error("Error: La librería PerspectiveTransform no ha cargado en el HTML.");
+                return;
+            }
+
             const transform = PerspectiveTransform(srcPts, dstPts);
             
-            // Limpiar canvas anterior
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Aplicar estilos de transformación al elemento canvas
+            // ESTO ES CLAVE: Aplicamos la transformación al canvas
             canvas.style.transform = transform.getCSS();
             canvas.style.transformOrigin = "0 0";
+            
+            // Si el modo multiply lo hace invisible, prueba comentando esta línea:
             canvas.style.mixBlendMode = "multiply"; 
             
-            // Dibujar la imagen en el canvas
             ctx.drawImage(img, 0, 0, img.width, img.height);
+            console.log("Proyección realizada con éxito");
         } catch (e) {
             console.error("Error en la transformación:", e);
         }
-    };
-
-    img.onerror = () => {
-        console.error("Error cargando la imagen en:", img.src);
     };
 }
 
 // --- 3. FUNCIONES DE INTERFAZ ---
 function setModo(modo) {
     modoEdicion = modo;
-    document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active'));
-    const IDs = (modo === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
-    IDs.forEach(id => document.getElementById(id)?.classList.add('active'));
+    console.log("Modo cambiado a:", modoEdicion);
 }
 
 function cambiarHabitacion(archivo) {
     const bg = document.getElementById('bg-room');
     if (bg) bg.src = 'img/habitaciones/' + archivo;
 }
+
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
@@ -583,38 +582,33 @@ function mostrarProductos(marca) {
     filtrados.forEach(producto => {
         const card = document.createElement('div');
         card.className = 'tile-card';
-        
-        // CORRECCIÓN CLAVE: Ruta relativa para GitHub
         const ruta = `img/ceramicas/${producto.nombre}.jpg`;
 
         card.innerHTML = `
-            <img src="${ruta}" onerror="this.src='img/error.jpg'">
-            <p>${producto.nombre}</p>
+            <img src="${ruta}" style="width:100%; cursor:pointer;">
+            <p style="color:white; font-size:10px;">${producto.nombre}</p>
         `;
 
         card.onclick = () => {
             texturaActual = ruta;
-            console.log("Intentando cargar:", texturaActual);
             renderizarTextura();
         };
         contenedor.appendChild(card);
     });
 }
 
-
 // --- 4. ARRASTRE DE PUNTOS ---
 document.querySelectorAll('.dot').forEach(dot => {
     dot.addEventListener('mousedown', function(e) {
-        e.preventDefault();
         const viewport = document.getElementById('viewport');
         const rect = viewport.getBoundingClientRect();
 
         function moverPunto(ev) {
             let x = ev.clientX - rect.left;
             let y = ev.clientY - rect.top;
-            dot.style.left = Math.max(0, Math.min(x, rect.width)) + 'px';
-            dot.style.top = Math.max(0, Math.min(y, rect.height)) + 'px';
-            renderizarTextura(); 
+            dot.style.left = x + 'px';
+            dot.style.top = y + 'px';
+            if(texturaActual) renderizarTextura(); 
         }
 
         function detenerMovimiento() {
@@ -627,7 +621,6 @@ document.querySelectorAll('.dot').forEach(dot => {
     });
 });
 
-// Inicializar
 window.onload = () => {
     mostrarProductos('todas');
     setModo('piso');

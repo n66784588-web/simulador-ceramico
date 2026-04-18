@@ -583,7 +583,17 @@ function mostrarProductos(marca) {
         contenedor.appendChild(card);
     });
 }
+// ... dentro de renderizarTextura ...
+img.onload = () => {
+    console.log("¡Imagen cargada con éxito!"); // Si no ves esto en la consola, la ruta sigue mal
+    
+    const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
+    // ... resto del código
+}
 
+img.onerror = () => {
+    console.error("No se pudo cargar la imagen en:", img.src); // Esto te dirá la ruta exacta que está fallando
+};
 // --- 5. ARRASTRE DE PUNTOS (CORREGIDO) ---
 document.querySelectorAll('.dot').forEach(dot => {
     dot.onmousedown = function(e) {
@@ -609,6 +619,7 @@ document.querySelectorAll('.dot').forEach(dot => {
         };
     };
 });
+
 
 // Inicializar
 window.onload = () => mostrarProductos('todas');

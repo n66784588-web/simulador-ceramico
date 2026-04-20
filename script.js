@@ -503,35 +503,7 @@ const misProductos = [
     { nombre: "newbury-white-30x60", marca: "benadresa" },
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
-
-// --- 3. FUNCIÓN PARA MOSTRAR PRODUCTOS ---
-function mostrarProductos(marca) {
-    const contenedor = document.getElementById('productos-lista');
-    if (!contenedor) return;
-    
-    contenedor.innerHTML = ''; 
-
-    const filtrados = misProductos.filter(p => p.marca === marca);
-
-    filtrados.forEach(prod => {
-        const div = document.createElement('div');
-        div.className = 'producto-item';
-        
-        // RUTA CORREGIDA según tu GitHub: img/ceramicas/
-        const rutaImg = `img/ceramicas/${prod.nombre}.jpg`; 
-
-        div.innerHTML = `
-            <img src="${rutaImg}" alt="${prod.nombre}" 
-                 onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Error+Ruta'">
-            <span>${prod.nombre}</span>
-        `;
-        
-        div.onclick = () => aplicarTextura(rutaImg);
-        contenedor.appendChild(div);
-    });
-}
-
-// --- 4. FUNCIONES DE CONTROL (Para eliminar los errores rojos de la consola) ---
+// --- 3. FUNCIONES DE CONTROL (CORREGIDAS) ---
 
 function setModo(modo) {
     modoEdicion = modo;
@@ -541,8 +513,8 @@ function setModo(modo) {
 function cambiarHabitacion(habitacion) {
     const imgHab = document.getElementById('habitacion-img');
     if (imgHab) {
-        // Ajusta esta ruta según donde tengas tus fondos (ej: img/escenarios/)
-        imgHab.src = `img/escenarios/${habitacion}.jpg`;
+        // Ajusta esta ruta a donde tengas tus escenarios
+        imgHab.src = "img/escenarios/" + habitacion + ".jpg";
     }
 }
 
@@ -550,11 +522,38 @@ function aplicarTextura(ruta) {
     texturaActual = ruta;
     const capaPiso = document.getElementById('capa-piso');
     if (capaPiso) {
-        capaPiso.style.backgroundImage = `url(${ruta})`;
+        capaPiso.style.backgroundImage = "url('" + ruta + "')";
     }
 }
 
+// --- 4. FUNCIÓN PARA MOSTRAR PRODUCTOS ---
+function mostrarProductos(marca) {
+    const contenedor = document.getElementById('productos-lista');
+    if (!contenedor) return;
+    
+    contenedor.innerHTML = ''; 
+
+    const filtrados = misProductos.filter(function(p) {
+        return p.marca === marca;
+    });
+
+    filtrados.forEach(function(prod) {
+        const div = document.createElement('div');
+        div.className = 'producto-item';
+        
+        // RUTA CORREGIDA: Usamos concatenación simple para evitar errores de símbolos
+        var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg"; 
+
+        div.innerHTML = '<img src="' + rutaImg + '" alt="' + prod.nombre + '" onerror="this.src=\'https://via.placeholder.com/150?text=Error\'"><span>' + prod.nombre + '</span>';
+        
+        div.onclick = function() {
+            aplicarTextura(rutaImg);
+        };
+        contenedor.appendChild(div);
+    });
+}
+
 // --- 5. INICIALIZACIÓN ---
-window.onload = () => {
+window.onload = function() {
     mostrarProductos('nitropiso');
 };

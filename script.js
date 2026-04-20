@@ -1,11 +1,9 @@
-/ --- 1. CONFIGURACIÓN ---
-let modoEdicion = 'piso';
-let texturaActual = '';
+// --- CONFIGURACION ---
+var modoEdicion = 'piso';
 
-// --- 2. LISTADO DE PRODUCTOS (Asegúrate de que el nombre sea igual al de tu carpeta) ---
-const misProductos = [
-
-    // NITROPISO
+// --- LISTA DE PRODUCTOS ---
+var misProductos = [
+ // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
     { nombre: "alhambra-gris-44x44", marca: "nitropiso" },
@@ -503,57 +501,59 @@ const misProductos = [
     { nombre: "newbury-white-30x60", marca: "benadresa" },
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
-// --- 3. FUNCIONES DE CONTROL (CORREGIDAS) ---
 
+// --- FUNCIONES DE CONTROL ---
 function setModo(modo) {
     modoEdicion = modo;
-    console.log("Modo cambiado a: " + modo);
+    console.log("Modo: " + modo);
 }
 
 function cambiarHabitacion(habitacion) {
-    const imgHab = document.getElementById('habitacion-img');
+    var imgHab = document.getElementById('habitacion-img');
     if (imgHab) {
-        // Ajusta esta ruta a donde tengas tus escenarios
         imgHab.src = "img/escenarios/" + habitacion + ".jpg";
     }
 }
 
 function aplicarTextura(ruta) {
-    texturaActual = ruta;
-    const capaPiso = document.getElementById('capa-piso');
+    var capaPiso = document.getElementById('capa-piso');
     if (capaPiso) {
         capaPiso.style.backgroundImage = "url('" + ruta + "')";
     }
 }
 
-// --- 4. FUNCIÓN PARA MOSTRAR PRODUCTOS ---
+// --- MOSTRAR PRODUCTOS ---
 function mostrarProductos(marca) {
-    const contenedor = document.getElementById('productos-lista');
+    var contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
     
     contenedor.innerHTML = ''; 
 
-    const filtrados = misProductos.filter(function(p) {
-        return p.marca === marca;
-    });
+    for (var i = 0; i < misProductos.length; i++) {
+        var prod = misProductos[i];
+        if (prod.marca === marca) {
+            var div = document.createElement('div');
+            div.className = 'producto-item';
+            
+            // RUTA SEGUN TU CAPTURA: img/ceramicas/
+            var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg"; 
 
-    filtrados.forEach(function(prod) {
-        const div = document.createElement('div');
-        div.className = 'producto-item';
-        
-        // RUTA CORREGIDA: Usamos concatenación simple para evitar errores de símbolos
-        var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg"; 
+            div.innerHTML = '<img src="' + rutaImg + '" style="width:100px">' +
+                            '<p>' + prod.nombre + '</p>';
+            
+            // Usamos una funcion anonima tradicional para evitar errores
+            (function(ruta) {
+                div.onclick = function() {
+                    aplicarTextura(ruta);
+                };
+            })(rutaImg);
 
-        div.innerHTML = '<img src="' + rutaImg + '" alt="' + prod.nombre + '" onerror="this.src=\'https://via.placeholder.com/150?text=Error\'"><span>' + prod.nombre + '</span>';
-        
-        div.onclick = function() {
-            aplicarTextura(rutaImg);
-        };
-        contenedor.appendChild(div);
-    });
+            contenedor.appendChild(div);
+        }
+    }
 }
 
-// --- 5. INICIALIZACIÓN ---
+// --- INICIO ---
 window.onload = function() {
     mostrarProductos('nitropiso');
 };

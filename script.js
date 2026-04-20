@@ -501,37 +501,102 @@ const misProductos = [
 { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
+// --- 2. FUNCIONES DE INTERFAZ ---
+function setModo(modo) {
+    modoEdicion = modo;
+    console.log("Modo activo: " + modoEdicion);
+}
+
+function cambiarHabitacion(archivo) {
+    const bg = document.getElementById('bg-room');
+    if (bg) bg.src = 'img/habitaciones/' + archivo;
+}
+
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
+    if (!contenedor) return;
     contenedor.innerHTML = ''; 
 
     const filtrados = misProductos.filter(p => marca === 'todas' || p.marca === marca);
 
     filtrados.forEach(prod => {
         const card = document.createElement('div');
-        card.style.background = '#222';
-        card.style.padding = '5px';
+        card.className = 'tile-card';
+        const rutaImg = `img/muestras/${prod.nombre}.jpg`;
+
         card.innerHTML = `
-            <img src="img/muestras/${prod.nombre}.jpg" style="width:100%; border-radius:4px;" 
-                 onerror="this.src='https://via.placeholder.com/100?text=S/F'">
-            <p style="font-size:10px; text-align:center;">${prod.nombre}</p>
+            <img src="${rutaImg}" style="width:100%; border-radius:4px; cursor:pointer;" 
+                 onerror="this.src='https://via.placeholder.com/150?text=Sin+Imagen'">
+            <p style="color:white; font-size:10px; margin-top:5px;">${prod.nombre.replace(/_/g, ' ')}</p>
         `;
+
         card.onclick = () => {
-            texturaActual = `img/muestras/${prod.nombre}.jpg`;
-            console.log("Textura seleccionada: " + texturaActual);
+            texturaActual = rutaImg;
+            renderizarTextura();
         };
         contenedor.appendChild(card);
     });
 }
 
-function cambiarHabitacion(archivo) {
-    document.getElementById('bg-room').src = 'img/habitaciones/' + archivo;
+// --- 3. MOTOR DE RENDERIZADO ---
+function renderizarTextura() {
+    const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
+    const canvas = document.getElementById(canvasId);
+    const viewport = document.getElementById('viewport');
+    
+    if (!canvas || !texturaActual || !viewport) return;
+
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = texturaActual;
+
+    img.onload = () => {
+        canvas.width = viewport.clientWidth;
+        canvas.height = viewport.clientHeight;
+
+        const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
+        const pts = IDs.map(id => {
+            const el = document.getElementById(id);
+            return el ? { x: el.offsetLeft + 5, y: el.offsetTop + 5 } : { x: 0, y: 0 };
+        });
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        ctx.lineTo(pts[1].x, pts[1].y);
+        ctx.lineTo(pts[2].x, pts[2].y);
+        ctx.lineTo(pts[3].x, pts[3].y);
+        ctx.closePath();
+        ctx.clip();
+        
+        ctx.globalAlpha = 0.8; 
+        ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+        
+        canvas.style.mixBlendMode = "multiply"; 
+    };
 }
 
-function setModo(modo) {
-    modoEdicion = modo;
-    console.log("Modo: " + modo);
-}
+// --- 4. MOVIMIENTO DE PUNTOS ---
+document.querySelectorAll('.dot').forEach(dot => {
+    dot.onmousedown = function(e) {
+        e.preventDefault();
+        const viewport = document.getElementById('viewport');
+        const move = (ev) => {
+            const rect = viewport.getBoundingClientRect();
+            let x = ev.clientX - rect.left;
+            let y = ev.clientY - rect.top;
+            dot.style.left = x + 'px';
+            dot.style.top = y + 'px';
+            renderizarTextura();
+        };
+        document.addEventListener('mousemove', move);
+        document.onmouseup = () => document.removeEventListener('mousemove', move);
+    };
+});
 
-window.onload = () => mostrarProductos('todas');
-
+// --- 5. INICIO ---
+window.onload = () => {
+    mostrarProductos('todas');
+};

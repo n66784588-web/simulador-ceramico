@@ -1,8 +1,8 @@
-// --- 1. ESTADO GLOBAL ---
-let texturaActual = ''; 
-let modoEdicion = 'piso'; 
+// --- CONFIGURACIÓN INICIAL ---
+let modoEdicion = 'piso';
+let texturaActual = '';
 
-// --- 2. CATÁLOGO COMPLETO POR MARCAS ---
+// Lista de tus productos (Asegúrate de que los nombres coincidan con tus imágenes)
 const misProductos = [
     // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
@@ -503,10 +503,12 @@ const misProductos = [
 { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
-// --- 3. MOTOR DE PROYECCIÓN (8 PUNTOS) ---
+// --- MOTOR DE RENDERIZADO ---
 function renderizarTextura() {
     const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
     const canvas = document.getElementById(canvasId);
+    const viewport = document.getElementById('viewport');
+    
     if (!canvas || !texturaActual) return;
 
     const ctx = canvas.getContext('2d');
@@ -514,91 +516,86 @@ function renderizarTextura() {
     img.src = texturaActual;
 
     img.onload = () => {
-        // IDs según el modo activo: p1-p4 para piso, p5-p8 para figura/muro
-        const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
-        
-        const pts = IDs.map(id => {
-            const el = document.getElementById(id);
-            if (!el) return { x: 0, y: 0 };
-            return { x: el.offsetLeft, y: el.offsetTop };
-        });
-
-        const viewport = document.getElementById('viewport');
         canvas.width = viewport.clientWidth;
         canvas.height = viewport.clientHeight;
 
-        const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
-        const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
+        const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
+        const pts = IDs.map(id => {
+            const el = document.getElementById(id);
+            return { x: el.offsetLeft + 5, y: el.offsetTop + 5 };
+        });
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        try {
-            const transform = PerspectiveTransform(srcPts, dstPts);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            canvas.style.transform = transform.getCSS();
-            canvas.style.transformOrigin = "0 0";
-            canvas.style.mixBlendMode = "multiply"; 
-            ctx.drawImage(img, 0, 0, img.width, img.height);
-        } catch (e) {
-            console.error("Error en PerspectiveTransform:", e);
-        }
+        // Simulación de perspectiva básica mediante dibujo de polígono
+        // Para perspectiva real 3D se requiere librería externa, pero esto habilita la visualización
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        ctx.lineTo(pts[1].x, pts[1].y);
+        ctx.lineTo(pts[2].x, pts[2].y);
+        ctx.lineTo(pts[3].x, pts[3].y);
+        ctx.closePath();
+        ctx.clip();
+        
+        // Dibujamos la imagen ajustada al área
+        ctx.globalAlpha = 0.85; // Para que se vea algo del fondo
+        ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+        
+        canvas.style.mixBlendMode = "multiply"; 
     };
 }
 
-// --- 4. FUNCIONES DE INTERFAZ ---
+// --- INTERFAZ ---
 function setModo(modo) {
     modoEdicion = modo;
-    console.log("Modo activo: " + modoEdicion);
+    document.getElementById('btn-piso').classList.toggle('active', modo === 'piso');
+    document.getElementById('btn-pared').classList.toggle('active', modo === 'pared');
+    console.log("Modo: " + modo);
 }
 
 function cambiarHabitacion(archivo) {
-    const bg = document.getElementById('bg-room');
-    if (bg) bg.src = 'img/habitaciones/' + archivo;
+    document.getElementById('bg-room').src = 'img/habitaciones/' + archivo;
 }
 
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
-    if (!contenedor) return;
     contenedor.innerHTML = ''; 
 
     const filtrados = misProductos.filter(p => marca === 'todas' || p.marca === marca);
 
-    filtrados.forEach(producto => {
+    filtrados.forEach(prod => {
         const card = document.createElement('div');
         card.className = 'tile-card';
-        const ruta = `img/ceramicas/${producto.nombre}.jpg`;
+        const rutaImg = `img/muestras/${prod.nombre}.jpg`;
 
         card.innerHTML = `
-            <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.src='img/error.jpg'">
-            <p style="color:white; font-size:10px; margin-top:5px;">${producto.nombre}</p>
+            <img src="${rutaImg}" onerror="this.src='https://via.placeholder.com/150?text=Error+Imagen'">
+            <p>${prod.nombre.replace(/_/g, ' ')}</p>
         `;
 
         card.onclick = () => {
-            texturaActual = ruta;
+            texturaActual = rutaImg;
             renderizarTextura();
         };
         contenedor.appendChild(card);
     });
 }
 
-// --- 5. ARRASTRE DE PUNTOS ---
+// --- DRAG AND DROP DE PUNTOS ---
 document.querySelectorAll('.dot').forEach(dot => {
     dot.onmousedown = function(e) {
-        document.onmousemove = function(ev) {
-            const viewport = document.getElementById('viewport');
-            let x = ev.pageX - viewport.offsetLeft;
-            let y = ev.pageY - viewport.offsetTop;
-            
-            dot.style.left = x + 'px';
-            dot.style.top = y + 'px';
-            
-            renderizarTextura(); 
+        const move = (ev) => {
+            const rect = document.getElementById('viewport').getBoundingClientRect();
+            dot.style.left = (ev.clientX - rect.left) + 'px';
+            dot.style.top = (ev.clientY - rect.top) + 'px';
+            renderizarTextura();
         };
-        document.onmouseup = function() {
-            document.onmousemove = null;
-        };
+        document.addEventListener('mousemove', move);
+        document.onmouseup = () => document.removeEventListener('mousemove', move);
     };
 });
 
-// Carga inicial
-window.onload = () => {
-    mostrarProductos('todas');
-};
+// Inicio
+window.onload = () => mostrarProductos('todas');

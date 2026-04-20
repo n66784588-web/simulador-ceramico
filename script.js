@@ -1,8 +1,6 @@
-// --- CONFIGURACIÓN INICIAL ---
 let modoEdicion = 'piso';
 let texturaActual = '';
 
-// Lista de tus productos (Asegúrate de que los nombres coincidan con tus imágenes)
 const misProductos = [
     // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
@@ -503,62 +501,6 @@ const misProductos = [
 { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
-// --- MOTOR DE RENDERIZADO ---
-function renderizarTextura() {
-    const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
-    const canvas = document.getElementById(canvasId);
-    const viewport = document.getElementById('viewport');
-    
-    if (!canvas || !texturaActual) return;
-
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.src = texturaActual;
-
-    img.onload = () => {
-        canvas.width = viewport.clientWidth;
-        canvas.height = viewport.clientHeight;
-
-        const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
-        const pts = IDs.map(id => {
-            const el = document.getElementById(id);
-            return { x: el.offsetLeft + 5, y: el.offsetTop + 5 };
-        });
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Simulación de perspectiva básica mediante dibujo de polígono
-        // Para perspectiva real 3D se requiere librería externa, pero esto habilita la visualización
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        ctx.lineTo(pts[1].x, pts[1].y);
-        ctx.lineTo(pts[2].x, pts[2].y);
-        ctx.lineTo(pts[3].x, pts[3].y);
-        ctx.closePath();
-        ctx.clip();
-        
-        // Dibujamos la imagen ajustada al área
-        ctx.globalAlpha = 0.85; // Para que se vea algo del fondo
-        ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
-        ctx.restore();
-        
-        canvas.style.mixBlendMode = "multiply"; 
-    };
-}
-
-// --- INTERFAZ ---
-function setModo(modo) {
-    modoEdicion = modo;
-    document.getElementById('btn-piso').classList.toggle('active', modo === 'piso');
-    document.getElementById('btn-pared').classList.toggle('active', modo === 'pared');
-    console.log("Modo: " + modo);
-}
-
-function cambiarHabitacion(archivo) {
-    document.getElementById('bg-room').src = 'img/habitaciones/' + archivo;
-}
-
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     contenedor.innerHTML = ''; 
@@ -567,35 +509,29 @@ function mostrarProductos(marca) {
 
     filtrados.forEach(prod => {
         const card = document.createElement('div');
-        card.className = 'tile-card';
-        const rutaImg = `img/muestras/${prod.nombre}.jpg`;
-
+        card.style.background = '#222';
+        card.style.padding = '5px';
         card.innerHTML = `
-            <img src="${rutaImg}" onerror="this.src='https://via.placeholder.com/150?text=Error+Imagen'">
-            <p>${prod.nombre.replace(/_/g, ' ')}</p>
+            <img src="img/muestras/${prod.nombre}.jpg" style="width:100%; border-radius:4px;" 
+                 onerror="this.src='https://via.placeholder.com/100?text=S/F'">
+            <p style="font-size:10px; text-align:center;">${prod.nombre}</p>
         `;
-
         card.onclick = () => {
-            texturaActual = rutaImg;
-            renderizarTextura();
+            texturaActual = `img/muestras/${prod.nombre}.jpg`;
+            console.log("Textura seleccionada: " + texturaActual);
         };
         contenedor.appendChild(card);
     });
 }
 
-// --- DRAG AND DROP DE PUNTOS ---
-document.querySelectorAll('.dot').forEach(dot => {
-    dot.onmousedown = function(e) {
-        const move = (ev) => {
-            const rect = document.getElementById('viewport').getBoundingClientRect();
-            dot.style.left = (ev.clientX - rect.left) + 'px';
-            dot.style.top = (ev.clientY - rect.top) + 'px';
-            renderizarTextura();
-        };
-        document.addEventListener('mousemove', move);
-        document.onmouseup = () => document.removeEventListener('mousemove', move);
-    };
-});
+function cambiarHabitacion(archivo) {
+    document.getElementById('bg-room').src = 'img/habitaciones/' + archivo;
+}
 
-// Inicio
+function setModo(modo) {
+    modoEdicion = modo;
+    console.log("Modo: " + modo);
+}
+
 window.onload = () => mostrarProductos('todas');
+

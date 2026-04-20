@@ -513,9 +513,8 @@ function mostrarProductos(marca) {
         const card = document.createElement('div');
         card.className = 'tile-card';
         // AQUÍ ESTÁ EL CAMBIO: Usar acentos graves ` ` en lugar de ' '
-        // Agregamos encodeURIComponent para manejar espacios o caracteres especiales
-const rutaImg = `img/muestras/${encodeURIComponent(prod.nombre)}.jpg`;
-
+// Si tu carpeta se llama "ceramicas" (todo en minúsculas):
+const rutaImg = `ceramicas/${prod.nombre}.jpg`;
         card.innerHTML = `
             <img src="${rutaImg}" style="width:100%; border-radius:4px; cursor:pointer;" 
                  onerror="this.src='https://via.placeholder.com/150?text=Error+Foto'">

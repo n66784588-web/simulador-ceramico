@@ -8,41 +8,51 @@
 </head>
 <body>
 
-<div id="viewport">
-    <img id="bg-room" src="img/habitaciones/sala.jpg">
-    <canvas id="floor-canvas"></canvas>
-    <canvas id="wall-canvas"></canvas>
+<div id="main-container">
+    <div id="viewport">
+        <img id="bg-room" src="img/habitaciones/sala.jpg">
+        <canvas id="floor-canvas"></canvas>
+        <canvas id="wall-canvas"></canvas>
 
-    <div class="controls">
-        <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
-        <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
-        <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
-        <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
-        <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
+        <div class="controls">
+            <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
+            <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
+            <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
+            <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
+            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
+        </div>
+
+        <div class="mode-selector">
+            <button onclick="setModo('piso')">Editar Piso</button>
+            <button onclick="setModo('pared')">Editar Pared</button>
+        </div>
+
+        <div id="p1" class="dot blue" style="top:70%; left:20%"></div>
+        <div id="p2" class="dot blue" style="top:70%; left:80%"></div>
+        <div id="p3" class="dot blue" style="top:90%; left:90%"></div>
+        <div id="p4" class="dot blue" style="top:90%; left:10%"></div>
+
+        <div id="p5" class="dot red" style="top:20%; left:30%"></div>
+        <div id="p6" class="dot red" style="top:20%; left:70%"></div>
+        <div id="p7" class="dot red" style="top:60%; left:70%"></div>
+        <div id="p8" class="dot red" style="top:60%; left:30%"></div>
     </div>
 
-    <div class="mode">
-        <button onclick="setModo('piso')">Editar Piso</button>
-        <button onclick="setModo('pared')">Editar Pared</button>
+    <div class="side-panel">
+        <h3>Marcas</h3>
+        <div class="brand-filters">
+            <button onclick="mostrarProductos('todas')">Todas</button>
+            <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
+            <button onclick="mostrarProductos('daltile')">Daltile</button>
+            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
+            <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
+            <button onclick="mostrarProductos('mise')">mise</button>
+             <button onclick="mostrarProductos('benadresa')">benadresa</button>
+
+
+        </div>
+        <div id="catalog-container"></div>
     </div>
-
-    <div id="p1" class="dot blue" style="top:70%; left:20%"></div>
-    <div id="p2" class="dot blue" style="top:70%; left:80%"></div>
-    <div id="p3" class="dot blue" style="top:90%; left:90%"></div>
-    <div id="p4" class="dot blue" style="top:90%; left:10%"></div>
-
-    <div id="p5" class="dot red" style="top:20%; left:30%"></div>
-    <div id="p6" class="dot red" style="top:20%; left:70%"></div>
-    <div id="p7" class="dot red" style="top:60%; left:70%"></div>
-    <div id="p8" class="dot red" style="top:60%; left:30%"></div>
-</div>
-
-<div class="panel">
-    <button onclick="mostrarProductos('todas')">Todas</button>
-    <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
-    <button onclick="mostrarProductos('daltile')">Daltile</button>
-    <button onclick="mostrarProductos('vitromex')">Vitromex</button>
-    <div id="catalog-container"></div>
 </div>
 
 <script src="script.js"></script>

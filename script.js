@@ -503,12 +503,12 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-// --- 3. FUNCIÓN PARA MOSTRAR PRODUCTOS POR MARCA ---
+// --- 3. FUNCIÓN PARA MOSTRAR PRODUCTOS ---
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
     
-    contenedor.innerHTML = ''; // Limpiar la lista actual
+    contenedor.innerHTML = ''; 
 
     const filtrados = misProductos.filter(p => p.marca === marca);
 
@@ -516,53 +516,48 @@ function mostrarProductos(marca) {
         const div = document.createElement('div');
         div.className = 'producto-item';
         
-        // Usamos la carpeta 'ceramicas' que mencionaste
+        // CORRECCIÓN DE RUTA: Apuntamos a la carpeta 'ceramicas'
         const rutaImg = `./ceramicas/${prod.nombre}.jpg`; 
 
         div.innerHTML = `
-            <img src="${rutaImg}" alt="${prod.nombre}" onerror="this.src='https://via.placeholder.com/150?text=Error+Foto'">
+            <img src="${rutaImg}" alt="${prod.nombre}" 
+                 onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=No+Encontrada'">
             <span>${prod.nombre}</span>
         `;
         
-        // Al hacer clic, se aplica la textura al simulador
         div.onclick = () => aplicarTextura(rutaImg);
         contenedor.appendChild(div);
     });
 }
 
-// --- 4. FUNCIÓN PARA APLICAR LA TEXTURA AL ESCENARIO ---
+// --- 4. FUNCIONES DE CONTROL (INDISPENSABLES) ---
+
+function setModo(modo) {
+    modoEdicion = modo;
+    console.log("Modo cambiado a: " + modo);
+}
+
+// Esta es la función que te marca error de "not defined"
+function cambiarHabitacion(habitacion) {
+    const imgHab = document.getElementById('habitacion-img');
+    if (imgHab) {
+        // Ajusta la ruta si tu carpeta de fondos se llama diferente
+        imgHab.src = `./img/escenarios/${habitacion}.jpg`;
+    } else {
+        console.error("No se encontró el elemento habitacion-img");
+    }
+}
+
 function aplicarTextura(ruta) {
     texturaActual = ruta;
-    // Aquí va la lógica para cambiar el fondo o la capa del piso
-    // Por ejemplo, si usas una capa con ID 'capa-piso':
     const capaPiso = document.getElementById('capa-piso');
     if (capaPiso) {
         capaPiso.style.backgroundImage = `url(${ruta})`;
     }
-    console.log("Textura aplicada:", ruta);
+    console.log("Aplicando cerámica:", ruta);
 }
 
-// --- 5. FUNCIONES DE CONTROL DE INTERFAZ ---
-
-// Cambia entre modo piso o muro
-function setModo(modo) {
-    modoEdicion = modo;
-    console.log("Modo de edición cambiado a:", modo);
-    // Opcional: Cambiar estilo visual de los botones de modo
-}
-
-// Cambia la imagen de fondo (habitación)
-function cambiarHabitacion(habitacion) {
-    const imgHab = document.getElementById('habitacion-img');
-    if (imgHab) {
-        // Asegúrate de que tus escenarios estén en esta ruta
-        imgHab.src = `./img/escenarios/${habitacion}.jpg`;
-        console.log("Habitación cambiada a:", habitacion);
-    }
-}
-
-// --- 6. INICIALIZACIÓN ---
-// Esto asegura que al cargar la página ya se vea una marca por defecto
+// --- 5. INICIO ---
 window.onload = () => {
     mostrarProductos('nitropiso');
 };

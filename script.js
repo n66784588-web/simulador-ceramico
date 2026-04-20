@@ -502,29 +502,67 @@ const misProductos = [
     { nombre: "newbury-white-30x60", marca: "benadresa" },
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
-function mostrarProductos(marca) {
-    const contenedor = document.getElementById('catalog-container');
-    if (!contenedor) return;
-    contenedor.innerHTML = ''; 
 
-    const filtrados = misProductos.filter(p => marca === 'todas' || p.marca === marca);
+// --- 3. FUNCIÓN PARA MOSTRAR PRODUCTOS POR MARCA ---
+function mostrarProductos(marca) {
+    const contenedor = document.getElementById('productos-lista');
+    if (!contenedor) return;
+    
+    contenedor.innerHTML = ''; // Limpiar la lista actual
+
+    const filtrados = misProductos.filter(p => p.marca === marca);
 
     filtrados.forEach(prod => {
-        const card = document.createElement('div');
-        card.className = 'tile-card';
-        // AQUÍ ESTÁ EL CAMBIO: Usar acentos graves ` ` en lugar de ' '
-// Si tu carpeta se llama "ceramicas" (todo en minúsculas):
-        const rutaImg = `./ceramicas/${prod.nombre}.jpg`;
-        card.innerHTML = `
-            <img src="${rutaImg}" style="width:100%; border-radius:4px; cursor:pointer;" 
-                 onerror="this.src='https://via.placeholder.com/150?text=Error+Foto'">
-            <p style="color:white; font-size:10px; margin-top:5px;">${prod.nombre}</p>
-        `;
+        const div = document.createElement('div');
+        div.className = 'producto-item';
+        
+        // Usamos la carpeta 'ceramicas' que mencionaste
+        const rutaImg = `./ceramicas/${prod.nombre}.jpg`; 
 
-        card.onclick = () => {
-            texturaActual = rutaImg;
-            renderizarTextura();
-        };
-        contenedor.appendChild(card);
+        div.innerHTML = `
+            <img src="${rutaImg}" alt="${prod.nombre}" onerror="this.src='https://via.placeholder.com/150?text=Error+Foto'">
+            <span>${prod.nombre}</span>
+        `;
+        
+        // Al hacer clic, se aplica la textura al simulador
+        div.onclick = () => aplicarTextura(rutaImg);
+        contenedor.appendChild(div);
     });
 }
+
+// --- 4. FUNCIÓN PARA APLICAR LA TEXTURA AL ESCENARIO ---
+function aplicarTextura(ruta) {
+    texturaActual = ruta;
+    // Aquí va la lógica para cambiar el fondo o la capa del piso
+    // Por ejemplo, si usas una capa con ID 'capa-piso':
+    const capaPiso = document.getElementById('capa-piso');
+    if (capaPiso) {
+        capaPiso.style.backgroundImage = `url(${ruta})`;
+    }
+    console.log("Textura aplicada:", ruta);
+}
+
+// --- 5. FUNCIONES DE CONTROL DE INTERFAZ ---
+
+// Cambia entre modo piso o muro
+function setModo(modo) {
+    modoEdicion = modo;
+    console.log("Modo de edición cambiado a:", modo);
+    // Opcional: Cambiar estilo visual de los botones de modo
+}
+
+// Cambia la imagen de fondo (habitación)
+function cambiarHabitacion(habitacion) {
+    const imgHab = document.getElementById('habitacion-img');
+    if (imgHab) {
+        // Asegúrate de que tus escenarios estén en esta ruta
+        imgHab.src = `./img/escenarios/${habitacion}.jpg`;
+        console.log("Habitación cambiada a:", habitacion);
+    }
+}
+
+// --- 6. INICIALIZACIÓN ---
+// Esto asegura que al cargar la página ya se vea una marca por defecto
+window.onload = () => {
+    mostrarProductos('nitropiso');
+};

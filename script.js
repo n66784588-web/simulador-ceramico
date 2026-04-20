@@ -1,5 +1,9 @@
-// BASE DE DATOS COMPLETA DE PRODUCTOS
-const productos = [
+// --- 1. ESTADO GLOBAL ---
+let texturaActual = ''; 
+let modoEdicion = 'piso'; 
+
+// --- 2. CATÁLOGO COMPLETO POR MARCAS ---
+const misProductos = [
     // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
@@ -106,7 +110,6 @@ const productos = [
     { nombre: "vancouver-blanco-60x60", marca: "nitropiso" },
     { nombre: "zacapa-44x44", marca: "nitropiso" },
     { nombre: "zurich-20x60", marca: "nitropiso" },
-
     // PORCELANITE
     { nombre: "alabaster-55x55", marca: "porcelanite" },
     { nombre: "andes-plus-blanco-20x30", marca: "porcelanite" },
@@ -269,7 +272,6 @@ const productos = [
     { nombre: "vetro-blanco-25x40", marca: "porcelanite" },
     { nombre: "yukon-beige-33x33", marca: "porcelanite" },
     { nombre: "yukon-cafe-33x33", marca: "porcelanite" },
-
     // VITROMEX
     { nombre: "alpino-oro-brillo-50x100", marca: "vitromex" },
     { nombre: "arizpe-caoba-18x60", marca: "vitromex" },
@@ -367,187 +369,236 @@ const productos = [
     { nombre: "yukon-black-55x55", marca: "vitromex" },
     { nombre: "yukon-cream-55x55", marca: "vitromex" },
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
-    { nombre: "zenia-black-36x50", marca: "vitromex" },
-
+    { nombre: "zenia-black-36x50", marca: "vitromex" }
     // DALTILE
     { nombre: "African-walnut-brown-20x90", marca: "daltile" },
     { nombre: "African-walnut-natural-20x90", marca: "daltile" },
-    { nombre: "Alpha-gris-37x37", marca: "daltile" },
-    { nombre: "Alpha-rojo-37x37", marca: "daltile" },
-    { nombre: "Amalia-gris-30x40", marca: "daltile" },
-    { nombre: "Amore-carlotta-60x60", marca: "daltile" },
-    { nombre: "Amore-julieta-60x60", marca: "daltile" },
-    { nombre: "Amore-stella-60x60", marca: "daltile" },
-    { nombre: "Antique-wood-ocre-18x60", marca: "daltile" },
-    { nombre: "Arboleda-café-45x45", marca: "daltile" },
-    { nombre: "Avenza-blanco-60x1.20", marca: "daltile" },
-    { nombre: "Black-walnut-moka-18x60", marca: "daltile" },
-    { nombre: "Blender-stone-30x45", marca: "daltile" },
-    { nombre: "Breccia-ligh-gray-60.5x60.5", marca: "daltile" },
-    { nombre: "Breccia-marfil-60x60", marca: "daltile" },
-    { nombre: "Cantavria-avorio-60.5x60.5", marca: "daltile" },
-    { nombre: "Colonial-frida-37x37", marca: "daltile" },
-    { nombre: "Corintia-oxford-60.5x60.5", marca: "daltile" },
-    { nombre: "Dannes-blanco-30x45", marca: "daltile" },
-    { nombre: "Dannes-café-30x45", marca: "daltile" },
-    { nombre: "Dannes-gris-30x45", marca: "daltile" },
-    { nombre: "Divana-brown-34x50", marca: "daltile" },
-    { nombre: "Encanabanu-cerezo-18x60", marca: "daltile" },
-    { nombre: "Encanabanu-natural-18x60", marca: "daltile" },
-    { nombre: "Fort-wood-beige-18x60", marca: "daltile" },
-    { nombre: "Fort-wood-brown-18x60", marca: "daltile" },
-    { nombre: "Fort-wood-dark-gray-18x60", marca: "daltile" },
-    { nombre: "Fort-wood-ligh-gray-18x60", marca: "daltile" },
-    { nombre: "Glitz-blue-37x37", marca: "daltile" },
-    { nombre: "Hamlet-latte-30x45", marca: "daltile" },
-    { nombre: "Hamlet-motley-30x45", marca: "daltile" },
-    { nombre: "Kalos-greige-45x90", marca: "daltile" },
-    { nombre: "Kalos-gris-45x90", marca: "daltile" },
-    { nombre: "Lake-beige-37x37", marca: "daltile" },
-    { nombre: "Legend-brown-15x66", marca: "daltile" },
-    { nombre: "Legend-greige-15x66", marca: "daltile" },
-    { nombre: "Legend-natural-18x50", marca: "daltile" },
-    { nombre: "Lucca-bianco-20x30", marca: "daltile" },
-    { nombre: "Lucca-bianco-37x37", marca: "daltile" },
-    { nombre: "Lumiere-blanco-37x37", marca: "daltile" },
-    { nombre: "Luster-graphite-60x60", marca: "daltile" },
-    { nombre: "Luster-gray-60x60", marca: "daltile" },
-    { nombre: "Luster-white-37x37", marca: "daltile" },
-    { nombre: "Luster-white-60.5x60.5", marca: "daltile" },
-    { nombre: "Magnus-black-60x60", marca: "daltile" },
-    { nombre: "Melbourne-gray-45x90", marca: "daltile" },
-    { nombre: "Melbourne-multicolor-45x90", marca: "daltile" },
-    { nombre: "Navia-azul-20x30", marca: "daltile" },
-    { nombre: "Navia-azul-37x37", marca: "daltile" },
-    { nombre: "Navia-beige-20x30", marca: "daltile" },
-    { nombre: "Navia-beige-37x37", marca: "daltile" },
-    { nombre: "Navida-gris-20x30", marca: "daltile" },
-    { nombre: "Navia-gris-37x37", marca: "daltile" },
-    { nombre: "Navia-verde-37x37", marca: "daltile" },
-    { nombre: "Origin-black-rec-60x1.20", marca: "daltile" },
-    { nombre: "Palatia-gold-60.5x60.5", marca: "daltile" },
-    { nombre: "Patio-terraza-ocre-37x37", marca: "daltile" },
-    { nombre: "Piacenza-beige-60x60", marca: "daltile" },
-    { nombre: "Piacenza-gris-60x60", marca: "daltile" },
-    { nombre: "Prisma-origami-blanco-30x45", marca: "daltile" },
-    { nombre: "Republica-multicolor-18x60", marca: "daltile" },
-    { nombre: "Rioja-multicolor-37x37", marca: "daltile" },
-    { nombre: "Rockweel-gris-30x45", marca: "daltile" },
-    { nombre: "Rockweel-latte-30x45", marca: "daltile" },
-    { nombre: "Rockweel-multicolor-30x45", marca: "daltile" },
-    { nombre: "Royal-walnut-natural-brown-15x66", marca: "daltile" },
-    { nombre: "San-miguel-azul-37x37", marca: "daltile" },
-    { nombre: "San-miguel-rojo-37x37", marca: "daltile" },
-    { nombre: "Santa-clara-37x37", marca: "daltile" },
-    { nombre: "Sayul-azul-37x37", marca: "daltile" },
-    { nombre: "Segovia-latte-30x45", marca: "daltile" },
-    { nombre: "Segovia-multicolor-30x45", marca: "daltile" },
-    { nombre: "Sonata-black-20x90", marca: "daltile" },
-    { nombre: "Sonata-gray-20x90", marca: "daltile" },
-    { nombre: "Stonefort-34x50", marca: "daltile" },
-    { nombre: "Stratto-black-60.5x60.5", marca: "daltile" },
-    { nombre: "Stratto-gray-60.5x60.5", marca: "daltile" },
-    { nombre: "Sunwood-miel-18x60", marca: "daltile" },
-    { nombre: "Symbol-cotto-37x37", marca: "daltile" },
-    { nombre: "Taxco-café-37x37", marca: "daltile" },
-    { nombre: "Teul-beige-37x37", marca: "daltile" },
-    { nombre: "Timberwood-gray-20x90", marca: "daltile" },
-    { nombre: "Tula-café-37x37", marca: "daltile" },
-    { nombre: "Urbania-black-30x45", marca: "daltile" },
-    { nombre: "Urbania-black-white-30x45", marca: "daltile" },
-    { nombre: "Urbania-blue-30x45", marca: "daltile" },
-    { nombre: "Urbania-obalt-blue-30x45", marca: "daltile" },
-    { nombre: "Urbania-white-30x45", marca: "daltile" },
-    { nombre: "Veneto-gris-60x60", marca: "daltile" },
-    { nombre: "Whisper-oak-brown-15x66", marca: "daltile" },
-    { nombre: "Whisper-oak-cherry-15x66", marca: "daltile" },
-    { nombre: "Whisper-oak-gray-15x66", marca: "daltile" },
-    { nombre: "Zenwood-brown-45x45", marca: "daltile" },
-
-    // MISE
-    { nombre: "abstrac-gold-60x1.20", marca: "mise" },
-    { nombre: "alistonia-gold-60x1.20", marca: "mise" },
-    { nombre: "calacatta-renoirse-60x60", marca: "mise" },
-    { nombre: "castor-blue-60x1.20", marca: "mise" },
-    { nombre: "cracovia-high-glossy-60x1.20", marca: "mise" },
-    { nombre: "eloy-satvario-60x1.20", marca: "mise" },
-    { nombre: "flicker-white-60x1.20", marca: "mise" },
-    { nombre: "frize-gold-60x1.20", marca: "mise" },
-    { nombre: "glassia-wood-60x1.20", marca: "mise" },
-    { nombre: "iron-gold-60x1.20", marca: "mise" },
-    { nombre: "lublin-60x1.20", marca: "mise" },
-    { nombre: "luccano-dark-60x1.20", marca: "mise" },
-    { nombre: "luccano-light-60x1.20", marca: "mise" },
-    { nombre: "ollin-marble-60x1.20", marca: "mise" },
-    { nombre: "onice-chiaro-glossy-60x60", marca: "mise" },
-    { nombre: "onice-scuro-60x60", marca: "mise" },
-    { nombre: "praga-60x1.20", marca: "mise" },
-    { nombre: "roomy-black-60x1.20", marca: "mise" },
-    { nombre: "stavario-ascent-grey-60x1.20", marca: "mise" },
-    { nombre: "titanium-blue-60x1.20", marca: "mise" },
-    { nombre: "titanium-blue-60x60", marca: "mise" },
-
-    // BENADRESA
-    { nombre: "avenue-beige-30x90", marca: "benadresa" },
-    { nombre: "blanco-brillo-30x90", marca: "benadresa" },
-    { nombre: "cascais-30x90", marca: "benadresa" },
-    { nombre: "decor-dune-newbury-white-30x60", marca: "benadresa" },
-    { nombre: "gothel-cream-30x60", marca: "benadresa" },
-    { nombre: "gothel-moka-30x90", marca: "benadresa" },
-    { nombre: "keid-gothel-cream-30x90", marca: "benadresa" },
-    { nombre: "keid-gothel-moka-30x90", marca: "benadresa" },
-    { nombre: "leaves-avenue-beige-30x90", marca: "benadresa" },
-    { nombre: "leaves-blanco-brillo-30x90", marca: "benadresa" },
-    { nombre: "leaves-cascais-30x90", marca: "benadresa" },
-    { nombre: "leaves-stryn-30x90", marca: "benadresa" },
-    { nombre: "newbury-white-30x60", marca: "benadresa" },
-    { nombre: "stryn-30x90", marca: "benadresa" }
+{ nombre: "Alpha-gris-37x37", marca: "daltile" },
+{ nombre: "Alpha-rojo-37x37", marca: "daltile" },
+{ nombre: "Amalia-gris-30x40", marca: "daltile" },
+{ nombre: "Amore-carlotta-60x60", marca: "daltile" },
+{ nombre: "Amore-julieta-60x60", marca: "daltile" },
+{ nombre: "Amore-stella-60x60", marca: "daltile" },
+{ nombre: "Antique-wood-ocre-18x60", marca: "daltile" },
+{ nombre: "Arboleda-café-45x45", marca: "daltile" },
+{ nombre: "Avenza-blanco-60x1.20", marca: "daltile" },
+{ nombre: "Black-walnut-moka-18x60", marca: "daltile" },
+{ nombre: "Blender-stone-30x45", marca: "daltile" },
+{ nombre: "Breccia-ligh-gray-60.5x60.5", marca: "daltile" },
+{ nombre: "Breccia-marfil-60x60", marca: "daltile" },
+{ nombre: "Cantavria-avorio-60.5x60.5", marca: "daltile" },
+{ nombre: "Colonial-frida-37x37", marca: "daltile" },
+{ nombre: "Corintia-oxford-60.5x60.5", marca: "daltile" },
+{ nombre: "Dannes-blanco-30x45", marca: "daltile" },
+{ nombre: "Dannes-café-30x45", marca: "daltile" },
+{ nombre: "Dannes-gris-30x45", marca: "daltile" },
+{ nombre: "Divana-brown-34x50", marca: "daltile" },
+{ nombre: "Encanabanu-cerezo-18x60", marca: "daltile" },
+{ nombre: "Encanabanu-natural-18x60", marca: "daltile" },
+{ nombre: "Fort-wood-beige-18x60", marca: "daltile" },
+{ nombre: "Fort-wood-brown-18x60", marca: "daltile" },
+{ nombre: "Fort-wood-dark-gray-18x60", marca: "daltile" },
+{ nombre: "Fort-wood-ligh-gray-18x60", marca: "daltile" },
+{ nombre: "Glitz-blue-37x37", marca: "daltile" },
+{ nombre: "Hamlet-latte-30x45", marca: "daltile" },
+{ nombre: "Hamlet-motley-30x45", marca: "daltile" },
+{ nombre: "Kalos-greige-45x90", marca: "daltile" },
+{ nombre: "Kalos-gris-45x90", marca: "daltile" },
+{ nombre: "Lake-beige-37x37", marca: "daltile" },
+{ nombre: "Legend-brown-15x66", marca: "daltile" },
+{ nombre: "Legend-greige-15x66", marca: "daltile" },
+{ nombre: "Legend-natural-18x50", marca: "daltile" },
+{ nombre: "Lucca-bianco-20x30", marca: "daltile" },
+{ nombre: "Lucca-bianco-37x37", marca: "daltile" },
+{ nombre: "Lumiere-blanco-37x37", marca: "daltile" },
+{ nombre: "Luster-graphite-60x60", marca: "daltile" },
+{ nombre: "Luster-gray-60x60", marca: "daltile" },
+{ nombre: "Luster-white-37x37", marca: "daltile" },
+{ nombre: "Luster-white-60.5x60.5", marca: "daltile" },
+{ nombre: "Magnus-black-60x60", marca: "daltile" },
+{ nombre: "Melbourne-gray-45x90", marca: "daltile" },
+{ nombre: "Melbourne-multicolor-45x90", marca: "daltile" },
+{ nombre: "Navia-azul-20x30", marca: "daltile" },
+{ nombre: "Navia-azul-37x37", marca: "daltile" },
+{ nombre: "Navia-beige-20x30", marca: "daltile" },
+{ nombre: "Navia-beige-37x37", marca: "daltile" },
+{ nombre: "Navida-gris-20x30", marca: "daltile" },
+{ nombre: "Navia-gris-37x37", marca: "daltile" },
+{ nombre: "Navia-verde-37x37", marca: "daltile" },
+{ nombre: "Origin-black-rec-60x1.20", marca: "daltile" },
+{ nombre: "Palatia-gold-60.5x60.5", marca: "daltile" },
+{ nombre: "Patio-terraza-ocre-37x37", marca: "daltile" },
+{ nombre: "Piacenza-beige-60x60", marca: "daltile" },
+{ nombre: "Piacenza-gris-60x60", marca: "daltile" },
+{ nombre: "Prisma-origami-blanco-30x45", marca: "daltile" },
+{ nombre: "Republica-multicolor-18x60", marca: "daltile" },
+{ nombre: "Rioja-multicolor-37x37", marca: "daltile" },
+{ nombre: "Rockweel-gris-30x45", marca: "daltile" },
+{ nombre: "Rockweel-latte-30x45", marca: "daltile" },
+{ nombre: "Rockweel-multicolor-30x45", marca: "daltile" },
+{ nombre: "Royal-walnut-natural-brown-15x66", marca: "daltile" },
+{ nombre: "San-miguel-azul-37x37", marca: "daltile" },
+{ nombre: "San-miguel-rojo-37x37", marca: "daltile" },
+{ nombre: "Santa-clara-37x37", marca: "daltile" },
+{ nombre: "Sayul-azul-37x37", marca: "daltile" },
+{ nombre: "Segovia-latte-30x45", marca: "daltile" },
+{ nombre: "Segovia-multicolor-30x45", marca: "daltile" },
+{ nombre: "Sonata-black-20x90", marca: "daltile" },
+{ nombre: "Sonata-gray-20x90", marca: "daltile" },
+{ nombre: "Stonefort-34x50", marca: "daltile" },
+{ nombre: "Stratto-black-60.5x60.5", marca: "daltile" },
+{ nombre: "Stratto-gray-60.5x60.5", marca: "daltile" },
+{ nombre: "Sunwood-miel-18x60", marca: "daltile" },
+{ nombre: "Symbol-cotto-37x37", marca: "daltile" },
+{ nombre: "Taxco-café-37x37", marca: "daltile" },
+{ nombre: "Teul-beige-37x37", marca: "daltile" },
+{ nombre: "Timberwood-gray-20x90", marca: "daltile" },
+{ nombre: "Tula-café-37x37", marca: "daltile" },
+{ nombre: "Urbania-black-30x45", marca: "daltile" },
+{ nombre: "Urbania-black-white-30x45", marca: "daltile" },
+{ nombre: "Urbania-blue-30x45", marca: "daltile" },
+{ nombre: "Urbania-obalt-blue-30x45", marca: "daltile" },
+{ nombre: "Urbania-white-30x45", marca: "daltile" },
+{ nombre: "Veneto-gris-60x60", marca: "daltile" },
+{ nombre: "Whisper-oak-brown-15x66", marca: "daltile" },
+{ nombre: "Whisper-oak-cherry-15x66", marca: "daltile" },
+{ nombre: "Whisper-oak-gray-15x66", marca: "daltile" },
+{ nombre: "Zenwood-brown-45x45", marca: "daltile" }
+// --- MISE ---
+{ nombre: "abstrac-gold-60x1.20", marca: "mise" },
+{ nombre: "alistonia-gold-60x1.20", marca: "mise" },
+{ nombre: "calacatta-renoirse-60x60", marca: "mise" },
+{ nombre: "castor-blue-60x1.20", marca: "mise" },
+{ nombre: "cracovia-high-glossy-60x1.20", marca: "mise" },
+{ nombre: "eloy-satvario-60x1.20", marca: "mise" },
+{ nombre: "flicker-white-60x1.20", marca: "mise" },
+{ nombre: "frize-gold-60x1.20", marca: "mise" },
+{ nombre: "glassia-wood-60x1.20", marca: "mise" },
+{ nombre: "iron-gold-60x1.20", marca: "mise" },
+{ nombre: "lublin-60x1.20", marca: "mise" },
+{ nombre: "luccano-dark-60x1.20", marca: "mise" },
+{ nombre: "luccano-light-60x1.20", marca: "mise" },
+{ nombre: "ollin-marble-60x1.20", marca: "mise" },
+{ nombre: "onice-chiaro-glossy-60x60", marca: "mise" },
+{ nombre: "onice-scuro-60x60", marca: "mise" },
+{ nombre: "praga-60x1.20", marca: "mise" },
+{ nombre: "roomy-black-60x1.20", marca: "mise" },
+{ nombre: "stavario-ascent-grey-60x1.20", marca: "mise" },
+{ nombre: "titanium-blue-60x1.20", marca: "mise" }
+{ nombre: "titanium-blue-60x60", marca: "mise" }
+// --- BENADRESA ---
+{ nombre: "avenue-beige-30x90", marca: "benadresa" },
+{ nombre: "blanco-brillo-30x90", marca: "benadresa" },
+{ nombre: "cascais-30x90", marca: "benadresa" },
+{ nombre: "decor-dune-newbury-white-30x60", marca: "benadresa" },
+{ nombre: "gothel-cream-30x60", marca: "benadresa" },
+{ nombre: "gothel-moka-30x90", marca: "benadresa" },
+{ nombre: "keid-gothel-cream-30x90", marca: "benadresa" },
+{ nombre: "keid-gothel-moka-30x90", marca: "benadresa" },
+{ nombre: "leaves-avenue-beige-30x90", marca: "benadresa" },
+{ nombre: "leaves-blanco-brillo-30x90", marca: "benadresa" },
+{ nombre: "leaves-cascais-30x90", marca: "benadresa" },
+{ nombre: "leaves-stryn-30x90", marca: "benadresa" },
+{ nombre: "newbury-white-30x60", marca: "benadresa" },
+{ nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
-// FUNCIONES DEL SIMULADOR
+// --- 3. MOTOR DE PROYECCIÓN (8 PUNTOS) ---
+function renderizarTextura() {
+    const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !texturaActual) return;
 
-// 1. Cambiar Habitación (Resuelve el ReferenceError)
-function cambiarHabitacion(tipo) {
-    const mainView = document.querySelector('.main-view img'); 
-    // Si usas <img> cambia el src, si usas fondo cambia el style.backgroundImage
-    if (mainView) {
-        mainView.src = `img/habitaciones/${tipo}.jpg`;
-    }
-    console.log("Habitación cambiada a: " + tipo);
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = texturaActual;
+
+    img.onload = () => {
+        // IDs según el modo activo: p1-p4 para piso, p5-p8 para figura/muro
+        const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
+        
+        const pts = IDs.map(id => {
+            const el = document.getElementById(id);
+            if (!el) return { x: 0, y: 0 };
+            return { x: el.offsetLeft, y: el.offsetTop };
+        });
+
+        const viewport = document.getElementById('viewport');
+        canvas.width = viewport.clientWidth;
+        canvas.height = viewport.clientHeight;
+
+        const srcPts = [0, 0, img.width, 0, img.width, img.height, 0, img.height];
+        const dstPts = [pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y];
+        
+        try {
+            const transform = PerspectiveTransform(srcPts, dstPts);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.transform = transform.getCSS();
+            canvas.style.transformOrigin = "0 0";
+            canvas.style.mixBlendMode = "multiply"; 
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+        } catch (e) {
+            console.error("Error en PerspectiveTransform:", e);
+        }
+    };
 }
 
-// 2. Filtrar por Marca
-function filtrarPorMarca(marca) {
-    const filtrados = productos.filter(p => p.marca.toLowerCase() === marca.toLowerCase() || marca === 'Todas');
-    mostrarProductos(filtrados);
+// --- 4. FUNCIONES DE INTERFAZ ---
+function setModo(modo) {
+    modoEdicion = modo;
+    console.log("Modo activo: " + modoEdicion);
 }
 
-// 3. Mostrar Productos en el Panel
-function mostrarProductos(lista) {
-    const contenedor = document.getElementById('lista-productos'); // Asegúrate de tener este ID en tu HTML
+function cambiarHabitacion(archivo) {
+    const bg = document.getElementById('bg-room');
+    if (bg) bg.src = 'img/habitaciones/' + archivo;
+}
+
+function mostrarProductos(marca) {
+    const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
+    contenedor.innerHTML = ''; 
 
-    contenedor.innerHTML = ''; // Limpia la lista actual
+    const filtrados = misProductos.filter(p => marca === 'todas' || p.marca === marca);
 
-    lista.forEach(prod => {
-        const btn = document.createElement('button');
-        btn.className = 'btn-producto';
-        btn.innerText = prod.nombre;
-        
-        // Al hacer clic, aplica la textura (debes tener las fotos con el mismo nombre)
-        btn.onclick = () => aplicarTextura(prod.nombre);
-        
-        contenedor.appendChild(btn);
+    filtrados.forEach(producto => {
+        const card = document.createElement('div');
+        card.className = 'tile-card';
+        const ruta = `img/ceramicas/${producto.nombre}.jpg`;
+
+        card.innerHTML = `
+            <img src="${ruta}" style="width:100%; cursor:pointer;" onerror="this.src='img/error.jpg'">
+            <p style="color:white; font-size:10px; margin-top:5px;">${producto.nombre}</p>
+        `;
+
+        card.onclick = () => {
+            texturaActual = ruta;
+            renderizarTextura();
+        };
+        contenedor.appendChild(card);
     });
 }
 
-// 4. Aplicar Textura (Aquí va tu lógica de perspectiva)
-function aplicarTextura(nombreImagen) {
-    console.log("Cargando textura de: " + nombreImagen);
-    // Aquí es donde usas tus puntos azules para proyectar la imagen en el piso
-}
+// --- 5. ARRASTRE DE PUNTOS ---
+document.querySelectorAll('.dot').forEach(dot => {
+    dot.onmousedown = function(e) {
+        document.onmousemove = function(ev) {
+            const viewport = document.getElementById('viewport');
+            let x = ev.pageX - viewport.offsetLeft;
+            let y = ev.pageY - viewport.offsetTop;
+            
+            dot.style.left = x + 'px';
+            dot.style.top = y + 'px';
+            
+            renderizarTextura(); 
+        };
+        document.onmouseup = function() {
+            document.onmousemove = null;
+        };
+    };
+});
 
-// Inicialización automática
+// Carga inicial
 window.onload = () => {
-    mostrarProductos(productos); // Muestra todos al iniciar
+    mostrarProductos('todas');
 };

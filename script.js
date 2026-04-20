@@ -3,7 +3,7 @@ let modoEdicion = 'piso';
 let texturaActual = '';
 
 const misProductos = [
-const misProductos = [
+
     // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },

@@ -1,7 +1,8 @@
-// --- 1. CONFIGURACIÓN Y DATOS ---
+/ --- 1. CONFIGURACIÓN ---
 let modoEdicion = 'piso';
 let texturaActual = '';
 
+// --- 2. LISTADO DE PRODUCTOS (Asegúrate de que el nombre sea igual al de tu carpeta) ---
 const misProductos = [
 
     // NITROPISO
@@ -516,12 +517,12 @@ function mostrarProductos(marca) {
         const div = document.createElement('div');
         div.className = 'producto-item';
         
-        // CORRECCIÓN DE RUTA: Apuntamos a la carpeta 'ceramicas'
-        const rutaImg = `./ceramicas/${prod.nombre}.jpg`; 
+        // RUTA CORREGIDA según tu GitHub: img/ceramicas/
+        const rutaImg = `img/ceramicas/${prod.nombre}.jpg`; 
 
         div.innerHTML = `
             <img src="${rutaImg}" alt="${prod.nombre}" 
-                 onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=No+Encontrada'">
+                 onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Error+Ruta'">
             <span>${prod.nombre}</span>
         `;
         
@@ -530,21 +531,18 @@ function mostrarProductos(marca) {
     });
 }
 
-// --- 4. FUNCIONES DE CONTROL (INDISPENSABLES) ---
+// --- 4. FUNCIONES DE CONTROL (Para eliminar los errores rojos de la consola) ---
 
 function setModo(modo) {
     modoEdicion = modo;
     console.log("Modo cambiado a: " + modo);
 }
 
-// Esta es la función que te marca error de "not defined"
 function cambiarHabitacion(habitacion) {
     const imgHab = document.getElementById('habitacion-img');
     if (imgHab) {
-        // Ajusta la ruta si tu carpeta de fondos se llama diferente
-        imgHab.src = `./img/escenarios/${habitacion}.jpg`;
-    } else {
-        console.error("No se encontró el elemento habitacion-img");
+        // Ajusta esta ruta según donde tengas tus fondos (ej: img/escenarios/)
+        imgHab.src = `img/escenarios/${habitacion}.jpg`;
     }
 }
 
@@ -554,10 +552,9 @@ function aplicarTextura(ruta) {
     if (capaPiso) {
         capaPiso.style.backgroundImage = `url(${ruta})`;
     }
-    console.log("Aplicando cerámica:", ruta);
 }
 
-// --- 5. INICIO ---
+// --- 5. INICIALIZACIÓN ---
 window.onload = () => {
     mostrarProductos('nitropiso');
 };

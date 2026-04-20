@@ -368,9 +368,9 @@ const misProductos = [
     { nombre: "yukon-black-55x55", marca: "vitromex" },
     { nombre: "yukon-cream-55x55", marca: "vitromex" },
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
-   { nombre: "zenia-black-36x50", marca: "vitromex" },
+    { nombre: "zenia-black-36x50", marca: "vitromex" }, // <-- ASEGÚRATE DE QUE ESTA COMA EXISTE
     // DALTILE
-    { nombre: "african-walnut-brown-20x90", marca: "daltile" },
+    { nombre: "African-walnut-brown-20x90", marca: "daltile" },
     { nombre: "african-walnut-natural-20x90", marca: "daltile" },
     { nombre: "alpha-gris-37x37", marca: "daltile" },
     { nombre: "alpha-rojo-37x37", marca: "daltile" },

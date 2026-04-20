@@ -462,7 +462,7 @@ const misProductos = [
     { nombre: "whisper-oak-brown-15x66", marca: "daltile" },
     { nombre: "whisper-oak-cherry-15x66", marca: "daltile" },
     { nombre: "whisper-oak-gray-15x66", marca: "daltile" },
-    { nombre: "zenwood-brown-45x45", marca: "daltile" },
+   { nombre: "zenwood-brown-45x45", marca: "daltile" },
     // --- MISE ---
     { nombre: "abstrac-gold-60x1.20", marca: "mise" },
     { nombre: "alistonia-gold-60x1.20", marca: "mise" },

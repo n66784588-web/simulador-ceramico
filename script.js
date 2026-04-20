@@ -3,6 +3,7 @@ let modoEdicion = 'piso';
 let texturaActual = '';
 
 const misProductos = [
+const misProductos = [
     // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
@@ -356,7 +357,7 @@ const misProductos = [
     { nombre: "san-joaquin-azul-20x30", marca: "vitromex" },
     { nombre: "san-joaquin-verde-20x30", marca: "vitromex" },
     { nombre: "sari-blanco-55x55", marca: "vitromex" },
-    { nombre: "sena-marfil-45x45", marca: "vitromex" },
+    { nombre: "sena-marmarfil-45x45", marca: "vitromex" },
     { nombre: "sierra-cafe-35.7x35.7", marca: "vitromex" },
     { nombre: "spritz-negro-20x20", marca: "vitromex" },
     { nombre: "spritz-blanco-20x20", marca: "vitromex" },
@@ -368,9 +369,9 @@ const misProductos = [
     { nombre: "yukon-black-55x55", marca: "vitromex" },
     { nombre: "yukon-cream-55x55", marca: "vitromex" },
     { nombre: "zenia-iron-36x50", marca: "vitromex" },
-    { nombre: "zenia-black-36x50", marca: "vitromex" }, // <-- ASEGÚRATE DE QUE ESTA COMA EXISTE
+    { nombre: "zenia-black-36x50", marca: "vitromex" },
     // DALTILE
-    { nombre: "African-walnut-brown-20x90", marca: "daltile" },
+    { nombre: "african-walnut-brown-20x90", marca: "daltile" },
     { nombre: "african-walnut-natural-20x90", marca: "daltile" },
     { nombre: "alpha-gris-37x37", marca: "daltile" },
     { nombre: "alpha-rojo-37x37", marca: "daltile" },
@@ -462,7 +463,7 @@ const misProductos = [
     { nombre: "whisper-oak-brown-15x66", marca: "daltile" },
     { nombre: "whisper-oak-cherry-15x66", marca: "daltile" },
     { nombre: "whisper-oak-gray-15x66", marca: "daltile" },
-   { nombre: "zenwood-brown-45x45", marca: "daltile" },
+    { nombre: "zenwood-brown-45x45", marca: "daltile" },
     // --- MISE ---
     { nombre: "abstrac-gold-60x1.20", marca: "mise" },
     { nombre: "alistonia-gold-60x1.20", marca: "mise" },
@@ -500,8 +501,7 @@ const misProductos = [
     { nombre: "leaves-stryn-30x90", marca: "benadresa" },
     { nombre: "newbury-white-30x60", marca: "benadresa" },
     { nombre: "stryn-30x90", marca: "benadresa" }
-];
-
+];   
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;

@@ -501,17 +501,7 @@ const misProductos = [
 { nombre: "stryn-30x90", marca: "benadresa" }
 ];
 
-// --- 2. FUNCIONES DE INTERFAZ ---
-function setModo(modo) {
-    modoEdicion = modo;
-    console.log("Modo activo: " + modoEdicion);
-}
-
-function cambiarHabitacion(archivo) {
-    const bg = document.getElementById('bg-room');
-    if (bg) bg.src = 'img/habitaciones/' + archivo;
-}
-
+// --- 2. FUNCIONES DEL CATÁLOGO ---
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('catalog-container');
     if (!contenedor) return;
@@ -522,12 +512,13 @@ function mostrarProductos(marca) {
     filtrados.forEach(prod => {
         const card = document.createElement('div');
         card.className = 'tile-card';
+        // IMPORTANTE: Asegúrate que tus fotos se llamen exactamente como el "nombre" arriba
         const rutaImg = `img/muestras/${prod.nombre}.jpg`;
 
         card.innerHTML = `
             <img src="${rutaImg}" style="width:100%; border-radius:4px; cursor:pointer;" 
-                 onerror="this.src='https://via.placeholder.com/150?text=Sin+Imagen'">
-            <p style="color:white; font-size:10px; margin-top:5px;">${prod.nombre.replace(/_/g, ' ')}</p>
+                 onerror="this.src='https://via.placeholder.com/150?text=Error+Foto'">
+            <p style="color:white; font-size:10px; margin-top:5px;">${prod.nombre}</p>
         `;
 
         card.onclick = () => {
@@ -538,7 +529,7 @@ function mostrarProductos(marca) {
     });
 }
 
-// --- 3. MOTOR DE RENDERIZADO ---
+// --- 3. MOTOR DE PROYECCIÓN (CANVAS) ---
 function renderizarTextura() {
     const canvasId = (modoEdicion === 'piso') ? 'floor-canvas' : 'wall-canvas';
     const canvas = document.getElementById(canvasId);
@@ -557,7 +548,7 @@ function renderizarTextura() {
         const IDs = (modoEdicion === 'piso') ? ['p1', 'p2', 'p3', 'p4'] : ['p5', 'p6', 'p7', 'p8'];
         const pts = IDs.map(id => {
             const el = document.getElementById(id);
-            return el ? { x: el.offsetLeft + 5, y: el.offsetTop + 5 } : { x: 0, y: 0 };
+            return el ? { x: el.offsetLeft + 10, y: el.offsetTop + 10 } : { x: 0, y: 0 };
         });
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -573,30 +564,37 @@ function renderizarTextura() {
         ctx.globalAlpha = 0.8; 
         ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
         ctx.restore();
-        
         canvas.style.mixBlendMode = "multiply"; 
     };
 }
 
 // --- 4. MOVIMIENTO DE PUNTOS ---
-document.querySelectorAll('.dot').forEach(dot => {
-    dot.onmousedown = function(e) {
-        e.preventDefault();
-        const viewport = document.getElementById('viewport');
-        const move = (ev) => {
-            const rect = viewport.getBoundingClientRect();
-            let x = ev.clientX - rect.left;
-            let y = ev.clientY - rect.top;
-            dot.style.left = x + 'px';
-            dot.style.top = y + 'px';
-            renderizarTextura();
+function inicializarPuntos() {
+    document.querySelectorAll('.dot').forEach(dot => {
+        dot.onmousedown = function(e) {
+            e.preventDefault();
+            const move = (ev) => {
+                const rect = document.getElementById('viewport').getBoundingClientRect();
+                dot.style.left = (ev.clientX - rect.left) + 'px';
+                dot.style.top = (ev.clientY - rect.top) + 'px';
+                renderizarTextura();
+            };
+            document.addEventListener('mousemove', move);
+            document.onmouseup = () => document.removeEventListener('mousemove', move);
         };
-        document.addEventListener('mousemove', move);
-        document.onmouseup = () => document.removeEventListener('mousemove', move);
-    };
-});
+    });
+}
 
 // --- 5. INICIO ---
+function cambiarHabitacion(archivo) {
+    document.getElementById('bg-room').src = 'img/habitaciones/' + archivo;
+}
+
+function setModo(modo) {
+    modoEdicion = modo;
+}
+
 window.onload = () => {
     mostrarProductos('todas');
+    inicializarPuntos();
 };

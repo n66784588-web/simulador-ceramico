@@ -507,38 +507,34 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-window.onload = () => {
-    mostrarProductos('todas');
-    initDragAndDrop();
-};
+// ESTA FUNCIÓN ES LA QUE TE FALTA SEGÚN TU ERROR
+function setModo(m) {
+    modoEdicion = m;
+    console.log("Cambiado a modo: " + m);
+}
 
 function initDragAndDrop() {
     const dots = document.querySelectorAll('.dot');
     const viewport = document.getElementById('viewport');
 
     dots.forEach(dot => {
-        dot.onmousedown = (e) => { puntoActivo = dot; e.preventDefault(); };
+        dot.onmousedown = (e) => { 
+            puntoActivo = dot; 
+            e.preventDefault(); 
+        };
     });
 
     window.onmousemove = (e) => {
         if (!puntoActivo) return;
         const rect = viewport.getBoundingClientRect();
-        let x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-        let y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
-
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
         puntoActivo.style.left = x + "px";
         puntoActivo.style.top = y + "px";
-
         dibujarEscena(); 
     };
 
     window.onmouseup = () => { puntoActivo = null; };
-}
-
-function setModo(m) {
-    modoEdicion = m;
-    document.getElementById('btn-piso').classList.toggle('active', m === 'piso');
-    document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
 }
 
 function aplicarTextura(ruta) {
@@ -579,6 +575,7 @@ function renderizar(tipo, ruta, dotIds, escala) {
         ctx.save();
         ctx.clip();
 
+        // AQUÍ ESTÁ EL TRUCO PARA QUE NO SEA SOLO UNA IMAGEN
         const pattern = ctx.createPattern(img, 'repeat');
         ctx.scale(escala, escala);
         ctx.fillStyle = pattern;
@@ -587,7 +584,7 @@ function renderizar(tipo, ruta, dotIds, escala) {
     };
 }
 
-// ZOOM CON RUEDA DEL MOUSE
+// PARA QUE LAS IMÁGENES NO SE VEAN GIGANTES (Usa la rueda del mouse)
 window.addEventListener('wheel', (e) => {
     if (modoEdicion === 'piso') {
         tileScalePiso = e.deltaY > 0 ? Math.max(0.05, tileScalePiso - 0.01) : Math.min(1, tileScalePiso + 0.01);

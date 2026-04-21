@@ -1,124 +1,153 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* --- CONTENEDOR PRINCIPAL --- */
 #main-container {
-  display: flex;
-  width: 100vw;
-  height: 100vh;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 }
 
+/* --- VIEWPORT --- */
 #viewport {
-  position: relative;
-  flex: 3;
-  background: #000;
-  overflow: hidden;
+    position: relative;
+    flex: 3;
+    background: #000;
+    overflow: hidden;
 }
 
-/* FONDO */
+/* --- IMAGEN DE FONDO --- */
 #bg-room {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 1;
-  pointer-events: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    top: 0;
+    left: 0;
+    z-index: 1;
 }
 
-/* CANVAS */
-canvas {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
+/* --- CANVAS (BASE) --- */
+#floor-canvas,
+#wall-canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none; /* 🔥 evita bloquear clicks */
 }
 
-#floor-canvas { z-index: 2; }
-#wall-canvas { z-index: 3; }
+/* --- PISO (RECORTADO) --- */
+#floor-canvas {
+    z-index: 2;
 
-/* 🔥 CAPA DE INTERACCION (LA MÁS IMPORTANTE) */
-#interaction-layer {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: 5;
-  cursor: grab;
+    /* 🔥 AQUÍ ESTÁ LA MAGIA */
+    clip-path: polygon(
+        20% 70%, 
+        80% 70%, 
+        90% 90%, 
+        10% 90%
+    );
 }
 
-/* CONTROLES */
-.controls, .mode-selector {
-  position: absolute;
-  left: 10px;
-  z-index: 10;
+/* --- PARED (OPCIONAL) --- */
+#wall-canvas {
+    z-index: 3;
+
+    clip-path: polygon(
+        30% 20%,
+        70% 20%,
+        70% 60%,
+        30% 60%
+    );
 }
 
-.controls { top: 10px; }
-.mode-selector { top: 60px; }
+/* --- CONTROLES --- */
+.controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
 
-/* 🔥 PUNTOS DE PROYECCIÓN */
+.mode-selector {
+    position: absolute;
+    top: 60px;
+    left: 10px;
+    z-index: 10;
+}
+
+/* --- PUNTOS --- */
 .dot {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  z-index: 6; /* arriba del canvas */
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    z-index: 20;
 }
 
-.blue { background: blue; }
-.red { background: red; }
+.blue {
+    background: blue;
+}
 
-/* PANEL */
+.red {
+    background: red;
+}
+
+/* --- PANEL DERECHO --- */
 .side-panel {
-  flex: 1;
-  background: #1a1a1a;
-  padding: 15px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* 🔥 evita desbordes raros */
+    flex: 1;
+    background: #1a1a1a;
+    padding: 15px;
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
+/* --- BOTONES MARCAS --- */
 .brand-filters {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
-button {
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-  background: #333;
-  color: white;
+.brand-filters button {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
-/* LISTA PRODUCTOS */
+/* --- CONTENEDOR DE PRODUCTOS --- */
 #productos-lista {
-  margin-top: 10px;
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
+    flex: 1;
+    overflow-y: auto;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
 }
 
-/* PRODUCTO */
+/* --- ITEM DE PRODUCTO --- */
 .producto-item {
-  background: #2a2a2a;
-  padding: 8px;
-  border-radius: 6px;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.2s;
+    background: #2a2a2a;
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
 .producto-item:hover {
-  background: #444;
+    background: #444;
 }
 
 .producto-item img {
-  width: 100%;
-  border-radius: 4px;
+    width: 100%;
+    border-radius: 4px;
 }
+

@@ -1,9 +1,9 @@
-// --- CONFIGURACION ---
-var modoEdicion = 'piso';
-var piezas = []; // 🔥 aquí guardamos TODAS las piezas (piso y muro)
+// CONFIG
+let modoEdicion = 'piso';
+let piezas = [];
 
-// --- LISTA DE PRODUCTOS (LA TUYA TAL CUAL) ---
-var misProductos = [ 
+// DEMO PRODUCTOS (PRUEBA)
+let misProductos = [
  // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
@@ -503,184 +503,164 @@ var misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-
-// --- CAMBIOS ---
+// CAMBIOS
 function setModo(modo){
-    modoEdicion = modo;
+  modoEdicion = modo;
 }
 
-function cambiarHabitacion(habitacion){
-    document.getElementById('bg-room').src = "img/habitaciones/" + habitacion;
+function cambiarHabitacion(img){
+  document.getElementById('bg-room').src = "img/habitaciones/" + img;
 }
 
-// --- APLICAR TEXTURA ---
+// TEXTURA
 function aplicarTextura(ruta){
 
-    var img = new Image();
-    img.src = ruta;
+  let img = new Image();
+  img.src = ruta;
 
-    var pieza = {
-        img: img,
-        x: 150,
-        y: 150,
-        width: 120,
-        height: 120,
-        tipo: modoEdicion
-    };
+  let pieza = {
+    img: img,
+    x: 150,
+    y: 150,
+    width: 120,
+    height: 120,
+    tipo: modoEdicion
+  };
 
-    img.onload = function(){
-        piezas.push(pieza);
-        renderizar();
-    };
+  img.onload = ()=>{
+    piezas.push(pieza);
+    renderizar();
+  };
 
-    if (img.complete) {
-        piezas.push(pieza);
-        renderizar();
-    }
+  if(img.complete){
+    piezas.push(pieza);
+    renderizar();
+  }
 }
 
-// --- AREAS ---
-function areaPiso(canvas){
-    return [
-        {x: canvas.width*0.2, y: canvas.height*0.7},
-        {x: canvas.width*0.8, y: canvas.height*0.7},
-        {x: canvas.width*0.9, y: canvas.height*0.9},
-        {x: canvas.width*0.1, y: canvas.height*0.9}
-    ];
+// AREAS
+function areaPiso(c){
+  return [
+    {x:c.width*0.2,y:c.height*0.7},
+    {x:c.width*0.8,y:c.height*0.7},
+    {x:c.width*0.9,y:c.height*0.9},
+    {x:c.width*0.1,y:c.height*0.9}
+  ];
 }
 
-function areaMuro(canvas){
-    return [
-        {x: canvas.width*0.3, y: canvas.height*0.2},
-        {x: canvas.width*0.7, y: canvas.height*0.2},
-        {x: canvas.width*0.7, y: canvas.height*0.6},
-        {x: canvas.width*0.3, y: canvas.height*0.6}
-    ];
+function areaMuro(c){
+  return [
+    {x:c.width*0.3,y:c.height*0.2},
+    {x:c.width*0.7,y:c.height*0.2},
+    {x:c.width*0.7,y:c.height*0.6},
+    {x:c.width*0.3,y:c.height*0.6}
+  ];
 }
 
-// --- RECORTE ---
-function recortar(ctx, puntos){
-    ctx.beginPath();
-    ctx.moveTo(puntos[0].x, puntos[0].y);
-    for(let i=1;i<puntos.length;i++){
-        ctx.lineTo(puntos[i].x, puntos[i].y);
-    }
-    ctx.closePath();
-    ctx.clip();
+// RECORTE
+function recortar(ctx,p){
+  ctx.beginPath();
+  ctx.moveTo(p[0].x,p[0].y);
+  p.forEach(pt=>ctx.lineTo(pt.x,pt.y));
+  ctx.closePath();
+  ctx.clip();
 }
 
-// --- RENDER ---
+// RENDER
 function renderizar(){
 
-    var floor = document.getElementById('floor-canvas');
-    var wall = document.getElementById('wall-canvas');
+  let f = document.getElementById('floor-canvas');
+  let w = document.getElementById('wall-canvas');
 
-    var fctx = floor.getContext('2d');
-    var wctx = wall.getContext('2d');
+  let fctx = f.getContext('2d');
+  let wctx = w.getContext('2d');
 
-    floor.width = floor.offsetWidth;
-    floor.height = floor.offsetHeight;
+  f.width = f.offsetWidth;
+  f.height = f.offsetHeight;
 
-    wall.width = wall.offsetWidth;
-    wall.height = wall.offsetHeight;
+  w.width = w.offsetWidth;
+  w.height = w.offsetHeight;
 
-    fctx.clearRect(0,0,floor.width,floor.height);
-    wctx.clearRect(0,0,wall.width,wall.height);
+  fctx.clearRect(0,0,f.width,f.height);
+  wctx.clearRect(0,0,w.width,w.height);
 
-    fctx.save();
-    recortar(fctx, areaPiso(floor));
+  fctx.save();
+  recortar(fctx, areaPiso(f));
 
-    wctx.save();
-    recortar(wctx, areaMuro(wall));
+  wctx.save();
+  recortar(wctx, areaMuro(w));
 
-    piezas.forEach(p=>{
-        var ctx = (p.tipo === 'piso') ? fctx : wctx;
-        ctx.drawImage(p.img, p.x, p.y, p.width, p.height);
-    });
+  piezas.forEach(p=>{
+    let ctx = (p.tipo === 'piso') ? fctx : wctx;
+    ctx.drawImage(p.img, p.x, p.y, p.width, p.height);
+  });
 
-    fctx.restore();
-    wctx.restore();
+  fctx.restore();
+  wctx.restore();
 }
 
-// =======================
-// 🔥 INTERACCION CORREGIDA
-// =======================
+// INTERACCION
+let activa=null, offsetX=0, offsetY=0;
+let layer = document.getElementById('interaction-layer');
 
-var activa = null;
-var offsetX = 0;
-var offsetY = 0;
-
-var layer = document.getElementById('interaction-layer');
-
-// CLICK
 layer.addEventListener('mousedown', e=>{
-    var rect = layer.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    var y = e.clientY - rect.top;
+  let rect = layer.getBoundingClientRect();
+  let x = e.clientX - rect.left;
+  let y = e.clientY - rect.top;
 
-    for(let i=piezas.length-1;i>=0;i--){
-        let p = piezas[i];
-        if(x>p.x && x<p.x+p.width && y>p.y && y<p.y+p.height){
-            activa = p;
-            offsetX = x - p.x;
-            offsetY = y - p.y;
-            break;
-        }
+  for(let i=piezas.length-1;i>=0;i--){
+    let p = piezas[i];
+    if(x>p.x && x<p.x+p.width && y>p.y && y<p.y+p.height){
+      activa = p;
+      offsetX = x-p.x;
+      offsetY = y-p.y;
+      break;
     }
+  }
 });
 
-// MOVER
 layer.addEventListener('mousemove', e=>{
-    if(activa){
-        var rect = layer.getBoundingClientRect();
-        activa.x = e.clientX - rect.left - offsetX;
-        activa.y = e.clientY - rect.top - offsetY;
-        renderizar();
-    }
+  if(activa){
+    let rect = layer.getBoundingClientRect();
+    activa.x = e.clientX - rect.left - offsetX;
+    activa.y = e.clientY - rect.top - offsetY;
+    renderizar();
+  }
 });
 
-// SOLTAR
-document.addEventListener('mouseup', ()=>{
-    activa = null;
-});
+document.addEventListener('mouseup', ()=>activa=null);
 
-// ZOOM
 layer.addEventListener('wheel', e=>{
-    if(activa){
-        e.preventDefault();
-        let scale = e.deltaY>0 ? 0.9 : 1.1;
-        activa.width *= scale;
-        activa.height *= scale;
-        renderizar();
-    }
+  if(activa){
+    e.preventDefault();
+    let s = e.deltaY>0 ? 0.9 : 1.1;
+    activa.width *= s;
+    activa.height *= s;
+    renderizar();
+  }
 });
 
-// --- PRODUCTOS ---
-function mostrarProductos(marca){
+// PRODUCTOS
+function mostrarProductos(){
+  let cont = document.getElementById('productos-lista');
+  cont.innerHTML = '';
 
-    var cont = document.getElementById('productos-lista');
-    cont.innerHTML='';
+  misProductos.forEach(p=>{
+    let ruta = "img/ceramicas/"+p.nombre+".jpg";
 
-    misProductos.forEach(prod=>{
+    let div = document.createElement('div');
+    div.className = 'producto-item';
+    div.innerHTML = `<img src="${ruta}"><p>${p.nombre}</p>`;
 
-        if(marca==='todas' || prod.marca===marca){
+    div.onclick = ()=>aplicarTextura(ruta);
 
-            let ruta = "img/ceramicas/"+prod.nombre+".jpg";
-
-            let div = document.createElement('div');
-            div.className='producto-item';
-
-            div.innerHTML = `
-                <img src="${ruta}">
-                <p>${prod.nombre}</p>
-            `;
-
-            div.onclick=()=>aplicarTextura(ruta);
-
-            cont.appendChild(div);
-        }
-    });
+    cont.appendChild(div);
+  });
 }
+
+window.onload = ()=>{
+  mostrarProductos();
+};
 
 // --- INICIO ---
 window.onload = ()=>{

@@ -8,7 +8,6 @@
   display: flex;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
 }
 
 #viewport {
@@ -18,6 +17,7 @@
   overflow: hidden;
 }
 
+/* FONDO */
 #bg-room {
   position: absolute;
   width: 100%;
@@ -27,21 +27,25 @@
   pointer-events: none;
 }
 
+/* CANVAS */
 canvas {
   position: absolute;
   width: 100%;
   height: 100%;
-  pointer-events: none;
+  top: 0;
+  left: 0;
 }
 
 #floor-canvas { z-index: 2; }
 #wall-canvas { z-index: 3; }
 
+/* 🔥 CAPA DE INTERACCION (LA CLAVE) */
 #interaction-layer {
   position: absolute;
   width: 100%;
   height: 100%;
   z-index: 5;
+  cursor: grab;
 }
 
 /* CONTROLES */
@@ -54,24 +58,33 @@ canvas {
 .controls { top: 10px; }
 .mode-selector { top: 60px; }
 
-button {
-  padding: 10px;
-  background: #333;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
 /* PANEL */
 .side-panel {
   flex: 1;
   background: #1a1a1a;
+  padding: 15px;
   color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+button {
   padding: 10px;
-  overflow-y: auto;
+  border: none;
+  cursor: pointer;
+  background: #333;
+  color: white;
 }
 
 #productos-lista {
+  margin-top: 10px;
+  overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 10px;
@@ -79,7 +92,9 @@ button {
 
 .producto-item {
   background: #2a2a2a;
-  padding: 5px;
+  padding: 8px;
+  border-radius: 6px;
+  text-align: center;
   cursor: pointer;
 }
 

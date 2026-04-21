@@ -1,8 +1,13 @@
-// --- CONFIGURACION ---
-var modoEdicion = 'piso';
+// CONFIGURACIÓN INICIAL
+let modoEdicion = 'piso';
+let ultimaRutaPiso = "";
+let ultimaRutaPared = "";
+let tileScalePiso = 0.25;  
+let tileScalePared = 0.25; 
+let puntoActivo = null;
 
-// --- LISTA DE PRODUCTOS ---
-var misProductos = [
+// LISTADO DE TUS PRODUCTOS POR MARCA
+const misProductos = [
  // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
@@ -502,84 +507,112 @@ var misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-/* CAMBIAR HABITACION */
-function cambiarHabitacion(habitacion) {
-    var imgHab = document.getElementById('bg-room');
-    if (imgHab) {
-        imgHab.src = "img/habitaciones/" + habitacion;
-    }
+window.onload = () => {
+    mostrarProductos('todas');
+    initDragAndDrop();
+};
+
+function initDragAndDrop() {
+    const dots = document.querySelectorAll('.dot');
+    const viewport = document.getElementById('viewport');
+
+    dots.forEach(dot => {
+        dot.onmousedown = (e) => { puntoActivo = dot; e.preventDefault(); };
+    });
+
+    window.onmousemove = (e) => {
+        if (!puntoActivo) return;
+        const rect = viewport.getBoundingClientRect();
+        let x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        let y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+
+        puntoActivo.style.left = x + "px";
+        puntoActivo.style.top = y + "px";
+
+        dibujarEscena(); 
+    };
+
+    window.onmouseup = () => { puntoActivo = null; };
 }
 
-/* APLICAR TEXTURA CORRECTA */
-function aplicarTextura(ruta) {
-    var canvas = document.getElementById('floor-canvas');
-    var ctx = canvas.getContext('2d');
+function setModo(m) {
+    modoEdicion = m;
+    document.getElementById('btn-piso').classList.toggle('active', m === 'piso');
+    document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
+}
 
-    var img = new Image();
+function aplicarTextura(ruta) {
+    if (modoEdicion === 'piso') ultimaRutaPiso = ruta;
+    else ultimaRutaPared = ruta;
+    dibujarEscena();
+}
+
+function dibujarEscena() {
+    renderizar('piso', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
+    renderizar('pared', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
+}
+
+function renderizar(tipo, ruta, dotIds, escala) {
+    if (!ruta) return;
+    const canvas = document.getElementById(tipo === 'piso' ? 'floor-canvas' : 'wall-canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
     img.src = ruta;
 
-    img.onload = function () {
-
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+    img.onload = () => {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        /* RECORTE DEL PISO */
+        const pts = dotIds.map(id => {
+            const el = document.getElementById(id);
+            return { x: el.offsetLeft, y: el.offsetTop };
+        });
+
         ctx.beginPath();
-        ctx.moveTo(canvas.width * 0.2, canvas.height * 0.7);
-        ctx.lineTo(canvas.width * 0.8, canvas.height * 0.7);
-        ctx.lineTo(canvas.width * 0.9, canvas.height * 0.9);
-        ctx.lineTo(canvas.width * 0.1, canvas.height * 0.9);
+        ctx.moveTo(pts[0].x, pts[0].y);
+        ctx.lineTo(pts[1].x, pts[1].y);
+        ctx.lineTo(pts[2].x, pts[2].y);
+        ctx.lineTo(pts[3].x, pts[3].y);
         ctx.closePath();
+
+        ctx.save();
         ctx.clip();
 
-        /* AJUSTE PROPORCIONAL */
-        var ratio = Math.max(
-            canvas.width / img.width,
-            canvas.height / img.height
-        );
-
-        var newWidth = img.width * ratio;
-        var newHeight = img.height * ratio;
-
-        var x = (canvas.width - newWidth) / 2;
-        var y = (canvas.height - newHeight) / 2;
-
-        ctx.drawImage(img, x, y, newWidth, newHeight);
+        const pattern = ctx.createPattern(img, 'repeat');
+        ctx.scale(escala, escala);
+        ctx.fillStyle = pattern;
+        ctx.fillRect(0, 0, canvas.width / escala, canvas.height / escala);
+        ctx.restore();
     };
 }
 
-/* MOSTRAR PRODUCTOS */
+// ZOOM CON RUEDA DEL MOUSE
+window.addEventListener('wheel', (e) => {
+    if (modoEdicion === 'piso') {
+        tileScalePiso = e.deltaY > 0 ? Math.max(0.05, tileScalePiso - 0.01) : Math.min(1, tileScalePiso + 0.01);
+    } else {
+        tileScalePared = e.deltaY > 0 ? Math.max(0.05, tileScalePared - 0.01) : Math.min(1, tileScalePared + 0.01);
+    }
+    dibujarEscena();
+    e.preventDefault();
+}, { passive: false });
+
 function mostrarProductos(marca) {
-    var contenedor = document.getElementById('productos-lista');
-    if (!contenedor) return;
-
+    const contenedor = document.getElementById('productos-lista');
     contenedor.innerHTML = '';
-
-    for (var i = 0; i < misProductos.length; i++) {
-        var prod = misProductos[i];
-
-        if (marca === 'todas' || prod.marca === marca) {
-
-            var div = document.createElement('div');
+    misProductos.forEach(p => {
+        if (marca === 'todas' || p.marca === marca) {
+            const div = document.createElement('div');
             div.className = 'producto-item';
-
-            var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg";
-
-            div.innerHTML =
-                '<img src="' + rutaImg + '">' +
-                '<p>' + prod.nombre + '</p>';
-
-            (function(ruta) {
-                div.onclick = function() {
-                    aplicarTextura(ruta);
-                };
-            })(rutaImg);
-
+            const ruta = `img/ceramicas/${p.nombre}.jpg`;
+            div.innerHTML = `<img src="${ruta}"><p>${p.nombre}</p>`;
+            div.onclick = () => aplicarTextura(ruta);
             contenedor.appendChild(div);
         }
-    }
+    });
 }
 
+function cambiarHabitacion(h) {
+    document.getElementById('bg-room').src = `img/habitaciones/${h}`;
+}

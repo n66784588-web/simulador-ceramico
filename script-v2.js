@@ -1,8 +1,9 @@
 // --- CONFIGURACION ---
 var modoEdicion = 'piso';
+var piezas = []; // 🔥 aquí guardamos TODAS las piezas (piso y muro)
 
-// --- LISTA DE PRODUCTOS ---
-var misProductos = [
+// --- LISTA DE PRODUCTOS (LA TUYA TAL CUAL) ---
+var misProductos = [ 
  // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
@@ -502,7 +503,12 @@ var misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-/* CAMBIAR HABITACION */
+// --- CAMBIAR MODO ---
+function setModo(modo) {
+    modoEdicion = modo;
+}
+
+// --- CAMBIAR HABITACION ---
 function cambiarHabitacion(habitacion) {
     var imgHab = document.getElementById('bg-room');
     if (imgHab) {
@@ -510,55 +516,121 @@ function cambiarHabitacion(habitacion) {
     }
 }
 
-/* APLICAR TEXTURA CORRECTA */
+// --- AGREGAR TEXTURA COMO PIEZA (MULTIPLE) ---
 function aplicarTextura(ruta) {
-    var canvas = document.getElementById('floor-canvas');
-    var ctx = canvas.getContext('2d');
 
-    var img = new Image();
-    img.src = ruta;
+    var pieza = {
+        img: new Image(),
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 200,
+        tipo: modoEdicion // piso o pared
+    };
 
-    img.onload = function () {
+    pieza.img.src = ruta;
 
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        /* RECORTE DEL PISO */
-        ctx.beginPath();
-        ctx.moveTo(canvas.width * 0.2, canvas.height * 0.7);
-        ctx.lineTo(canvas.width * 0.8, canvas.height * 0.7);
-        ctx.lineTo(canvas.width * 0.9, canvas.height * 0.9);
-        ctx.lineTo(canvas.width * 0.1, canvas.height * 0.9);
-        ctx.closePath();
-        ctx.clip();
-
-        /* AJUSTE PROPORCIONAL */
-        var ratio = Math.max(
-            canvas.width / img.width,
-            canvas.height / img.height
-        );
-
-        var newWidth = img.width * ratio;
-        var newHeight = img.height * ratio;
-
-        var x = (canvas.width - newWidth) / 2;
-        var y = (canvas.height - newHeight) / 2;
-
-        ctx.drawImage(img, x, y, newWidth, newHeight);
+    pieza.img.onload = function () {
+        piezas.push(pieza);
+        renderizar();
     };
 }
 
-/* MOSTRAR PRODUCTOS */
+// --- RENDER GENERAL (DIBUJA TODO) ---
+function renderizar() {
+
+    var floorCanvas = document.getElementById('floor-canvas');
+    var wallCanvas = document.getElementById('wall-canvas');
+
+    var fctx = floorCanvas.getContext('2d');
+    var wctx = wallCanvas.getContext('2d');
+
+    floorCanvas.width = floorCanvas.offsetWidth;
+    floorCanvas.height = floorCanvas.offsetHeight;
+
+    wallCanvas.width = wallCanvas.offsetWidth;
+    wallCanvas.height = wallCanvas.offsetHeight;
+
+    fctx.clearRect(0, 0, floorCanvas.width, floorCanvas.height);
+    wctx.clearRect(0, 0, wallCanvas.width, wallCanvas.height);
+
+    for (var i = 0; i < piezas.length; i++) {
+
+        var p = piezas[i];
+        var ctx = (p.tipo === 'piso') ? fctx : wctx;
+
+        ctx.drawImage(p.img, p.x, p.y, p.width, p.height);
+    }
+}
+
+// --- ARRASTRAR PIEZAS ---
+var piezaActiva = null;
+var offsetX = 0;
+var offsetY = 0;
+
+document.getElementById('viewport').addEventListener('mousedown', function(e) {
+
+    var rect = this.getBoundingClientRect();
+    var mouseX = e.clientX - rect.left;
+    var mouseY = e.clientY - rect.top;
+
+    for (var i = piezas.length - 1; i >= 0; i--) {
+        var p = piezas[i];
+
+        if (
+            mouseX > p.x &&
+            mouseX < p.x + p.width &&
+            mouseY > p.y &&
+            mouseY < p.y + p.height
+        ) {
+            piezaActiva = p;
+            offsetX = mouseX - p.x;
+            offsetY = mouseY - p.y;
+            break;
+        }
+    }
+});
+
+document.addEventListener('mousemove', function(e) {
+    if (piezaActiva) {
+        var rect = document.getElementById('viewport').getBoundingClientRect();
+
+        piezaActiva.x = e.clientX - rect.left - offsetX;
+        piezaActiva.y = e.clientY - rect.top - offsetY;
+
+        renderizar();
+    }
+});
+
+document.addEventListener('mouseup', function() {
+    piezaActiva = null;
+});
+
+// --- ESCALAR CON RUEDA DEL MOUSE ---
+document.getElementById('viewport').addEventListener('wheel', function(e) {
+
+    if (piezaActiva) {
+        e.preventDefault();
+
+        var scale = e.deltaY > 0 ? 0.9 : 1.1;
+
+        piezaActiva.width *= scale;
+        piezaActiva.height *= scale;
+
+        renderizar();
+    }
+});
+
+// --- MOSTRAR PRODUCTOS ---
 function mostrarProductos(marca) {
+
     var contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
 
     contenedor.innerHTML = '';
 
     for (var i = 0; i < misProductos.length; i++) {
+
         var prod = misProductos[i];
 
         if (marca === 'todas' || prod.marca === marca) {

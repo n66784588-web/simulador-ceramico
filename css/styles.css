@@ -3,13 +3,76 @@
     width: 100vw;
     height: 100vh;
 }
-
-/* --- AREA VISUAL --- */
+/* --- VIEWPORT --- */
 #viewport {
     position: relative;
     flex: 3;
     background: #000;
+    overflow: hidden;
 }
+/* --- IMAGEN DE FONDO --- */
+#bg-room {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* --- CANVAS (PISO Y PARED) --- */
+#floor-canvas,
+#wall-canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+/* orden de capas */
+#floor-canvas {
+    z-index: 2;
+}
+
+#wall-canvas {
+    z-index: 3;
+}
+
+/* --- CONTROLES --- */
+.controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
+
+/* --- MODO --- */
+.mode-selector {
+    position: absolute;
+    top: 60px;
+    left: 10px;
+    z-index: 10;
+}
+
+/* --- PUNTOS --- */
+.dot {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    z-index: 20;
+}
+
+.blue {
+    background: blue;
+}
+
+.red {
+    background: red;
+}
+
 
 /* --- PANEL DERECHO --- */
 .side-panel {

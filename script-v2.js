@@ -503,7 +503,43 @@ var misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-// --- AREAS (AJUSTABLES) ---
+
+// --- CAMBIOS ---
+function setModo(modo){
+    modoEdicion = modo;
+}
+
+function cambiarHabitacion(habitacion){
+    document.getElementById('bg-room').src = "img/habitaciones/" + habitacion;
+}
+
+// --- APLICAR TEXTURA ---
+function aplicarTextura(ruta){
+
+    var img = new Image();
+    img.src = ruta;
+
+    var pieza = {
+        img: img,
+        x: 150,
+        y: 150,
+        width: 120,
+        height: 120,
+        tipo: modoEdicion
+    };
+
+    img.onload = function(){
+        piezas.push(pieza);
+        renderizar();
+    };
+
+    if (img.complete) {
+        piezas.push(pieza);
+        renderizar();
+    }
+}
+
+// --- AREAS ---
 function areaPiso(canvas){
     return [
         {x: canvas.width*0.2, y: canvas.height*0.7},
@@ -522,42 +558,7 @@ function areaMuro(canvas){
     ];
 }
 
-// --- CAMBIOS ---
-function setModo(modo){
-    modoEdicion = modo;
-}
-
-function cambiarHabitacion(habitacion){
-    document.getElementById('bg-room').src = "img/habitaciones/" + habitacion;
-}
-
-function aplicarTextura(ruta){
-
-    var img = new Image();
-    img.src = ruta;
-
-    var pieza = {
-        img: img,
-        x: 100,
-        y: 100,
-        width: 150,
-        height: 150,
-        tipo: modoEdicion
-    };
-
-    // 🔥 IMPORTANTE: forzar render SIEMPRE
-    img.onload = function(){
-        piezas.push(pieza);
-        renderizar();
-    };
-
-    // 🔥 SI YA ESTÁ EN CACHE
-        piezas.push(pieza);
-        renderizar();
-    }
-}
-
-// --- DIBUJAR POLIGONO ---
+// --- RECORTE ---
 function recortar(ctx, puntos){
     ctx.beginPath();
     ctx.moveTo(puntos[0].x, puntos[0].y);
@@ -586,18 +587,12 @@ function renderizar(){
     fctx.clearRect(0,0,floor.width,floor.height);
     wctx.clearRect(0,0,wall.width,wall.height);
 
-    // 🔥 RECORTE PISO
     fctx.save();
     recortar(fctx, areaPiso(floor));
 
-    // 🔥 RECORTE MURO
     wctx.save();
     recortar(wctx, areaMuro(wall));
- 
-if(!floor.width || !floor.height) return;
-if(!wall.width || !wall.height) return;
- 
-    // 🔥 DIBUJAR PIEZAS
+
     piezas.forEach(p=>{
         var ctx = (p.tipo === 'piso') ? fctx : wctx;
         ctx.drawImage(p.img, p.x, p.y, p.width, p.height);
@@ -607,12 +602,19 @@ if(!wall.width || !wall.height) return;
     wctx.restore();
 }
 
-// --- DRAG ---
-document.getElementById('viewport').addEventListener('mousedown', e=>{
+// =======================
+// 🔥 INTERACCION CORREGIDA
+// =======================
 
-    const canvas = document.getElementById('floor-canvas'); // usamos referencia fija
-    const rect = canvas.getBoundingClientRect();
+var activa = null;
+var offsetX = 0;
+var offsetY = 0;
 
+var layer = document.getElementById('interaction-layer');
+
+// CLICK
+layer.addEventListener('mousedown', e=>{
+    var rect = layer.getBoundingClientRect();
     var x = e.clientX - rect.left;
     var y = e.clientY - rect.top;
 
@@ -620,30 +622,30 @@ document.getElementById('viewport').addEventListener('mousedown', e=>{
         let p = piezas[i];
         if(x>p.x && x<p.x+p.width && y>p.y && y<p.y+p.height){
             activa = p;
-            offsetX = x-p.x;
-            offsetY = y-p.y;
+            offsetX = x - p.x;
+            offsetY = y - p.y;
             break;
         }
     }
 });
 
-document.addEventListener('mousemove', e=>{
+// MOVER
+layer.addEventListener('mousemove', e=>{
     if(activa){
-
-        const canvas = document.getElementById('floor-canvas');
-        const rect = canvas.getBoundingClientRect();
-
+        var rect = layer.getBoundingClientRect();
         activa.x = e.clientX - rect.left - offsetX;
         activa.y = e.clientY - rect.top - offsetY;
-
         renderizar();
     }
 });
 
-document.addEventListener('mouseup', ()=> activa=null);
+// SOLTAR
+document.addEventListener('mouseup', ()=>{
+    activa = null;
+});
 
-// --- ZOOM ---
-document.getElementById('viewport').addEventListener('wheel', e=>{
+// ZOOM
+layer.addEventListener('wheel', e=>{
     if(activa){
         e.preventDefault();
         let scale = e.deltaY>0 ? 0.9 : 1.1;
@@ -660,6 +662,7 @@ function mostrarProductos(marca){
     cont.innerHTML='';
 
     misProductos.forEach(prod=>{
+
         if(marca==='todas' || prod.marca===marca){
 
             let ruta = "img/ceramicas/"+prod.nombre+".jpg";
@@ -678,3 +681,8 @@ function mostrarProductos(marca){
         }
     });
 }
+
+// --- INICIO ---
+window.onload = ()=>{
+    mostrarProductos('todas');
+};

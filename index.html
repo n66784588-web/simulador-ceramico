@@ -1,10 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Simulador de Cerámicos</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 🔥 CSS -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -13,10 +14,18 @@
 
     <!-- AREA VISUAL -->
     <div id="viewport">
+
+        <!-- 🔥 FONDO -->
         <img id="bg-room" src="img/habitaciones/sala.jpg">
+
+        <!-- 🔥 CANVAS -->
         <canvas id="floor-canvas"></canvas>
         <canvas id="wall-canvas"></canvas>
 
+        <!-- 🔥 CAPA PARA INTERACCION (CLAVE) -->
+        <div id="interaction-layer"></div>
+
+        <!-- CONTROLES -->
         <div class="controls">
             <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
             <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
@@ -31,15 +40,16 @@
         </div>
 
         <!-- PUNTOS -->
-        <div id="p1" class="dot blue" style="top:70%; left:20%"></div>
-        <div id="p2" class="dot blue" style="top:70%; left:80%"></div>
-        <div id="p3" class="dot blue" style="top:90%; left:90%"></div>
-        <div id="p4" class="dot blue" style="top:90%; left:10%"></div>
+        <div class="dot blue" style="top:70%; left:20%"></div>
+        <div class="dot blue" style="top:70%; left:80%"></div>
+        <div class="dot blue" style="top:90%; left:90%"></div>
+        <div class="dot blue" style="top:90%; left:10%"></div>
 
-        <div id="p5" class="dot red" style="top:20%; left:30%"></div>
-        <div id="p6" class="dot red" style="top:20%; left:70%"></div>
-        <div id="p7" class="dot red" style="top:60%; left:70%"></div>
-        <div id="p8" class="dot red" style="top:60%; left:30%"></div>
+        <div class="dot red" style="top:20%; left:30%"></div>
+        <div class="dot red" style="top:20%; left:70%"></div>
+        <div class="dot red" style="top:60%; left:70%"></div>
+        <div class="dot red" style="top:60%; left:30%"></div>
+
     </div>
 
     <!-- PANEL DERECHO -->
@@ -47,7 +57,6 @@
 
         <h3>Marcas</h3>
 
-        <!-- BOTONES -->
         <div class="brand-filters">
             <button onclick="mostrarProductos('todas')">Todas</button>
             <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
@@ -58,13 +67,13 @@
             <button onclick="mostrarProductos('benadresa')">Benadresa</button>
         </div>
 
-        <!-- 🔥 AQUI VA SOLO -->
         <div id="productos-lista"></div>
 
     </div>
 
 </div>
 
+<!-- 🔥 SCRIPT SIEMPRE AL FINAL -->
 <script src="script-v2.js"></script>
 
 </body>

@@ -531,21 +531,28 @@ function cambiarHabitacion(habitacion){
     document.getElementById('bg-room').src = "img/habitaciones/" + habitacion;
 }
 
-// --- AGREGAR PIEZA ---
 function aplicarTextura(ruta){
 
+    var img = new Image();
+    img.src = ruta;
+
     var pieza = {
-        img: new Image(),
-        x: 150,
-        y: 150,
+        img: img,
+        x: 100,
+        y: 100,
         width: 150,
         height: 150,
         tipo: modoEdicion
     };
 
-    pieza.img.src = ruta;
+    // 🔥 IMPORTANTE: forzar render SIEMPRE
+    img.onload = function(){
+        piezas.push(pieza);
+        renderizar();
+    };
 
-    pieza.img.onload = function(){
+    // 🔥 SI YA ESTÁ EN CACHE
+    if (img.complete) {
         piezas.push(pieza);
         renderizar();
     }

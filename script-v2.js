@@ -552,7 +552,6 @@ function aplicarTextura(ruta){
     };
 
     // 🔥 SI YA ESTÁ EN CACHE
-    if (img.complete) {
         piezas.push(pieza);
         renderizar();
     }
@@ -594,7 +593,10 @@ function renderizar(){
     // 🔥 RECORTE MURO
     wctx.save();
     recortar(wctx, areaMuro(wall));
-
+ 
+if(!floor.width || !floor.height) return;
+if(!wall.width || !wall.height) return;
+ 
     // 🔥 DIBUJAR PIEZAS
     piezas.forEach(p=>{
         var ctx = (p.tipo === 'piso') ? fctx : wctx;
@@ -606,10 +608,11 @@ function renderizar(){
 }
 
 // --- DRAG ---
-var activa=null, offsetX=0, offsetY=0;
-
 document.getElementById('viewport').addEventListener('mousedown', e=>{
-    var rect = e.target.getBoundingClientRect();
+
+    const canvas = document.getElementById('floor-canvas'); // usamos referencia fija
+    const rect = canvas.getBoundingClientRect();
+
     var x = e.clientX - rect.left;
     var y = e.clientY - rect.top;
 
@@ -626,9 +629,13 @@ document.getElementById('viewport').addEventListener('mousedown', e=>{
 
 document.addEventListener('mousemove', e=>{
     if(activa){
-        var rect = document.getElementById('viewport').getBoundingClientRect();
+
+        const canvas = document.getElementById('floor-canvas');
+        const rect = canvas.getBoundingClientRect();
+
         activa.x = e.clientX - rect.left - offsetX;
         activa.y = e.clientY - rect.top - offsetY;
+
         renderizar();
     }
 });

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Simulador de Cerámicos Pro</title>
+    <title>Simulador de Cerámicos Profesional</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -19,12 +19,15 @@
             <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
             <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
             <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
+            <button onclick="cambiarHabitacion('recamara.jpg')">Baño</button>
+             <button onclick="cambiarHabitacion('terraza.jpg')">Baño</button>
+
         </div>
 
         <div class="mode-selector">
-            <button class="btn-piso" onclick="setModo('piso')">Editar Piso</button>
-            <button class="btn-pared" onclick="setModo('pared')">Editar Pared</button>
-            <p style="color: white; font-size: 12px; margin-top: 5px;">*Usa la rueda del mouse para cambiar tamaño de pieza</p>
+            <button id="btn-piso" class="active" onclick="setModo('piso')">Editar Piso (Puntos Azules)</button>
+            <button id="btn-pared" onclick="setModo('pared')">Editar Pared (Puntos Rojos)</button>
+            <small style="color: white; margin-top: 5px;">Rueda del mouse: Cambiar tamaño de pieza</small>
         </div>
 
         <div id="p1" class="dot blue" style="top:70%; left:20%"></div>
@@ -39,17 +42,18 @@
     </div>
 
     <div class="side-panel">
-        <h3>Filtros de Marca</h3>
+        <h3>Marcas</h3>
         <div class="brand-filters">
             <button onclick="mostrarProductos('todas')">Todas</button>
             <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
             <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
             <button onclick="mostrarProductos('vitromex')">Vitromex</button>
             <button onclick="mostrarProductos('daltile')">Daltile</button>
-            <button onclick="mostrarProductos('mise')">mise</button>
-            <button onclick="mostrarProductos('benadresa')">benadresa</button>
+            <button onclick="mostrarProductos('mise')">Mise</button>
+            <button onclick="mostrarProductos('benadresa')">Benadresa</button>
         </div>
-        <div id="productos-lista"></div>
+        <div id="productos-lista">
+            </div>
     </div>
 </div>
 

@@ -501,6 +501,7 @@ var piezas = [
 
 
 // ================= ÁREAS =================
+
 function areaPiso(canvas){
     return [
         {x: canvas.width*0.1, y: canvas.height*0.7},
@@ -519,7 +520,9 @@ function areaMuro(canvas){
     ];
 }
 
-// ================= MODOS =================
+// ------------------------
+// MODOS
+// ------------------------
 function setModo(modo){
     modoEdicion = modo;
 }
@@ -528,13 +531,16 @@ function cambiarHabitacion(habitacion){
     document.getElementById('bg-room').src = "img/habitaciones/" + habitacion;
 }
 
-// ================= TEXTURA =================
+// ------------------------
+// APLICAR TEXTURA (CORREGIDO)
+// ------------------------
 function aplicarTextura(ruta){
 
-    var img = new Image();
+    let img = new Image();
+    img.crossOrigin = "anonymous";
     img.src = ruta;
 
-    var pieza = {
+    let pieza = {
         img: img,
         x: 100,
         y: 100,
@@ -548,13 +554,14 @@ function aplicarTextura(ruta){
         renderizar();
     };
 
-    if (img.complete) {
-        piezas.push(pieza);
-        renderizar();
-    }
+    img.onerror = function(){
+        console.error("❌ No se pudo cargar imagen:", ruta);
+    };
 }
 
-// ================= RECORTE =================
+// ------------------------
+// RECORTE
+// ------------------------
 function recortar(ctx, puntos){
     ctx.beginPath();
     ctx.moveTo(puntos[0].x, puntos[0].y);
@@ -565,53 +572,67 @@ function recortar(ctx, puntos){
     ctx.clip();
 }
 
-// ================= RENDER =================
+// ------------------------
+// RENDER (CORREGIDO)
+// ------------------------
 function renderizar(){
 
-    var floor = document.getElementById('floor-canvas');
-    var wall = document.getElementById('wall-canvas');
+    const floor = document.getElementById('floor-canvas');
+    const wall = document.getElementById('wall-canvas');
 
-    var fctx = floor.getContext('2d');
-    var wctx = wall.getContext('2d');
+    const fctx = floor.getContext('2d');
+    const wctx = wall.getContext('2d');
 
-    floor.width = floor.offsetWidth;
-    floor.height = floor.offsetHeight;
-
-    wall.width = wall.offsetWidth;
-    wall.height = wall.offsetHeight;
-
+    // limpiar
     fctx.clearRect(0,0,floor.width,floor.height);
     wctx.clearRect(0,0,wall.width,wall.height);
 
-    // PISO
+    // piso
     fctx.save();
     recortar(fctx, areaPiso(floor));
 
-    // MURO
+    // muro
     wctx.save();
     recortar(wctx, areaMuro(wall));
 
-    piezas.forEach(p=>{
-        var ctx = (p.tipo === 'piso') ? fctx : wctx;
-        ctx.drawImage(p.img, p.x, p.y, p.width, p.height);
+    // dibujar piezas
+    piezas.forEach(p => {
+
+        if(!p.img.complete) return;
+
+        let ctx = (p.tipo === 'piso') ? fctx : wctx;
+
+        ctx.drawImage(
+            p.img,
+            p.x,
+            p.y,
+            p.width,
+            p.height
+        );
     });
 
     fctx.restore();
     wctx.restore();
 }
 
-// ================= INTERACCIÓN =================
-var activa = null, offsetX = 0, offsetY = 0;
-var layer = document.getElementById('interaction-layer');
+// ------------------------
+// INTERACCION
+// ------------------------
+let activa = null;
+let offsetX = 0;
+let offsetY = 0;
 
-// CLICK
-layer.addEventListener('mousedown', e=>{
-    var rect = layer.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    var y = e.clientY - rect.top;
+const layer = document.getElementById('interaction-layer');
+
+layer.addEventListener('mousedown', e => {
+
+    const rect = layer.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
     for(let i=piezas.length-1;i>=0;i--){
         let p = piezas[i];
+
         if(x>p.x && x<p.x+p.width && y>p.y && y<p.y+p.height){
             activa = p;
             offsetX = x - p.x;
@@ -621,37 +642,48 @@ layer.addEventListener('mousedown', e=>{
     }
 });
 
-// MOVER
-document.addEventListener('mousemove', e=>{
-    if(activa){
-        var rect = layer.getBoundingClientRect();
-        activa.x = e.clientX - rect.left - offsetX;
-        activa.y = e.clientY - rect.top - offsetY;
-        renderizar();
-    }
+document.addEventListener('mousemove', e => {
+    if(!activa) return;
+
+    const rect = layer.getBoundingClientRect();
+
+    activa.x = e.clientX - rect.left - offsetX;
+    activa.y = e.clientY - rect.top - offsetY;
+
+    renderizar();
 });
 
-// SOLTAR
-document.addEventListener('mouseup', ()=> activa = null);
+document.addEventListener('mouseup', () => {
+    activa = null;
+});
 
+// ------------------------
 // ZOOM
-layer.addEventListener('wheel', e=>{
-    if(activa){
-        e.preventDefault();
-        let scale = e.deltaY > 0 ? 0.9 : 1.1;
-        activa.width *= scale;
-        activa.height *= scale;
-        renderizar();
-    }
+// ------------------------
+layer.addEventListener('wheel', e => {
+
+    if(!activa) return;
+
+    e.preventDefault();
+
+    let scale = e.deltaY > 0 ? 0.9 : 1.1;
+
+    activa.width *= scale;
+    activa.height *= scale;
+
+    renderizar();
 });
 
-// ================= PRODUCTOS =================
+// ------------------------
+// PRODUCTOS (CORREGIDO ERROR CRÍTICO)
+// ------------------------
 function mostrarProductos(marca){
 
-    var cont = document.getElementById('productos-lista');
+    const cont = document.getElementById('productos-lista');
     cont.innerHTML = '';
 
-    piezas.forEach(prod=>{
+    piezas.forEach(prod => {
+
         if(marca === 'todas' || prod.marca === marca){
 
             let ruta = "img/ceramicas/" + prod.nombre + ".jpg";
@@ -660,14 +692,13 @@ function mostrarProductos(marca){
             div.className = 'producto-item';
 
             div.innerHTML = `
-                <img src="${ruta}">
+                <img src="${ruta}" onerror="this.style.display='none'">
                 <p>${prod.nombre}</p>
             `;
 
-            div.onclick = ()=>aplicarTextura(ruta);
+            div.onclick = () => aplicarTextura(ruta);
 
             cont.appendChild(div);
         }
     });
 }
-      

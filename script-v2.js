@@ -521,10 +521,6 @@ function aplicarTextura(ruta) {
         capaPiso.style.backgroundImage = "url('" + ruta + "')";
         capaPiso.style.backgroundSize = "cover";
     }
-}
-
-
-// --- MOSTRAR PRODUCTOS (CORREGIDO) ---
 function mostrarProductos(marca) {
     var contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
@@ -534,7 +530,6 @@ function mostrarProductos(marca) {
     for (var i = 0; i < misProductos.length; i++) {
         var prod = misProductos[i];
 
-        // ✅ CORRECTO: ahora sí todo está dentro del IF
         if (marca === 'todas' || prod.marca === marca) {
 
             var div = document.createElement('div');
@@ -546,20 +541,11 @@ function mostrarProductos(marca) {
                 '<img src="' + rutaImg + '" style="width:100px">' +
                 '<p>' + prod.nombre + '</p>';
 
-            // Evento click
-            (function(ruta) {
-                div.onclick = function() {
-                    aplicarTextura(ruta);
-                };
-            })(rutaImg);
+            div.onclick = function() {
+                aplicarTextura(rutaImg);
+            };
 
             contenedor.appendChild(div);
         }
     }
 }
-
-
-// --- INICIO ---
-window.onload = function () {
-    mostrarProductos('nitropiso');
-};

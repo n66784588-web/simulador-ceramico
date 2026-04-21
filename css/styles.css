@@ -1,11 +1,9 @@
-/* --- RESET --- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* --- CONTENEDOR --- */
 #main-container {
   display: flex;
   width: 100vw;
@@ -13,7 +11,6 @@
   overflow: hidden;
 }
 
-/* --- VIEWPORT --- */
 #viewport {
   position: relative;
   flex: 3;
@@ -21,7 +18,6 @@
   overflow: hidden;
 }
 
-/* --- FONDO --- */
 #bg-room {
   position: absolute;
   width: 100%;
@@ -31,21 +27,16 @@
   pointer-events: none;
 }
 
-/* --- CANVAS --- */
 canvas {
   position: absolute;
   width: 100%;
   height: 100%;
-  top: 0;
-  left: 0;
-  display: block;
-  pointer-events: none; /* 🔥 CLAVE */
+  pointer-events: none;
 }
 
 #floor-canvas { z-index: 2; }
 #wall-canvas { z-index: 3; }
 
-/* --- CAPA DE INTERACCIÓN (🔥 LA QUE ARREGLA TODO) --- */
 #interaction-layer {
   position: absolute;
   width: 100%;
@@ -53,7 +44,7 @@ canvas {
   z-index: 5;
 }
 
-/* --- CONTROLES --- */
+/* CONTROLES */
 .controls, .mode-selector {
   position: absolute;
   left: 10px;
@@ -63,37 +54,24 @@ canvas {
 .controls { top: 10px; }
 .mode-selector { top: 60px; }
 
-/* --- PANEL DERECHO --- */
+button {
+  padding: 10px;
+  background: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* PANEL */
 .side-panel {
   flex: 1;
   background: #1a1a1a;
-  padding: 15px;
   color: white;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* --- FILTROS --- */
-.brand-filters {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-/* --- BOTONES --- */
-button {
   padding: 10px;
-  border: none;
-  cursor: pointer;
-  background: #333;
-  color: white;
+  overflow-y: auto;
 }
 
-/* --- PRODUCTOS --- */
 #productos-lista {
-  margin-top: 10px;
-  overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 10px;
@@ -101,13 +79,10 @@ button {
 
 .producto-item {
   background: #2a2a2a;
-  padding: 8px;
-  border-radius: 6px;
-  text-align: center;
+  padding: 5px;
   cursor: pointer;
 }
 
 .producto-item img {
   width: 100%;
-  border-radius: 4px;
 }

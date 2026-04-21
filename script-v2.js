@@ -509,16 +509,17 @@ function setModo(modo) {
 }
 
 function cambiarHabitacion(habitacion) {
-    var imgHab = document.getElementById('habitacion-img');
+    var imgHab = document.getElementById('bg-room');
     if (imgHab) {
-        imgHab.src = "img/escenarios/" + habitacion + ".jpg";
+        imgHab.src = "img/habitaciones/" + habitacion;
     }
 }
 
 function aplicarTextura(ruta) {
-    var capaPiso = document.getElementById('capa-piso');
+    var capaPiso = document.getElementById('floor-canvas');
     if (capaPiso) {
         capaPiso.style.backgroundImage = "url('" + ruta + "')";
+        capaPiso.style.backgroundSize = "cover";
     }
 }
 
@@ -531,7 +532,7 @@ function mostrarProductos(marca) {
 
     for (var i = 0; i < misProductos.length; i++) {
         var prod = misProductos[i];
-        if (prod.marca === marca) {
+        if (marca === 'todas' || prod.marca === marca)
             var div = document.createElement('div');
             div.className = 'producto-item';
             

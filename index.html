@@ -2,17 +2,16 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Simulador de Cerámicos</title>
+    <title>Simulador de Cerámicos Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
 <div id="main-container">
-
-    <!-- AREA VISUAL -->
     <div id="viewport">
         <img id="bg-room" src="img/habitaciones/sala.jpg">
+        
         <canvas id="floor-canvas"></canvas>
         <canvas id="wall-canvas"></canvas>
 
@@ -20,16 +19,14 @@
             <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
             <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
             <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
-            <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
-            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
         </div>
 
         <div class="mode-selector">
-            <button onclick="setModo('piso')">Editar Piso</button>
-            <button onclick="setModo('pared')">Editar Pared</button>
+            <button class="btn-piso" onclick="setModo('piso')">Editar Piso</button>
+            <button class="btn-pared" onclick="setModo('pared')">Editar Pared</button>
+            <p style="color: white; font-size: 12px; margin-top: 5px;">*Usa la rueda del mouse para cambiar tamaño de pieza</p>
         </div>
 
-        <!-- PUNTOS -->
         <div id="p1" class="dot blue" style="top:70%; left:20%"></div>
         <div id="p2" class="dot blue" style="top:70%; left:80%"></div>
         <div id="p3" class="dot blue" style="top:90%; left:90%"></div>
@@ -41,31 +38,21 @@
         <div id="p8" class="dot red" style="top:60%; left:30%"></div>
     </div>
 
-    <!-- PANEL DERECHO -->
     <div class="side-panel">
-
-        <h3>Marcas</h3>
-
-        <!-- BOTONES -->
+        <h3>Filtros de Marca</h3>
         <div class="brand-filters">
             <button onclick="mostrarProductos('todas')">Todas</button>
             <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
-            <button onclick="mostrarProductos('daltile')">Daltile</button>
-            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
             <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
-            <button onclick="mostrarProductos('mise')">Mise</button>
-            <button onclick="mostrarProductos('benadresa')">Benadresa</button>
+            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
+            <button onclick="mostrarProductos('daltile')">Daltile</button>
+            <button onclick="mostrarProductos('mise')">mise</button>
+            <button onclick="mostrarProductos('benadresa')">benadresa</button>
         </div>
-
-        <!-- 🔥 AQUI VA SOLO -->
         <div id="productos-lista"></div>
-
     </div>
-
 </div>
 
 <script src="script-v2.js"></script>
-
 </body>
 </html>
-

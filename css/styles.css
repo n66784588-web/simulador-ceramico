@@ -1,44 +1,176 @@
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+/* RESET GENERAL */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+}
 
-#main-container { display: flex; width: 100vw; height: 100vh; background: #111; overflow: hidden; }
+#main-container { 
+    display: flex; 
+    width: 100vw; 
+    height: 100vh; 
+    background: #111; 
+    overflow: hidden; 
+}
 
-#viewport { position: relative; flex: 3; background: #000; overflow: hidden; }
+/* ÁREA DEL SIMULADOR */
+#viewport { 
+    position: relative; 
+    flex: 3; 
+    background: #000; 
+    overflow: hidden; 
+}
 
-#bg-room { position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+#bg-room { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    z-index: 1; 
+}
 
-canvas { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 2; pointer-events: none; }
+/* CANVASES: Corregidos para no bloquear el mouse */
+#floor-canvas { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    top: 0; 
+    left: 0; 
+    z-index: 5; 
+    pointer-events: none; 
+}
 
-/* Botones de control flotantes */
-.controls, .mode-selector { position: absolute; z-index: 10; display: flex; gap: 8px; padding: 15px; }
-.mode-selector { top: 70px; flex-direction: column; background: rgba(0,0,0,0.5); border-radius: 8px; }
+#wall-canvas { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    top: 0; 
+    left: 0; 
+    z-index: 6; 
+    pointer-events: none; 
+}
+
+/* CONTROLES FLOTANTES */
+.controls { 
+    position: absolute; 
+    top: 10px; 
+    left: 10px; 
+    z-index: 100; 
+    display: flex; 
+    gap: 8px; 
+}
+
+.mode-selector { 
+    position: absolute; 
+    top: 60px; /* Bajado un poco para no chocar con botones de arriba */
+    left: 10px; 
+    z-index: 100; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+    background: rgba(0,0,0,0.7); 
+    padding: 12px; 
+    border-radius: 8px; 
+    border: 1px solid #444;
+}
 
 button { 
-    padding: 10px 15px; cursor: pointer; background: #222; color: white; 
-    border: 1px solid #444; border-radius: 5px; transition: 0.3s;
+    padding: 10px 15px; 
+    cursor: pointer; 
+    background: #222; 
+    color: white; 
+    border: 1px solid #444; 
+    border-radius: 5px; 
+    transition: 0.3s;
+    font-size: 13px;
 }
-button:hover { background: #444; border-color: #666; }
-button.active { background: #007bff; border-color: #00a2ff; }
 
-/* Puntos de arrastre (Dots) */
-.dot {
-    position: absolute; width: 18px; height: 18px; border-radius: 50%;
-    z-index: 30; cursor: move; border: 3px solid #fff;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 10px rgba(0,0,0,0.8);
+button:hover { 
+    background: #444; 
+    border-color: #666; 
 }
+
+button.active { 
+    background: #007bff !important; 
+    border-color: #00a2ff !important; 
+    font-weight: bold;
+}
+
+/* PUNTOS DE ARRASTRE: Prioridad máxima */
+.dot {
+    position: absolute; 
+    width: 22px; /* Más grandes para que sean fáciles de agarrar */
+    height: 22px; 
+    border-radius: 50%;
+    z-index: 150 !important; /* Por encima de todo */
+    cursor: move; 
+    border: 3px solid #fff;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 15px rgba(0,0,0,0.8);
+    pointer-events: auto; /* IMPORTANTE: Activa el clic/arrastre */
+}
+
 .blue { background: #007bff; }
 .red { background: #ff4757; }
 
-/* Panel Lateral de Productos */
-.side-panel { flex: 1; background: #1a1a1a; color: white; padding: 20px; display: flex; flex-direction: column; }
-.brand-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 20px 0; }
-#productos-lista { 
-    flex: 1; overflow-y: auto; display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; 
+/* PANEL LATERAL */
+.side-panel { 
+    flex: 1; 
+    background: #1a1a1a; 
+    color: white; 
+    padding: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    border-left: 2px solid #333;
 }
 
-.producto-item { background: #2a2a2a; padding: 8px; border-radius: 6px; text-align: center; cursor: pointer; }
-.producto-item:hover { border: 1px solid #007bff; background: #333; }
-.producto-item img { width: 100%; border-radius: 4px; margin-bottom: 8px; }
-.producto-item p { font-size: 11px; color: #ccc; text-transform: uppercase; }
+.brand-filters { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 8px; 
+    margin: 20px 0; 
+}
 
+#productos-lista { 
+    flex: 1; 
+    overflow-y: auto; 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+    gap: 12px; 
+    padding-right: 5px;
+}
+
+/* Estilo de barra de desplazamiento (Scrollbar) */
+#productos-lista::-webkit-scrollbar { width: 6px; }
+#productos-lista::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+
+.producto-item { 
+    background: #2a2a2a; 
+    padding: 8px; 
+    border-radius: 6px; 
+    text-align: center; 
+    cursor: pointer; 
+    border: 1px solid transparent;
+    transition: 0.2s;
+}
+
+.producto-item:hover { 
+    border: 1px solid #007bff; 
+    background: #333; 
+}
+
+.producto-item img { 
+    width: 100%; 
+    border-radius: 4px; 
+    margin-bottom: 8px; 
+    display: block;
+}
+
+.producto-item p { 
+    font-size: 10px; 
+    color: #ccc; 
+    text-transform: uppercase; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

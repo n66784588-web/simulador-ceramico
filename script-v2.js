@@ -523,26 +523,30 @@ function aplicarTextura(ruta) {
     }
 }
 
-// --- MOSTRAR PRODUCTOS ---
+
+// --- MOSTRAR PRODUCTOS (CORREGIDO) ---
 function mostrarProductos(marca) {
     var contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
-    
-    contenedor.innerHTML = ''; 
+
+    contenedor.innerHTML = '';
 
     for (var i = 0; i < misProductos.length; i++) {
         var prod = misProductos[i];
-        if (marca === 'todas' || prod.marca === marca)
+
+        // ✅ CORRECTO: ahora sí todo está dentro del IF
+        if (marca === 'todas' || prod.marca === marca) {
+
             var div = document.createElement('div');
             div.className = 'producto-item';
-            
-            // RUTA SEGUN TU CAPTURA: img/ceramicas/
-            var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg"; 
 
-            div.innerHTML = '<img src="' + rutaImg + '" style="width:100px">' +
-                            '<p>' + prod.nombre + '</p>';
-            
-            // Usamos una funcion anonima tradicional para evitar errores
+            var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg";
+
+            div.innerHTML =
+                '<img src="' + rutaImg + '" style="width:100px">' +
+                '<p>' + prod.nombre + '</p>';
+
+            // Evento click
             (function(ruta) {
                 div.onclick = function() {
                     aplicarTextura(ruta);
@@ -554,7 +558,8 @@ function mostrarProductos(marca) {
     }
 }
 
+
 // --- INICIO ---
-window.onload = function() {
+window.onload = function () {
     mostrarProductos('nitropiso');
 };

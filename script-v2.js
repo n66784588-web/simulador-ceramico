@@ -514,15 +514,36 @@ function cambiarHabitacion(habitacion) {
         imgHab.src = "img/habitaciones/" + habitacion;
     }
 }
-
-// ✅ CORREGIDA (YA CERRADA)
 function aplicarTextura(ruta) {
-    var capaPiso = document.getElementById('floor-canvas');
-    if (capaPiso) {
-        capaPiso.style.backgroundImage = "url('" + ruta + "')";
-        capaPiso.style.backgroundSize = "cover";
-    }
+    var canvas = document.getElementById('floor-canvas');
+    var ctx = canvas.getContext('2d');
+
+    var img = new Image();
+    img.src = ruta;
+
+    img.onload = function () {
+
+        // Ajustar tamaño real del canvas
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        // Limpiar
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 🔥 DIBUJAR SOLO EN EL ÁREA DEL PISO
+        ctx.beginPath();
+        ctx.moveTo(canvas.width * 0.2, canvas.height * 0.7);
+        ctx.lineTo(canvas.width * 0.8, canvas.height * 0.7);
+        ctx.lineTo(canvas.width * 0.9, canvas.height * 0.9);
+        ctx.lineTo(canvas.width * 0.1, canvas.height * 0.9);
+        ctx.closePath();
+        ctx.clip();
+
+        // Dibujar imagen dentro del recorte
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
 }
+
 
 // ✅ MOSTRAR PRODUCTOS ORDENADOS Y FUNCIONANDO
 function mostrarProductos(marca) {

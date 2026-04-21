@@ -500,6 +500,22 @@ var piezas = [
 ];   
 
 
+        {x: canvas.width*0.8, y: canvas.height*0.7},
+        {x: canvas.width*0.9, y: canvas.height*0.9},
+        {x: canvas.width*0.1, y: canvas.height*0.9}
+    ];
+}
+
+function areaMuro(canvas){
+    return [
+        {x: canvas.width*0.3, y: canvas.height*0.2},
+        {x: canvas.width*0.7, y: canvas.height*0.2},
+        {x: canvas.width*0.7, y: canvas.height*0.6},
+        {x: canvas.width*0.3, y: canvas.height*0.6}
+    ];
+}
+
+// --- MODOS ---
 function setModo(modo){
     modoEdicion = modo;
 }
@@ -508,6 +524,7 @@ function cambiarHabitacion(habitacion){
     document.getElementById('bg-room').src = "img/habitaciones/" + habitacion;
 }
 
+// --- TEXTURA ---
 function aplicarTextura(ruta){
 
     var img = new Image();
@@ -515,10 +532,10 @@ function aplicarTextura(ruta){
 
     var pieza = {
         img: img,
-        x: 50,
-        y: 50,
-        width: 200,
-        height: 200,
+        x: 100,
+        y: 100,
+        width: 150,
+        height: 150,
         tipo: modoEdicion
     };
 
@@ -526,34 +543,26 @@ function aplicarTextura(ruta){
         piezas.push(pieza);
         renderizar();
     };
+
+    // 🔥 evita fallo de cache
+    if (img.complete) {
+        piezas.push(pieza);
+        renderizar();
+    }
 }
 
+// --- RECORTE ---
 function recortar(ctx, puntos){
     ctx.beginPath();
     ctx.moveTo(puntos[0].x, puntos[0].y);
-    puntos.forEach(p => ctx.lineTo(p.x, p.y));
+    for(let i=1;i<puntos.length;i++){
+        ctx.lineTo(puntos[i].x, puntos[i].y);
+    }
     ctx.closePath();
     ctx.clip();
 }
 
-function areaPiso(c){
-    return [
-        {x:c.width*0.2,y:c.height*0.7},
-        {x:c.width*0.8,y:c.height*0.7},
-        {x:c.width*0.9,y:c.height*0.9},
-        {x:c.width*0.1,y:c.height*0.9}
-    ];
-}
-
-function areaMuro(c){
-    return [
-        {x:c.width*0.3,y:c.height*0.2},
-        {x:c.width*0.7,y:c.height*0.2},
-        {x:c.width*0.7,y:c.height*0.6},
-        {x:c.width*0.3,y:c.height*0.6}
-    ];
-}
-
+// --- RENDER ---
 function renderizar(){
 
     var floor = document.getElementById('floor-canvas');
@@ -564,20 +573,24 @@ function renderizar(){
 
     floor.width = floor.offsetWidth;
     floor.height = floor.offsetHeight;
+
     wall.width = wall.offsetWidth;
     wall.height = wall.offsetHeight;
 
     fctx.clearRect(0,0,floor.width,floor.height);
     wctx.clearRect(0,0,wall.width,wall.height);
 
+    // piso
     fctx.save();
     recortar(fctx, areaPiso(floor));
 
+    // muro
     wctx.save();
     recortar(wctx, areaMuro(wall));
 
+    // dibujar piezas
     piezas.forEach(p=>{
-        let ctx = p.tipo === 'piso' ? fctx : wctx;
+        var ctx = (p.tipo === 'piso') ? fctx : wctx;
         ctx.drawImage(p.img, p.x, p.y, p.width, p.height);
     });
 
@@ -585,38 +598,43 @@ function renderizar(){
     wctx.restore();
 }
 
-/* 🔥 INTERACCION CORRECTA */
+// 🔥🔥🔥 AQUÍ ESTABA EL ERROR REAL 🔥🔥🔥
+// EVENTOS deben ir en interaction-layer, NO en viewport
+
 var activa=null, offsetX=0, offsetY=0;
 var layer = document.getElementById('interaction-layer');
 
+// CLICK
 layer.addEventListener('mousedown', e=>{
-    let rect = layer.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    var rect = layer.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
 
     for(let i=piezas.length-1;i>=0;i--){
         let p = piezas[i];
         if(x>p.x && x<p.x+p.width && y>p.y && y<p.y+p.height){
             activa = p;
-            offsetX = x - p.x;
-            offsetY = y - p.y;
+            offsetX = x-p.x;
+            offsetY = y-p.y;
             break;
         }
     }
 });
 
+// MOVER
 document.addEventListener('mousemove', e=>{
     if(activa){
-        let rect = layer.getBoundingClientRect();
+        var rect = layer.getBoundingClientRect();
         activa.x = e.clientX - rect.left - offsetX;
         activa.y = e.clientY - rect.top - offsetY;
         renderizar();
     }
 });
 
-document.addEventListener('mouseup', ()=>activa=null);
+// SOLTAR
+document.addEventListener('mouseup', ()=> activa=null);
 
-/* ZOOM */
+// ZOOM
 layer.addEventListener('wheel', e=>{
     if(activa){
         e.preventDefault();
@@ -627,7 +645,7 @@ layer.addEventListener('wheel', e=>{
     }
 });
 
-/* PRODUCTOS */
+// --- PRODUCTOS (NO SE TOCA) ---
 function mostrarProductos(marca){
 
     var cont = document.getElementById('productos-lista');
@@ -652,3 +670,4 @@ function mostrarProductos(marca){
         }
     });
 }
+

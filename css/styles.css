@@ -34,12 +34,13 @@ canvas {
   height: 100%;
   top: 0;
   left: 0;
+  pointer-events: none; /* 🔥 CLAVE: evita bloquear el mouse */
 }
 
 #floor-canvas { z-index: 2; }
 #wall-canvas { z-index: 3; }
 
-/* 🔥 CAPA DE INTERACCION (LA CLAVE) */
+/* 🔥 CAPA DE INTERACCION (LA MÁS IMPORTANTE) */
 #interaction-layer {
   position: absolute;
   width: 100%;
@@ -58,6 +59,18 @@ canvas {
 .controls { top: 10px; }
 .mode-selector { top: 60px; }
 
+/* 🔥 PUNTOS DE PROYECCIÓN */
+.dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  z-index: 6; /* arriba del canvas */
+}
+
+.blue { background: blue; }
+.red { background: red; }
+
 /* PANEL */
 .side-panel {
   flex: 1;
@@ -66,6 +79,7 @@ canvas {
   color: white;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* 🔥 evita desbordes raros */
 }
 
 .brand-filters {
@@ -82,6 +96,7 @@ button {
   color: white;
 }
 
+/* LISTA PRODUCTOS */
 #productos-lista {
   margin-top: 10px;
   overflow-y: auto;
@@ -90,14 +105,21 @@ button {
   gap: 10px;
 }
 
+/* PRODUCTO */
 .producto-item {
   background: #2a2a2a;
   padding: 8px;
   border-radius: 6px;
   text-align: center;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+.producto-item:hover {
+  background: #444;
 }
 
 .producto-item img {
   width: 100%;
+  border-radius: 4px;
 }

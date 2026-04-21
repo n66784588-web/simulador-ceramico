@@ -515,25 +515,32 @@ function cambiarHabitacion(habitacion) {
     }
 }
 
+// ✅ CORREGIDA (YA CERRADA)
 function aplicarTextura(ruta) {
     var capaPiso = document.getElementById('floor-canvas');
     if (capaPiso) {
         capaPiso.style.backgroundImage = "url('" + ruta + "')";
         capaPiso.style.backgroundSize = "cover";
     }
+}
+
+// ✅ MOSTRAR PRODUCTOS ORDENADOS Y FUNCIONANDO
 function mostrarProductos(marca) {
     var contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
 
     contenedor.innerHTML = '';
 
-    // 🔥 ORDENAR ALFABÉTICAMENTE
-    misProductos.sort(function(a, b) {
+    // 🔥 ORDEN PROFESIONAL: marca + nombre
+    var productosOrdenados = misProductos.slice().sort(function(a, b) {
+        if (a.marca !== b.marca) {
+            return a.marca.localeCompare(b.marca);
+        }
         return a.nombre.localeCompare(b.nombre);
     });
 
-    for (var i = 0; i < misProductos.length; i++) {
-        var prod = misProductos[i];
+    for (var i = 0; i < productosOrdenados.length; i++) {
+        var prod = productosOrdenados[i];
 
         if (marca === 'todas' || prod.marca === marca) {
 
@@ -546,9 +553,12 @@ function mostrarProductos(marca) {
                 '<img src="' + rutaImg + '" style="width:100px">' +
                 '<p>' + prod.nombre + '</p>';
 
-            div.onclick = function() {
-                aplicarTextura(rutaImg);
-            };
+            // ✅ CLICK CORRECTO (YA NO FALLA)
+            (function(ruta) {
+                div.onclick = function() {
+                    aplicarTextura(ruta);
+                };
+            })(rutaImg);
 
             contenedor.appendChild(div);
         }

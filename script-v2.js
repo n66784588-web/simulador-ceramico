@@ -506,12 +506,15 @@ const misProductos = [
     { nombre: "newbury-white-30x60", marca: "benadresa" },
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
-
-// ESTA FUNCIÓN ES LA QUE TE FALTA SEGÚN TU ERROR
 function setModo(m) {
     modoEdicion = m;
-    console.log("Cambiado a modo: " + m);
+    // Esto ayuda visualmente a saber qué estás editando
+    document.getElementById('btn-piso').style.backgroundColor = (m === 'piso') ? '#007bff' : '#222';
+    document.getElementById('btn-pared').style.backgroundColor = (m === 'pared') ? '#ff4757' : '#222';
+    
+    console.log("Cambiado a modo: " + modoEdicion);
 }
+
 
 function initDragAndDrop() {
     const dots = document.querySelectorAll('.dot');
@@ -536,12 +539,15 @@ function initDragAndDrop() {
 
     window.onmouseup = () => { puntoActivo = null; };
 }
-
 function aplicarTextura(ruta) {
-    if (modoEdicion === 'piso') ultimaRutaPiso = ruta;
-    else ultimaRutaPared = ruta;
+    if (modoEdicion === 'piso') {
+        ultimaRutaPiso = ruta;
+    } else {
+        ultimaRutaPared = ruta;
+    }
     dibujarEscena();
 }
+
 
 function dibujarEscena() {
     renderizar('piso', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);

@@ -524,29 +524,25 @@ function aplicarTextura(ruta) {
 }
 
 
-// --- MOSTRAR PRODUCTOS (CORREGIDO) ---
 function mostrarProductos(marca) {
     var contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
-
-    contenedor.innerHTML = '';
+    
+    contenedor.innerHTML = ''; 
 
     for (var i = 0; i < misProductos.length; i++) {
         var prod = misProductos[i];
 
-        // ✅ CORRECTO: ahora sí todo está dentro del IF
         if (marca === 'todas' || prod.marca === marca) {
 
             var div = document.createElement('div');
             div.className = 'producto-item';
+            
+            var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg"; 
 
-            var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg";
-
-            div.innerHTML =
-                '<img src="' + rutaImg + '" style="width:100px">' +
-                '<p>' + prod.nombre + '</p>';
-
-            // Evento click
+            div.innerHTML = '<img src="' + rutaImg + '" style="width:100px">' +
+                            '<p>' + prod.nombre + '</p>';
+            
             (function(ruta) {
                 div.onclick = function() {
                     aplicarTextura(ruta);

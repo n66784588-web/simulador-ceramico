@@ -2,17 +2,16 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<title>Simulador de Cerámicos</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador</title>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
 
 <div id="main-container">
 
-    <!-- VISOR -->
     <div id="viewport">
 
         <img id="bg-room" src="img/habitaciones/sala.jpg">
@@ -20,10 +19,9 @@
         <canvas id="floor-canvas"></canvas>
         <canvas id="wall-canvas"></canvas>
 
-        <!-- 🔥 CAPA DE INTERACCION -->
+        <!-- 🔥 ESTA CAPA ES LA SOLUCION -->
         <div id="interaction-layer"></div>
 
-        <!-- CONTROLES -->
         <div class="controls">
             <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
             <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
@@ -37,15 +35,18 @@
 
     </div>
 
-    <!-- PANEL -->
     <div class="side-panel">
-        <h3>Productos</h3>
+        <div class="brand-filters">
+            <button onclick="mostrarProductos('todas')">Todas</button>
+            <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
+        </div>
+
         <div id="productos-lista"></div>
     </div>
 
 </div>
 
-<script src="script.js"></script>
+<script src="script-v2.js"></script>
 
 </body>
 </html>

@@ -1,103 +1,93 @@
 /* --- RESET IMPORTANTE --- */
+
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  }
 
 /* --- CONTENEDOR PRINCIPAL --- */
 #main-container {
-    display: flex;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+display: flex;
+width: 100vw;
+height: 100vh;
+overflow: hidden;
 }
 
 /* --- VIEWPORT --- */
 #viewport {
-    position: relative;
-    flex: 3;
-    background: #000;
-    overflow: hidden;
+position: relative;
+flex: 3;
+background: #000;
+overflow: hidden;
 }
 
 /* --- IMAGEN DE FONDO --- */
 #bg-room {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    pointer-events: none; /* 🔥 evita bloquear interacción */
+position: absolute;
+width: 100%;
+height: 100%;
+object-fit: cover;
+top: 0;
+left: 0;
+z-index: 1;
+pointer-events: none; /* correcto */
 }
 
 /* --- CANVAS BASE --- */
 #floor-canvas,
 #wall-canvas {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
+position: absolute;
+width: 100%;
+height: 100%;
+top: 0;
+left: 0;
 
-    z-index: 2;
+```
+z-index: 2;
 
-    pointer-events: none; /* 🔥 CLAVE para poder mover piezas */
+pointer-events: auto; /* 🔥 ACTIVADO (ANTES ESTABA MAL) */
+display: block; /* 🔥 evita errores de render */
+```
+
 }
 
-/* --- PISO --- */
+/* --- ORDEN DE CAPAS --- */
 #floor-canvas {
-    z-index: 2;
-
-    clip-path: polygon(
-        20% 70%, 
-        80% 70%, 
-        90% 90%, 
-        10% 90%
-    );
+z-index: 2;
 }
 
-/* --- MURO --- */
 #wall-canvas {
-    z-index: 3;
-
-    clip-path: polygon(
-        30% 20%,
-        70% 20%,
-        70% 60%,
-        30% 60%
-    );
+z-index: 3;
 }
 
 /* --- CONTROLES --- */
 .controls {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 10;
+position: absolute;
+top: 10px;
+left: 10px;
+z-index: 10;
 }
 
 .mode-selector {
-    position: absolute;
-    top: 60px;
-    left: 10px;
-    z-index: 10;
+position: absolute;
+top: 60px;
+left: 10px;
+z-index: 10;
 }
 
 /* --- BOTONES GENERALES --- */
 button {
-    cursor: pointer;
+cursor: pointer;
 }
 
 /* --- PUNTOS (SI LOS USAS) --- */
 .dot {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    z-index: 20;
+position: absolute;
+width: 12px;
+height: 12px;
+border-radius: 50%;
+z-index: 20;
 }
 
 .blue { background: blue; }
@@ -105,58 +95,65 @@ button {
 
 /* --- PANEL DERECHO --- */
 .side-panel {
-    flex: 1;
-    background: #1a1a1a;
-    padding: 15px;
-    color: white;
+flex: 1;
+background: #1a1a1a;
+padding: 15px;
+color: white;
 
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+```
+display: flex;
+flex-direction: column;
+overflow: hidden;
+```
+
 }
 
 /* --- FILTROS --- */
 .brand-filters {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 10px;
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 8px;
+margin-bottom: 10px;
 }
 
 /* --- BOTONES FILTRO --- */
 .brand-filters button {
-    background: #333;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
+background: #333;
+color: white;
+border: none;
+padding: 10px;
+border-radius: 4px;
 }
 
 /* --- CONTENEDOR PRODUCTOS --- */
 #productos-lista {
-    flex: 1;
-    overflow-y: auto;
+flex: 1;
+overflow-y: auto;
 
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
+```
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+gap: 10px;
+```
+
 }
 
 /* --- PRODUCTO --- */
 .producto-item {
-    background: #2a2a2a;
-    padding: 8px;
-    border-radius: 6px;
-    text-align: center;
-    cursor: pointer;
-    transition: 0.2s;
+background: #2a2a2a;
+padding: 8px;
+border-radius: 6px;
+text-align: center;
+cursor: pointer;
+transition: 0.2s;
 }
 
 .producto-item:hover {
-    background: #444;
+background: #444;
 }
 
 .producto-item img {
-    width: 100%;
-    border-radius: 4px;
+width: 100%;
+border-radius: 4px;
 }
+

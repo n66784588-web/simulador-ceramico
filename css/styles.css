@@ -1,3 +1,10 @@
+/* --- RESET IMPORTANTE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 /* --- CONTENEDOR PRINCIPAL --- */
 #main-container {
     display: flex;
@@ -23,9 +30,10 @@
     top: 0;
     left: 0;
     z-index: 1;
+    pointer-events: none; /* 🔥 evita bloquear interacción */
 }
 
-/* --- CANVAS (BASE) --- */
+/* --- CANVAS BASE --- */
 #floor-canvas,
 #wall-canvas {
     position: absolute;
@@ -33,14 +41,16 @@
     height: 100%;
     top: 0;
     left: 0;
-    pointer-events: none; /* 🔥 evita bloquear clicks */
+
+    z-index: 2;
+
+    pointer-events: none; /* 🔥 CLAVE para poder mover piezas */
 }
 
-/* --- PISO (RECORTADO) --- */
+/* --- PISO --- */
 #floor-canvas {
     z-index: 2;
 
-    /* 🔥 AQUÍ ESTÁ LA MAGIA */
     clip-path: polygon(
         20% 70%, 
         80% 70%, 
@@ -49,7 +59,7 @@
     );
 }
 
-/* --- PARED (OPCIONAL) --- */
+/* --- MURO --- */
 #wall-canvas {
     z-index: 3;
 
@@ -76,7 +86,12 @@
     z-index: 10;
 }
 
-/* --- PUNTOS --- */
+/* --- BOTONES GENERALES --- */
+button {
+    cursor: pointer;
+}
+
+/* --- PUNTOS (SI LOS USAS) --- */
 .dot {
     position: absolute;
     width: 12px;
@@ -85,13 +100,8 @@
     z-index: 20;
 }
 
-.blue {
-    background: blue;
-}
-
-.red {
-    background: red;
-}
+.blue { background: blue; }
+.red { background: red; }
 
 /* --- PANEL DERECHO --- */
 .side-panel {
@@ -105,7 +115,7 @@
     overflow: hidden;
 }
 
-/* --- BOTONES MARCAS --- */
+/* --- FILTROS --- */
 .brand-filters {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -113,16 +123,16 @@
     margin-bottom: 10px;
 }
 
+/* --- BOTONES FILTRO --- */
 .brand-filters button {
     background: #333;
     color: white;
     border: none;
     padding: 10px;
     border-radius: 4px;
-    cursor: pointer;
 }
 
-/* --- CONTENEDOR DE PRODUCTOS --- */
+/* --- CONTENEDOR PRODUCTOS --- */
 #productos-lista {
     flex: 1;
     overflow-y: auto;
@@ -132,7 +142,7 @@
     gap: 10px;
 }
 
-/* --- ITEM DE PRODUCTO --- */
+/* --- PRODUCTO --- */
 .producto-item {
     background: #2a2a2a;
     padding: 8px;

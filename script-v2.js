@@ -502,18 +502,15 @@ var misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-// --- FUNCIONES DE CONTROL ---
-function setModo(modo) {
-    modoEdicion = modo;
-    console.log("Modo: " + modo);
-}
-
+/* CAMBIAR HABITACION */
 function cambiarHabitacion(habitacion) {
     var imgHab = document.getElementById('bg-room');
     if (imgHab) {
         imgHab.src = "img/habitaciones/" + habitacion;
     }
 }
+
+/* APLICAR TEXTURA CORRECTA */
 function aplicarTextura(ruta) {
     var canvas = document.getElementById('floor-canvas');
     var ctx = canvas.getContext('2d');
@@ -523,14 +520,13 @@ function aplicarTextura(ruta) {
 
     img.onload = function () {
 
-        // Ajustar tamaño real del canvas
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
 
-        // Limpiar
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 🔥 DIBUJAR SOLO EN EL ÁREA DEL PISO
+        /* RECORTE DEL PISO */
         ctx.beginPath();
         ctx.moveTo(canvas.width * 0.2, canvas.height * 0.7);
         ctx.lineTo(canvas.width * 0.8, canvas.height * 0.7);
@@ -539,29 +535,31 @@ function aplicarTextura(ruta) {
         ctx.closePath();
         ctx.clip();
 
-        // Dibujar imagen dentro del recorte
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        /* AJUSTE PROPORCIONAL */
+        var ratio = Math.max(
+            canvas.width / img.width,
+            canvas.height / img.height
+        );
+
+        var newWidth = img.width * ratio;
+        var newHeight = img.height * ratio;
+
+        var x = (canvas.width - newWidth) / 2;
+        var y = (canvas.height - newHeight) / 2;
+
+        ctx.drawImage(img, x, y, newWidth, newHeight);
     };
 }
 
-
-// ✅ MOSTRAR PRODUCTOS ORDENADOS Y FUNCIONANDO
+/* MOSTRAR PRODUCTOS */
 function mostrarProductos(marca) {
     var contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
 
     contenedor.innerHTML = '';
 
-    // 🔥 ORDEN PROFESIONAL: marca + nombre
-    var productosOrdenados = misProductos.slice().sort(function(a, b) {
-        if (a.marca !== b.marca) {
-            return a.marca.localeCompare(b.marca);
-        }
-        return a.nombre.localeCompare(b.nombre);
-    });
-
-    for (var i = 0; i < productosOrdenados.length; i++) {
-        var prod = productosOrdenados[i];
+    for (var i = 0; i < misProductos.length; i++) {
+        var prod = misProductos[i];
 
         if (marca === 'todas' || prod.marca === marca) {
 
@@ -571,10 +569,9 @@ function mostrarProductos(marca) {
             var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg";
 
             div.innerHTML =
-                '<img src="' + rutaImg + '" style="width:100px">' +
+                '<img src="' + rutaImg + '">' +
                 '<p>' + prod.nombre + '</p>';
 
-            // ✅ CLICK CORRECTO (YA NO FALLA)
             (function(ruta) {
                 div.onclick = function() {
                     aplicarTextura(ruta);

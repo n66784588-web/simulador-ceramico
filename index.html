@@ -2,85 +2,36 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Simulador de Cerámicos</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div id="main-container">
 
-    <div id="viewport">
+  <div id="viewport">
+    <img id="bg-room" src="img/habitaciones/default.jpg">
 
-        <!-- FONDO -->
-        <img id="bg-room" src="img/habitaciones/sala.jpg">
+    <canvas id="floor-canvas"></canvas>
+    <canvas id="wall-canvas"></canvas>
 
-        <!-- CANVAS -->
-        <canvas id="floor-canvas"></canvas>
-        <canvas id="wall-canvas"></canvas>
+    <div id="interaction-layer"></div>
+  </div>
 
-        <!-- 🔥 CAPA DE INTERACCIÓN (NO LA QUITES) -->
-        <div id="interaction-layer"></div>
+  <div id="panel">
+    <button onclick="mostrarProductos('todas')">TODAS</button>
+    <button onclick="mostrarProductos('nitropiso')">NITROPISO</button>
+    <button onclick="mostrarProductos('porcelanite')">PORCELANITE</button>
+    <button onclick="mostrarProductos('vitromex')">VITROMEX</button>
+    <button onclick="mostrarProductos('daltile')">DALTILE</button>
 
-        <!-- CONTROLES -->
-        <div class="controls">
-            <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
-            <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
-            <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
-            <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
-            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
-        </div>
-
-        <!-- MODOS -->
-        <div class="mode-selector">
-            <button onclick="setModo('piso')">Piso</button>
-            <button onclick="setModo('pared')">Pared</button>
-        </div>
-
-        <!-- 🔥 PUNTOS DE PROYECCIÓN (IMPORTANTES VISUALMENTE) -->
-        <div class="dot blue" style="top:70%; left:20%"></div>
-        <div class="dot blue" style="top:70%; left:80%"></div>
-        <div class="dot blue" style="top:90%; left:90%"></div>
-        <div class="dot blue" style="top:90%; left:10%"></div>
-
-        <div class="dot red" style="top:20%; left:30%"></div>
-        <div class="dot red" style="top:20%; left:70%"></div>
-        <div class="dot red" style="top:60%; left:70%"></div>
-        <div class="dot red" style="top:60%; left:30%"></div>
-
-    </div>
-
-    <!-- PANEL -->
-    <div class="side-panel">
-
-        <h3>Marcas</h3>
-
-        <div class="brand-filters">
-            <button onclick="mostrarProductos('todas')">Todas</button>
-            <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
-            <button onclick="mostrarProductos('daltile')">Daltile</button>
-            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
-            <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
-            <button onclick="mostrarProductos('mise')">Mise</button>
-            <button onclick="mostrarProductos('benadresa')">Benadresa</button>
-        </div>
-
-        <div id="productos-lista"></div>
-
-    </div>
+    <div id="productos-lista"></div>
+  </div>
 
 </div>
 
-<script src="script-v2.js"></script>
-
-<!-- 🔥 CARGA AUTOMÁTICA DE PRODUCTOS -->
-<script>
-window.onload = function(){
-    mostrarProductos('todas');
-};
-</script>
+<script src="script.js" defer></script>
 
 </body>
 </html>

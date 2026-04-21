@@ -500,6 +500,10 @@ var piezas = [
 ];   
 
 
+// ================= ÁREAS =================
+function areaPiso(canvas){
+    return [
+        {x: canvas.width*0.1, y: canvas.height*0.7},
         {x: canvas.width*0.8, y: canvas.height*0.7},
         {x: canvas.width*0.9, y: canvas.height*0.9},
         {x: canvas.width*0.1, y: canvas.height*0.9}
@@ -515,7 +519,7 @@ function areaMuro(canvas){
     ];
 }
 
-// --- MODOS ---
+// ================= MODOS =================
 function setModo(modo){
     modoEdicion = modo;
 }
@@ -524,7 +528,7 @@ function cambiarHabitacion(habitacion){
     document.getElementById('bg-room').src = "img/habitaciones/" + habitacion;
 }
 
-// --- TEXTURA ---
+// ================= TEXTURA =================
 function aplicarTextura(ruta){
 
     var img = new Image();
@@ -544,14 +548,13 @@ function aplicarTextura(ruta){
         renderizar();
     };
 
-    // 🔥 evita fallo de cache
     if (img.complete) {
         piezas.push(pieza);
         renderizar();
     }
 }
 
-// --- RECORTE ---
+// ================= RECORTE =================
 function recortar(ctx, puntos){
     ctx.beginPath();
     ctx.moveTo(puntos[0].x, puntos[0].y);
@@ -562,7 +565,7 @@ function recortar(ctx, puntos){
     ctx.clip();
 }
 
-// --- RENDER ---
+// ================= RENDER =================
 function renderizar(){
 
     var floor = document.getElementById('floor-canvas');
@@ -580,15 +583,14 @@ function renderizar(){
     fctx.clearRect(0,0,floor.width,floor.height);
     wctx.clearRect(0,0,wall.width,wall.height);
 
-    // piso
+    // PISO
     fctx.save();
     recortar(fctx, areaPiso(floor));
 
-    // muro
+    // MURO
     wctx.save();
     recortar(wctx, areaMuro(wall));
 
-    // dibujar piezas
     piezas.forEach(p=>{
         var ctx = (p.tipo === 'piso') ? fctx : wctx;
         ctx.drawImage(p.img, p.x, p.y, p.width, p.height);
@@ -598,10 +600,8 @@ function renderizar(){
     wctx.restore();
 }
 
-// 🔥🔥🔥 AQUÍ ESTABA EL ERROR REAL 🔥🔥🔥
-// EVENTOS deben ir en interaction-layer, NO en viewport
-
-var activa=null, offsetX=0, offsetY=0;
+// ================= INTERACCIÓN =================
+var activa = null, offsetX = 0, offsetY = 0;
 var layer = document.getElementById('interaction-layer');
 
 // CLICK
@@ -614,8 +614,8 @@ layer.addEventListener('mousedown', e=>{
         let p = piezas[i];
         if(x>p.x && x<p.x+p.width && y>p.y && y<p.y+p.height){
             activa = p;
-            offsetX = x-p.x;
-            offsetY = y-p.y;
+            offsetX = x - p.x;
+            offsetY = y - p.y;
             break;
         }
     }
@@ -632,42 +632,42 @@ document.addEventListener('mousemove', e=>{
 });
 
 // SOLTAR
-document.addEventListener('mouseup', ()=> activa=null);
+document.addEventListener('mouseup', ()=> activa = null);
 
 // ZOOM
 layer.addEventListener('wheel', e=>{
     if(activa){
         e.preventDefault();
-        let scale = e.deltaY>0 ? 0.9 : 1.1;
+        let scale = e.deltaY > 0 ? 0.9 : 1.1;
         activa.width *= scale;
         activa.height *= scale;
         renderizar();
     }
 });
 
-// --- PRODUCTOS (NO SE TOCA) ---
+// ================= PRODUCTOS =================
 function mostrarProductos(marca){
 
     var cont = document.getElementById('productos-lista');
-    cont.innerHTML='';
+    cont.innerHTML = '';
 
-    misProductos.forEach(prod=>{
-        if(marca==='todas' || prod.marca===marca){
+    piezas.forEach(prod=>{
+        if(marca === 'todas' || prod.marca === marca){
 
-            let ruta = "img/ceramicas/"+prod.nombre+".jpg";
+            let ruta = "img/ceramicas/" + prod.nombre + ".jpg";
 
             let div = document.createElement('div');
-            div.className='producto-item';
+            div.className = 'producto-item';
 
             div.innerHTML = `
                 <img src="${ruta}">
                 <p>${prod.nombre}</p>
             `;
 
-            div.onclick=()=>aplicarTextura(ruta);
+            div.onclick = ()=>aplicarTextura(ruta);
 
             cont.appendChild(div);
         }
     });
 }
-
+      

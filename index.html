@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Simulador de Cerámicos</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador</title>
 
-    <!-- 🔥 CSS -->
-    <link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
 <div id="main-container">
 
-    <!-- AREA VISUAL -->
+    <!-- VISOR -->
     <div id="viewport">
 
-        <!-- 🔥 FONDO -->
         <img id="bg-room" src="img/habitaciones/sala.jpg">
 
-        <!-- 🔥 CANVAS -->
         <canvas id="floor-canvas"></canvas>
         <canvas id="wall-canvas"></canvas>
 
-        <!-- 🔥 CAPA PARA INTERACCION (CLAVE) -->
+        <!-- 🔥 CAPA DE INTERACCION -->
         <div id="interaction-layer"></div>
 
         <!-- CONTROLES -->
@@ -30,51 +28,24 @@
             <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
             <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
             <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
-            <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
-            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
         </div>
 
         <div class="mode-selector">
-            <button onclick="setModo('piso')">Editar Piso</button>
-            <button onclick="setModo('pared')">Editar Pared</button>
+            <button onclick="setModo('piso')">Piso</button>
+            <button onclick="setModo('pared')">Pared</button>
         </div>
-
-        <!-- PUNTOS -->
-        <div class="dot blue" style="top:70%; left:20%"></div>
-        <div class="dot blue" style="top:70%; left:80%"></div>
-        <div class="dot blue" style="top:90%; left:90%"></div>
-        <div class="dot blue" style="top:90%; left:10%"></div>
-
-        <div class="dot red" style="top:20%; left:30%"></div>
-        <div class="dot red" style="top:20%; left:70%"></div>
-        <div class="dot red" style="top:60%; left:70%"></div>
-        <div class="dot red" style="top:60%; left:30%"></div>
 
     </div>
 
-    <!-- PANEL DERECHO -->
+    <!-- PANEL -->
     <div class="side-panel">
-
-        <h3>Marcas</h3>
-
-        <div class="brand-filters">
-            <button onclick="mostrarProductos('todas')">Todas</button>
-            <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
-            <button onclick="mostrarProductos('daltile')">Daltile</button>
-            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
-            <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
-            <button onclick="mostrarProductos('mise')">Mise</button>
-            <button onclick="mostrarProductos('benadresa')">Benadresa</button>
-        </div>
-
+        <h3>Productos</h3>
         <div id="productos-lista"></div>
-
     </div>
 
 </div>
 
-<!-- 🔥 SCRIPT SIEMPRE AL FINAL -->
-<script src="script-v2.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>

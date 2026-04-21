@@ -527,6 +527,11 @@ function mostrarProductos(marca) {
 
     contenedor.innerHTML = '';
 
+    // 🔥 ORDENAR ALFABÉTICAMENTE
+    misProductos.sort(function(a, b) {
+        return a.nombre.localeCompare(b.nombre);
+    });
+
     for (var i = 0; i < misProductos.length; i++) {
         var prod = misProductos[i];
 

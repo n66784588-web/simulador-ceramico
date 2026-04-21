@@ -4,25 +4,31 @@
     height: 100vh;
 }
 
+/* --- AREA VISUAL --- */
 #viewport {
     position: relative;
-    flex: 3; /* Toma el 75% de la pantalla */
+    flex: 3;
     background: #000;
 }
 
+/* --- PANEL DERECHO --- */
 .side-panel {
-    flex: 1; /* Toma el 25% de la pantalla */
+    flex: 1;
     background: #1a1a1a;
-    padding: 20px;
+    padding: 15px;
     color: white;
-    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column; /* 🔥 CLAVE */
+    overflow: hidden;       /* 🔥 evita que se rompa */
 }
 
+/* --- BOTONES MARCAS --- */
 .brand-filters {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .brand-filters button {
@@ -34,9 +40,31 @@
     cursor: pointer;
 }
 
-#catalog-container {
+/* --- CONTENEDOR DE PRODUCTOS --- */
+#productos-lista {
+    flex: 1;               /* 🔥 ocupa todo el espacio disponible */
+    overflow-y: auto;     /* 🔥 scroll interno */
+    
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
 }
 
+/* --- ITEM DE PRODUCTO --- */
+.producto-item {
+    background: #2a2a2a;
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.producto-item:hover {
+    background: #444;
+}
+
+.producto-item img {
+    width: 100%;
+    border-radius: 4px;
+}

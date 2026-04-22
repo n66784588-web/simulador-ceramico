@@ -1,20 +1,18 @@
+/* =========================
+   VARIABLES GLOBALES
+========================= */
 let modoEdicion = 'piso';
+let puntoActivo = null;
 
 let ultimaRutaPiso = null;
 let ultimaRutaPared = null;
 
-let tileScalePiso = 0.6;
-let tileScalePared = 0.6;
+let tileScalePiso = 0.3;
+let tileScalePared = 0.3;
 
-let rotacion = 0;
-let patron = "cuadricula";
-let junta = 2;
+let rotacionPiso = 0;
+let rotacionPared = 0;
 
-let puntoActivo = null;
-
-/* DATOS VENTA */
-let precioM2 = 250;
-let m2Area = 10;
 /* PRODUCTOS */
 const misProductos = [
  // NITROPISO
@@ -516,44 +514,38 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-/* INIT */
 window.onload = () => {
-    initDrag();
+    initDragAndDrop();
     mostrarProductos('todas');
-
-    // 🔥 ASEGURA QUE SIEMPRE SE VEA ALGO
-    ultimaRutaPiso = "img/ceramicas/modelo1.jpg";
     dibujarEscena();
 };
 
-/* MODO */
-function setModo(m){
+/* =========================
+   MODO
+========================= */
+function setModo(m) {
     modoEdicion = m;
+
+    document.getElementById('btn-piso').classList.toggle('active', m === 'piso');
+    document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
 }
 
-/* ROTAR */
-function rotarTextura(){
-    rotacion += 90;
-    dibujarEscena();
-}
-
-/* PATRON */
-function setPatron(p){
-    patron = p;
-    dibujarEscena();
-}
-
-/* DRAG */
-function initDrag(){
+/* =========================
+   DRAG PUNTOS (FUNCIONA)
+========================= */
+function initDragAndDrop() {
     const dots = document.querySelectorAll('.dot');
     const viewport = document.getElementById('viewport');
 
-    dots.forEach(dot=>{
-        dot.onmousedown = ()=> puntoActivo = dot;
+    dots.forEach(dot => {
+        dot.addEventListener('mousedown', (e) => {
+            puntoActivo = dot;
+            e.preventDefault();
+        });
     });
 
-    window.onmousemove = (e)=>{
-        if(!puntoActivo) return;
+    window.addEventListener('mousemove', (e) => {
+        if (!puntoActivo) return;
 
         const rect = viewport.getBoundingClientRect();
 
@@ -561,14 +553,18 @@ function initDrag(){
         puntoActivo.style.top = (e.clientY - rect.top) + "px";
 
         dibujarEscena();
-    };
+    });
 
-    window.onmouseup = ()=> puntoActivo = null;
+    window.addEventListener('mouseup', () => {
+        puntoActivo = null;
+    });
 }
 
-/* TEXTURA */
-function aplicarTextura(ruta){
-    if(modoEdicion === 'piso'){
+/* =========================
+   TEXTURA
+========================= */
+function aplicarTextura(ruta) {
+    if (modoEdicion === 'piso') {
         ultimaRutaPiso = ruta;
     } else {
         ultimaRutaPared = ruta;
@@ -576,14 +572,49 @@ function aplicarTextura(ruta){
     dibujarEscena();
 }
 
-/* RENDER */
-function dibujarEscena(){
-    render('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
-    render('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
+/* =========================
+   ROTACIÓN (TECLA R)
+========================= */
+window.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'r') {
+        if (modoEdicion === 'piso') {
+            rotacionPiso += Math.PI / 2;
+        } else {
+            rotacionPared += Math.PI / 2;
+        }
+        dibujarEscena();
+    }
+});
+
+/* =========================
+   ZOOM RUEDA
+========================= */
+window.addEventListener('wheel', (e) => {
+    if (modoEdicion === 'piso') {
+        tileScalePiso += e.deltaY > 0 ? -0.02 : 0.02;
+        tileScalePiso = Math.max(0.1, Math.min(1, tileScalePiso));
+    } else {
+        tileScalePared += e.deltaY > 0 ? -0.02 : 0.02;
+        tileScalePared = Math.max(0.1, Math.min(1, tileScalePared));
+    }
+
+    dibujarEscena();
+    e.preventDefault();
+}, { passive: false });
+
+/* =========================
+   RENDER PRINCIPAL
+========================= */
+function dibujarEscena() {
+    renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso, rotacionPiso);
+    renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared, rotacionPared);
 }
 
-function render(canvasId, ruta, puntos, escala){
-    if(!ruta) return;
+/* =========================
+   MOTOR PROFESIONAL
+========================= */
+function renderizar(canvasId, ruta, puntos, escala, rotacion) {
+    if (!ruta) return;
 
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
@@ -591,71 +622,47 @@ function render(canvasId, ruta, puntos, escala){
     const img = new Image();
     img.src = ruta;
 
-    img.onload = ()=>{
-
+    img.onload = () => {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
 
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        const pts = puntos.map(id=>{
+        const pts = puntos.map(id => {
             const el = document.getElementById(id);
-            return {x:el.offsetLeft, y:el.offsetTop};
+            return { x: el.offsetLeft, y: el.offsetTop };
         });
 
+        // RECORTE ÁREA
         ctx.beginPath();
         ctx.moveTo(pts[0].x, pts[0].y);
-        pts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));
+        pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
         ctx.closePath();
 
         ctx.save();
         ctx.clip();
 
-        const minX = Math.min(...pts.map(p=>p.x));
-        const minY = Math.min(...pts.map(p=>p.y));
-
+        // 🔥 PATRÓN PROFESIONAL REAL
         const size = img.width * escala;
 
-        for(let x = minX - size; x < canvas.width + size; x += size){
-            for(let y = minY - size; y < canvas.height + size; y += size){
-
-                let drawX = x;
-                let drawY = y;
-
-                if(patron === "ladrillo"){
-                    if(Math.floor((y-minY)/size)%2===0){
-                        drawX += size/2;
-                    }
-                }
-
-                if(patron === "desfase30"){
-                    if(Math.floor((y-minY)/size)%2===0){
-                        drawX += size*0.3;
-                    }
-                }
+        for (let x = -size; x < canvas.width + size; x += size) {
+            for (let y = -size; y < canvas.height + size; y += size) {
 
                 ctx.save();
 
-                ctx.translate(drawX + size/2, drawY + size/2);
+                // CENTRAR CADA LOSA
+                ctx.translate(x + size/2, y + size/2);
 
-                let angle = rotacion;
+                // ROTACIÓN
+                ctx.rotate(rotacion);
 
-                if(patron === "espiga"){
-                    angle += ((Math.floor((x-minX)/size)+Math.floor((y-minY)/size))%2===0)?90:0;
-                }
-
-                ctx.rotate(angle * Math.PI/180);
-
-                // JUNTA
-                ctx.fillStyle = "#ccc";
-                ctx.fillRect(-size/2, -size/2, size, size);
-
+                // DIBUJAR PIEZA
                 ctx.drawImage(
                     img,
-                    -size/2 + junta,
-                    -size/2 + junta,
-                    size - junta*2,
-                    size - junta*2
+                    -size/2,
+                    -size/2,
+                    size,
+                    size
                 );
 
                 ctx.restore();
@@ -665,63 +672,42 @@ function render(canvasId, ruta, puntos, escala){
         ctx.restore();
     };
 
-    img.onerror = ()=>{
-        console.error("ERROR IMAGEN:", ruta);
+    img.onerror = () => {
+        console.error("❌ Error imagen:", ruta);
     };
 }
 
-/* ZOOM */
-window.addEventListener('wheel',(e)=>{
-    if(modoEdicion==='piso'){
-        tileScalePiso += e.deltaY>0?-0.02:0.02;
-        tileScalePiso = Math.max(0.2, Math.min(1, tileScalePiso));
-    }else{
-        tileScalePared += e.deltaY>0?-0.02:0.02;
-        tileScalePared = Math.max(0.2, Math.min(1, tileScalePared));
-    }
-    dibujarEscena();
-});
+/* =========================
+   PRODUCTOS
+========================= */
+function mostrarProductos(marca) {
+    const contenedor = document.getElementById('productos-lista');
+    contenedor.innerHTML = '';
 
-/* PRODUCTOS */
-function mostrarProductos(marca){
-    const cont = document.getElementById('productos-lista');
-    cont.innerHTML='';
-
-    misProductos.forEach(p=>{
-        if(marca==='todas'||p.marca===marca){
+    misProductos.forEach(p => {
+        if (marca === 'todas' || p.marca === marca) {
 
             const ruta = `img/ceramicas/${p.nombre}.jpg`;
 
             const div = document.createElement('div');
-            div.className='producto-item';
+            div.className = 'producto-item';
 
-            div.innerHTML=`
+            div.innerHTML = `
                 <img src="${ruta}" onerror="this.src='img/error.jpg'">
                 <p>${p.nombre}</p>
             `;
 
-            div.onclick=()=>aplicarTextura(ruta);
+            div.onclick = () => aplicarTextura(ruta);
 
-            cont.appendChild(div);
+            contenedor.appendChild(div);
         }
     });
 }
 
-/* HABITACIONES */
-function cambiarHabitacion(h){
+/* =========================
+   HABITACIONES
+========================= */
+function cambiarHabitacion(h) {
     document.getElementById('bg-room').src = `img/habitaciones/${h}`;
-}
-
-/* COTIZACIÓN */
-function calcularCotizacion(){
-
-    let cajas = Math.ceil(m2Area / 1.44);
-    let total = m2Area * precioM2;
-
-    alert(`
-Área: ${m2Area} m²
-Cajas: ${cajas}
-Total: $${total}
-    `);
 }
 

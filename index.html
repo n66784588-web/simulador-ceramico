@@ -14,7 +14,7 @@
     <!-- VISOR -->
     <div id="viewport">
 
-        <!-- Fondo -->
+        <!-- FONDO -->
         <img id="bg-room" src="img/habitaciones/sala.jpg">
 
         <!-- CANVAS -->
@@ -22,16 +22,26 @@
         <canvas id="wall-canvas"></canvas>
 
         <!-- PUNTOS PISO -->
-        <div class="dot" id="p1"></div>
-        <div class="dot" id="p2"></div>
-        <div class="dot" id="p3"></div>
-        <div class="dot" id="p4"></div>
+        <div class="dot" id="p1" style="left:200px; top:500px;"></div>
+        <div class="dot" id="p2" style="left:900px; top:500px;"></div>
+        <div class="dot" id="p3" style="left:850px; top:650px;"></div>
+        <div class="dot" id="p4" style="left:250px; top:650px;"></div>
 
         <!-- PUNTOS PARED -->
-        <div class="dot red" id="p5"></div>
-        <div class="dot red" id="p6"></div>
-        <div class="dot red" id="p7"></div>
-        <div class="dot red" id="p8"></div>
+        <div class="dot red" id="p5" style="left:350px; top:200px;"></div>
+        <div class="dot red" id="p6" style="left:750px; top:200px;"></div>
+        <div class="dot red" id="p7" style="left:750px; top:400px;"></div>
+        <div class="dot red" id="p8" style="left:350px; top:400px;"></div>
+
+        <!-- BOTONES HABITACIONES -->
+        <div id="habitaciones">
+            <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
+            <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
+            <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
+            <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
+            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
+            <button onclick="cambiarHabitacion('fachada.jpg')">Fachada</button>
+        </div>
 
         <!-- CONTROLES -->
         <div id="controls">
@@ -48,6 +58,10 @@
         <button onclick="mostrarProductos('todas')">Todas</button>
         <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
         <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
+        <button onclick="mostrarProductos('vitromex')">Vitromex</button>
+        <button onclick="mostrarProductos('daltile')">Daltile</button>
+        <button onclick="mostrarProductos('mise')">Mise</button>
+        <button onclick="mostrarProductos('benadresa')">Benadresa</button>
 
         <div id="productos-lista"></div>
     </div>

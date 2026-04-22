@@ -509,6 +509,7 @@ function cambiarHabitacion(habitacion) {
         imgHab.src = "img/habitaciones/" + habitacion;
     }
 }
+
 function aplicarTextura(ruta) {
     var canvas = document.getElementById('floor-canvas');
     var ctx = canvas.getContext('2d');
@@ -520,9 +521,9 @@ function aplicarTextura(ruta) {
         canvas.height = canvas.clientHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. ESCALA DE LA FIGURA
-        // Aumenté el valor a 0.35 para que la figura del piso se vea de tamaño real (60x60 o similar)
-        var escala = 0.35; 
+        // 1. TAMAÑO DE LA PIEZA
+        // Ajustamos la escala para que la figura sea grande y legible
+        var escala = 0.4; 
         var tempCanvas = document.createElement('canvas');
         var tCtx = tempCanvas.getContext('2d');
         tempCanvas.width = img.width * escala;
@@ -530,33 +531,35 @@ function aplicarTextura(ruta) {
         tCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
         var pattern = ctx.createPattern(tempCanvas, 'repeat');
 
-        // 2. DIBUJAR EL ÁREA SEGÚN TUS PUNTOS AZULES
+        // 2. RECORTE DEL PISO (Según tus puntos azules)
         ctx.save();
         ctx.beginPath();
-        // Ajustado para que cubra exactamente el suelo de tu imagen
-        ctx.moveTo(canvas.width * 0.05, canvas.height * 0.72); // Esquina fondo izq
-        ctx.lineTo(canvas.width * 0.95, canvas.height * 0.72); // Esquina fondo der
-        ctx.lineTo(canvas.width * 1.30, canvas.height * 1.00); // Esquina frente der
-        ctx.lineTo(canvas.width * -0.30, canvas.height * 1.00); // Esquina frente izq
+        ctx.moveTo(canvas.width * 0.0, canvas.height * 0.70); // Atrás Izquierda
+        ctx.lineTo(canvas.width * 1.0, canvas.height * 0.70); // Atrás Derecha
+        ctx.lineTo(canvas.width * 1.3, canvas.height * 1.0);  // Frente Derecha
+        ctx.lineTo(canvas.width * -0.3, canvas.height * 1.0); // Frente Izquierda
         ctx.closePath();
         ctx.clip();
 
-        // 3. PERSPECTIVA ARTIFICIAL (LA MAGIA)
-        // Movemos el origen al horizonte del suelo
-        ctx.translate(canvas.width / 2, canvas.height * 0.72);
+        // 3. TRANSFORMACIÓN DE PERSPECTIVA
+        // Movemos el origen al centro de la línea del horizonte del suelo
+        ctx.translate(canvas.width / 2, canvas.height * 0.70);
         
-        // El primer valor (2.5) hace que la imagen se ensanche al frente
-        // El cuarto valor (0.4) hace que se aplaste hacia el fondo
-        ctx.transform(2.5, 0, 0, 0.45, 0, 0); 
-        
+        /* MATRIZ DE TRANSFORMACIÓN:
+           (Escala Horizontal, Inclinación, Inclinación, Escala Vertical, X, Y)
+           El 2.8 hace que se ensanche al frente. 
+           El 0.4 hace que se comprima hacia el fondo.
+        */
+        ctx.transform(2.8, 0, 0, 0.4, 0, 0); 
+
+        // 4. DIBUJAR
         ctx.fillStyle = pattern;
-        // Dibujamos un rectángulo gigante que el "clip" recortará con la forma del suelo
+        // Dibujamos el patrón desplazado para que las figuras se alineen al centro
         ctx.fillRect(-canvas.width, 0, canvas.width * 2, canvas.height * 2);
         
         ctx.restore();
     };
 }
-
 /* MOSTRAR PRODUCTOS */
 function mostrarProductos(marca) {
     var contenedor = document.getElementById('productos-lista');

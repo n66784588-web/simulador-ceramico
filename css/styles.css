@@ -35,19 +35,16 @@
     left: 0;
     pointer-events: none; /* 🔥 evita bloquear clicks */
 }
-
-/* --- PISO (RECORTADO) --- */
+/* --- PISO (ACTUALIZADO) --- */
 #floor-canvas {
     z-index: 2;
-
-    /* 🔥 AQUÍ ESTÁ LA MAGIA */
-    clip-path: polygon(
-        20% 70%, 
-        80% 70%, 
-        90% 90%, 
-        10% 90%
-    );
+    /* Eliminamos el clip-path de aquí para manejarlo en JS */
+    
+    /* 🔥 ESTO LE DA EL REALISMO: permite que las sombras de la foto original se vean */
+    mix-blend-mode: multiply; 
+    opacity: 0.9;
 }
+
 
 /* --- PARED (OPCIONAL) --- */
 #wall-canvas {

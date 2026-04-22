@@ -1,10 +1,11 @@
-/* =========================
-   VARIABLES GLOBALES
-========================= */
 let modoEdicion = 'piso';
 
-let imagenes = [];        // 🔥 Todas las piezas
-let imagenActiva = null;  // 🔥 Imagen seleccionada
+let imagenes = [];
+let imagenActiva = null;
+
+let offsetX = 0;
+let offsetY = 0;
+const gridSize = 120; // 🔥 tamaño de la loseta (ajusta según tu modelo)
 // LISTADO DE TUS PRODUCTOS POR MARCA
 const misProductos = [
  // NITROPISO
@@ -506,7 +507,6 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-
 window.onload = () => {
     initDragAndDrop();
     mostrarProductos('todas');
@@ -528,10 +528,10 @@ function setModo(m) {
 function aplicarTextura(ruta) {
     const nueva = {
         img: new Image(),
-        x: 300,
-        y: 250,
-        width: 150,
-        height: 150,
+        x: gridSize,
+        y: gridSize,
+        width: gridSize,
+        height: gridSize,
         rotation: 0
     };
 
@@ -551,9 +551,6 @@ function aplicarTextura(ruta) {
 /* =========================
    DRAG & SELECT
 ========================= */
-let offsetX = 0;
-let offsetY = 0;
-
 function initDragAndDrop() {
     const canvas = document.getElementById('floor-canvas');
 
@@ -564,7 +561,6 @@ function initDragAndDrop() {
 
         imagenActiva = null;
 
-        // Buscar desde arriba (última imagen)
         for (let i = imagenes.length - 1; i >= 0; i--) {
             const img = imagenes[i];
 
@@ -576,7 +572,6 @@ function initDragAndDrop() {
             ) {
                 imagenActiva = img;
 
-                // 🔥 CLAVE: guardar dónde hiciste clic dentro de la imagen
                 offsetX = x - img.x;
                 offsetY = y - img.y;
 
@@ -592,7 +587,6 @@ function initDragAndDrop() {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // 🔥 MOVER CON OFFSET (SOLUCIÓN)
         imagenActiva.x = x - offsetX;
         imagenActiva.y = y - offsetY;
 
@@ -600,7 +594,14 @@ function initDragAndDrop() {
     };
 
     canvas.onmouseup = () => {
+        if (imagenActiva) {
+            // 🔥 SNAP A GRID (ALINEACIÓN REAL)
+            imagenActiva.x = Math.round(imagenActiva.x / gridSize) * gridSize;
+            imagenActiva.y = Math.round(imagenActiva.y / gridSize) * gridSize;
+        }
+
         imagenActiva = null;
+        dibujarEscena();
     };
 }
 
@@ -641,7 +642,7 @@ window.addEventListener('keydown', (e) => {
     if (!imagenActiva) return;
 
     if (e.key.toLowerCase() === 'r') {
-        imagenActiva.rotation += Math.PI / 4; // 45°
+        imagenActiva.rotation += Math.PI / 2; // 🔥 90° exactos
         dibujarEscena();
     }
 });
@@ -699,3 +700,5 @@ function mostrarProductos(marca) {
 function cambiarHabitacion(h) {
     document.getElementById('bg-room').src = `img/habitaciones/${h}`;
 }
+
+

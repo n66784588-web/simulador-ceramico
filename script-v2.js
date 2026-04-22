@@ -516,14 +516,13 @@ function aplicarTextura(ruta) {
     img.src = ruta;
 
     img.onload = function () {
-        // Sincronizar tamaño del canvas con el viewport
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. CREAR EL PATRÓN (Tiling)
-        // Ajusta 0.12 para que las losetas se vean más grandes o pequeñas
-        var escala = 0.12; 
+        // 1. ESCALA DE LA FIGURA
+        // Aumenté el valor a 0.35 para que la figura del piso se vea de tamaño real (60x60 o similar)
+        var escala = 0.35; 
         var tempCanvas = document.createElement('canvas');
         var tCtx = tempCanvas.getContext('2d');
         tempCanvas.width = img.width * escala;
@@ -531,24 +530,28 @@ function aplicarTextura(ruta) {
         tCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
         var pattern = ctx.createPattern(tempCanvas, 'repeat');
 
-        // 2. DEFINIR EL ÁREA DEL PISO (Coincidiendo con tu diseño original)
+        // 2. DIBUJAR EL ÁREA SEGÚN TUS PUNTOS AZULES
         ctx.save();
         ctx.beginPath();
-        // Estas coordenadas recrean el polígono que tenías en CSS
-        ctx.moveTo(canvas.width * 0.20, canvas.height * 0.70); // Arriba Izq
-        ctx.lineTo(canvas.width * 0.80, canvas.height * 0.70); // Arriba Der
-        ctx.lineTo(canvas.width * 0.95, canvas.height * 1.00); // Abajo Der
-        ctx.lineTo(canvas.width * 0.05, canvas.height * 1.00); // Abajo Izq
+        // Ajustado para que cubra exactamente el suelo de tu imagen
+        ctx.moveTo(canvas.width * 0.05, canvas.height * 0.72); // Esquina fondo izq
+        ctx.lineTo(canvas.width * 0.95, canvas.height * 0.72); // Esquina fondo der
+        ctx.lineTo(canvas.width * 1.30, canvas.height * 1.00); // Esquina frente der
+        ctx.lineTo(canvas.width * -0.30, canvas.height * 1.00); // Esquina frente izq
         ctx.closePath();
         ctx.clip();
 
-        // 3. APLICAR PERSPECTIVA ARTIFICIAL
-        // Inclinamos y escalamos el patrón para que parezca que está en el suelo
-        ctx.translate(0, canvas.height * 0.70); // Empezar desde la línea del horizonte
-        ctx.transform(1.5, 0, 0, 0.4, -canvas.width * 0.2, 0); 
+        // 3. PERSPECTIVA ARTIFICIAL (LA MAGIA)
+        // Movemos el origen al horizonte del suelo
+        ctx.translate(canvas.width / 2, canvas.height * 0.72);
+        
+        // El primer valor (2.5) hace que la imagen se ensanche al frente
+        // El cuarto valor (0.4) hace que se aplaste hacia el fondo
+        ctx.transform(2.5, 0, 0, 0.45, 0, 0); 
         
         ctx.fillStyle = pattern;
-        ctx.fillRect(-canvas.width, 0, canvas.width * 3, canvas.height * 2);
+        // Dibujamos un rectángulo gigante que el "clip" recortará con la forma del suelo
+        ctx.fillRect(-canvas.width, 0, canvas.width * 2, canvas.height * 2);
         
         ctx.restore();
     };

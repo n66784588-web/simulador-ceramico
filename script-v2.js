@@ -1,11 +1,13 @@
 let modoEdicion = 'piso';
+let ultimaRutaPiso = "";
+let ultimaRutaPared = "";
+let tileScalePiso = 0.25;
+let tileScalePared = 0.25;
+let puntoActivo = null;
 
-let imagenes = [];
-let imagenActiva = null;
+// 🔥 NUEVO: tamaño de junta (boquilla)
+let junta = 2;
 
-let offsetX = 0;
-let offsetY = 0;
-const gridSize = 120; // 🔥 tamaño de la loseta (ajusta según tu modelo)
 // LISTADO DE TUS PRODUCTOS POR MARCA
 const misProductos = [
  // NITROPISO
@@ -507,13 +509,17 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
+
+/* =========================
+   INICIO
+========================= */
 window.onload = () => {
     initDragAndDrop();
     mostrarProductos('todas');
 };
 
 /* =========================
-   CAMBIO DE MODO
+   MODO
 ========================= */
 function setModo(m) {
     modoEdicion = m;
@@ -523,144 +529,126 @@ function setModo(m) {
 }
 
 /* =========================
-   AGREGAR IMAGEN
+   DRAG PUNTOS (PERSPECTIVA)
 ========================= */
-function aplicarTextura(ruta) {
-    const nueva = {
-        img: new Image(),
-        x: gridSize,
-        y: gridSize,
-        width: gridSize,
-        height: gridSize,
-        rotation: 0
-    };
+function initDragAndDrop() {
+    const dots = document.querySelectorAll('.dot');
+    const viewport = document.getElementById('viewport');
 
-    nueva.img.src = ruta;
+    dots.forEach(dot => {
+        dot.onmousedown = (e) => {
+            puntoActivo = dot;
+            e.preventDefault();
+        };
+    });
 
-    nueva.img.onload = () => {
-        imagenes.push(nueva);
-        imagenActiva = nueva;
+    window.onmousemove = (e) => {
+        if (!puntoActivo) return;
+
+        const rect = viewport.getBoundingClientRect();
+        puntoActivo.style.left = (e.clientX - rect.left) + "px";
+        puntoActivo.style.top = (e.clientY - rect.top) + "px";
+
         dibujarEscena();
     };
 
-    nueva.img.onerror = () => {
+    window.onmouseup = () => {
+        puntoActivo = null;
+    };
+}
+
+/* =========================
+   APLICAR TEXTURA
+========================= */
+function aplicarTextura(ruta) {
+    if (modoEdicion === 'piso') {
+        ultimaRutaPiso = ruta;
+    } else {
+        ultimaRutaPared = ruta;
+    }
+    dibujarEscena();
+}
+
+/* =========================
+   DIBUJO GENERAL
+========================= */
+function dibujarEscena() {
+    renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
+    renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
+}
+
+/* =========================
+   RENDER PRO (CON JUNTA REAL)
+========================= */
+function renderizar(canvasId, ruta, puntos, escala) {
+    if (!ruta) return;
+
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.src = ruta;
+
+    img.onload = () => {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const pts = puntos.map(id => {
+            const el = document.getElementById(id);
+            return { x: el.offsetLeft, y: el.offsetTop };
+        });
+
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.closePath();
+
+        ctx.save();
+        ctx.clip();
+
+        // 🔥 CREAR PATRÓN CON JUNTA
+        const patternCanvas = document.createElement('canvas');
+        const pctx = patternCanvas.getContext('2d');
+
+        const w = img.width * escala;
+        const h = img.height * escala;
+
+        patternCanvas.width = w + junta;
+        patternCanvas.height = h + junta;
+
+        // fondo de junta
+        pctx.fillStyle = "#dcdcdc"; // color de boquilla
+        pctx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
+
+        // imagen encima dejando espacio de junta
+        pctx.drawImage(img, 0, 0, w, h);
+
+        const pattern = ctx.createPattern(patternCanvas, 'repeat');
+        ctx.fillStyle = pattern;
+
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.restore();
+    };
+
+    img.onerror = () => {
         console.error("No se encontró:", ruta);
     };
 }
 
 /* =========================
-   DRAG & SELECT
-========================= */
-function initDragAndDrop() {
-    const canvas = document.getElementById('floor-canvas');
-
-for (let i = imagenes.length - 1; i >= 0; i--) {
-    const img = imagenes[i];
-
-    // 🔥 convertir coordenadas al sistema de la imagen
-    const dx = x - img.x;
-    const dy = y - img.y;
-
-    const cos = Math.cos(-img.rotation);
-    const sin = Math.sin(-img.rotation);
-
-    const localX = dx * cos - dy * sin;
-    const localY = dx * sin + dy * cos;
-
-    if (
-        localX > -img.width / 2 &&
-        localX < img.width / 2 &&
-        localY > -img.height / 2 &&
-        localY < img.height / 2
-    ) {
-        imagenActiva = img;
-
-        offsetX = localX;
-        offsetY = localY;
-
-        break;
-    }
-}   
-
-canvas.onmousemove = (e) => {
-    if (!imagenActiva) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const cos = Math.cos(imagenActiva.rotation);
-    const sin = Math.sin(imagenActiva.rotation);
-
-    imagenActiva.x = x - (offsetX * cos - offsetY * sin);
-    imagenActiva.y = y - (offsetX * sin + offsetY * cos);
-
-    dibujarEscena();
-};
-    canvas.onmouseup = () => {
-        if (imagenActiva) {
-            // 🔥 SNAP A GRID (ALINEACIÓN REAL)
-            imagenActiva.x = Math.round(imagenActiva.x / gridSize) * gridSize;
-            imagenActiva.y = Math.round(imagenActiva.y / gridSize) * gridSize;
-        }
-
-        imagenActiva = null;
-        dibujarEscena();
-    };
-}
-
-/* =========================
-   RENDER
-========================= */
-function dibujarEscena() {
-    const canvas = document.getElementById('floor-canvas');
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    imagenes.forEach(imgObj => {
-        ctx.save();
-
-        ctx.translate(imgObj.x, imgObj.y);
-        ctx.rotate(imgObj.rotation);
-
-        ctx.drawImage(
-            imgObj.img,
-            -imgObj.width / 2,
-            -imgObj.height / 2,
-            imgObj.width,
-            imgObj.height
-        );
-
-        ctx.restore();
-    });
-}
-
-/* =========================
-   ROTAR (TECLA R)
-========================= */
-window.addEventListener('keydown', (e) => {
-    if (!imagenActiva) return;
-
-    if (e.key.toLowerCase() === 'r') {
-        imagenActiva.rotation += Math.PI / 2; // 🔥 90° exactos
-        dibujarEscena();
-    }
-});
-
-/* =========================
-   ESCALAR (RUEDA MOUSE)
+   ZOOM (ESCALA REAL)
 ========================= */
 window.addEventListener('wheel', (e) => {
-    if (!imagenActiva) return;
-
-    const escala = e.deltaY > 0 ? 0.9 : 1.1;
-
-    imagenActiva.width *= escala;
-    imagenActiva.height *= escala;
+    if (modoEdicion === 'piso') {
+        tileScalePiso += e.deltaY > 0 ? -0.01 : 0.01;
+        tileScalePiso = Math.max(0.05, Math.min(1, tileScalePiso));
+    } else {
+        tileScalePared += e.deltaY > 0 ? -0.01 : 0.01;
+        tileScalePared = Math.max(0.05, Math.min(1, tileScalePared));
+    }
 
     dibujarEscena();
     e.preventDefault();
@@ -672,11 +660,6 @@ window.addEventListener('wheel', (e) => {
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('productos-lista');
     contenedor.innerHTML = '';
-
-    if (typeof misProductos === 'undefined') {
-        console.error("misProductos no está definido");
-        return;
-    }
 
     misProductos.forEach(p => {
         if (marca === 'todas' || p.marca === marca) {
@@ -704,5 +687,3 @@ function mostrarProductos(marca) {
 function cambiarHabitacion(h) {
     document.getElementById('bg-room').src = `img/habitaciones/${h}`;
 }
-
-

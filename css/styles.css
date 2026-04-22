@@ -35,11 +35,17 @@
     left: 0;
     pointer-events: none; /* 🔥 evita bloquear clicks */
 }
+/* --- PISO (RECORTADO) --- */
 #floor-canvas {
     z-index: 2;
-    mix-blend-mode: multiply; /* Esto es vital para que la figura no parezca una calcomanía */
-    opacity: 0.85;
-    pointer-events: none;
+    
+    /* Agrega estas dos líneas aquí: */
+    mix-blend-mode: multiply; 
+    opacity: 0.9;
+
+    /* Puedes comentar o borrar el clip-path si usas la versión de JS 
+       que te pasé, para que no choquen */
+    /* clip-path: polygon(20% 70%, 80% 70%, 90% 90%, 10% 90%); */
 }
 
 

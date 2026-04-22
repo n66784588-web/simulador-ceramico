@@ -1,183 +1,180 @@
-/* =========================================
-   CONFIGURACIÓN GENERAL
-   ========================================= */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f9;
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
+/* RESET GENERAL */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
 }
 
-#main-container {
-    display: flex;
-    width: 100%;
-    height: 100%;
+#main-container { 
+    display: flex; 
+    width: 100vw; 
+    height: 100vh; 
+    background: #111; 
+    overflow: hidden; 
 }
 
-/* =========================================
-   ÁREA VISUAL (IZQUIERDA)
-   ========================================= */
-#viewport {
-    position: relative;
-    flex: 1; /* Ocupa todo el espacio restante */
-    background-color: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+/* ÁREA DEL SIMULADOR */
+#viewport { 
+    position: relative; 
+    flex: 3; 
+    background: #000; 
+    overflow: hidden; 
 }
 
-#bg-room {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* Mantiene la proporción de la habitación */
+#bg-room { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    z-index: 1; 
 }
 
-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none; /* Permite hacer clic en los puntos debajo */
+/* CANVASES: Corregidos para no bloquear el mouse */
+#floor-canvas { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    top: 0; 
+    left: 0; 
+    z-index: 5; 
+    pointer-events: none; 
 }
 
-/* =========================================
-   PUNTOS DE CONTROL (DOTS)
-   ========================================= */
+#wall-canvas { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    top: 0; 
+    left: 0; 
+    z-index: 6; 
+    pointer-events: none; 
+}
+
+/* CONTROLES FLOTANTES */
+.controls { 
+    position: absolute; 
+    top: 10px; 
+    left: 10px; 
+    z-index: 100; 
+    display: flex; 
+    gap: 8px; 
+}
+
+.mode-selector { 
+    position: absolute; 
+    top: 60px; /* Bajado un poco para no chocar con botones de arriba */
+    left: 10px; 
+    z-index: 100; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+    background: rgba(0,0,0,0.7); 
+    padding: 12px; 
+    border-radius: 8px; 
+    border: 1px solid #444;
+}
+
+button { 
+    padding: 10px 15px; 
+    cursor: pointer; 
+    background: #222; 
+    color: white; 
+    border: 1px solid #444; 
+    border-radius: 5px; 
+    transition: 0.3s;
+    font-size: 13px;
+}
+
+button:hover { 
+    background: #444; 
+    border-color: #666; 
+}
+
+button.active { 
+    background: #007bff !important; 
+    border-color: #00a2ff !important; 
+    font-weight: bold;
+}
+
+/* PUNTOS DE ARRASTRE: Prioridad máxima */
 .dot {
-    position: absolute;
-    width: 14px;
-    height: 14px;
+    position: absolute; 
+    width: 22px; /* Más grandes para que sean fáciles de agarrar */
+    height: 22px; 
     border-radius: 50%;
-    border: 2px solid white;
-    cursor: move;
-    z-index: 100;
-    transform: translate(-50%, -50%); /* Centra el punto en la coordenada */
-    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    z-index: 150 !important; /* Por encima de todo */
+    cursor: move; 
+    border: 3px solid #fff;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 15px rgba(0,0,0,0.8);
+    pointer-events: auto; /* IMPORTANTE: Activa el clic/arrastre */
 }
 
-.blue { background-color: #007bff; }
-.red { background-color: #dc3545; }
+.blue { background: #007bff; }
+.red { background: #ff4757; }
 
-/* Selector de Modo flotante */
-.mode-selector {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 10px;
-    border-radius: 30px;
-    z-index: 110;
+/* PANEL LATERAL */
+.side-panel { 
+    flex: 1; 
+    background: #1a1a1a; 
+    color: white; 
+    padding: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    border-left: 2px solid #333;
 }
 
-.mode-selector button {
-    padding: 8px 20px;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s;
+.brand-filters { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 8px; 
+    margin: 20px 0; 
 }
 
-.mode-selector button.active {
-    background: #333;
-    color: white;
+#productos-lista { 
+    flex: 1; 
+    overflow-y: auto; 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+    gap: 12px; 
+    padding-right: 5px;
 }
 
-/* =========================================
-   PANEL DERECHO
-   ========================================= */
-.side-panel {
-    width: 350px;
-    background: white;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    z-index: 120;
-    overflow-y: auto;
+/* Estilo de barra de desplazamiento (Scrollbar) */
+#productos-lista::-webkit-scrollbar { width: 6px; }
+#productos-lista::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+
+.producto-item { 
+    background: #2a2a2a; 
+    padding: 8px; 
+    border-radius: 6px; 
+    text-align: center; 
+    cursor: pointer; 
+    border: 1px solid transparent;
+    transition: 0.2s;
 }
 
-h3 {
-    margin: 20px 0 10px 0;
-    font-size: 1.1rem;
-    color: #444;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 5px;
+.producto-item:hover { 
+    border: 1px solid #007bff; 
+    background: #333; 
 }
 
-.brand-filters {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.brand-filters button {
-    padding: 8px;
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.85rem;
-}
-
-.brand-filters button:hover {
-    background: #e9ecef;
-}
-
-/* Grilla del Catálogo */
-.grid-productos {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-top: 10px;
-}
-
-.producto-item {
-    text-align: center;
-    cursor: pointer;
-    border: 1px solid #eee;
-    padding: 10px;
-    border-radius: 8px;
-    transition: 0.3s;
-}
-
-.producto-item:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border-color: #007bff;
-}
-
-.producto-item img {
-    width: 100%;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 5px;
-}
-
-.producto-item small {
+.producto-item img { 
+    width: 100%; 
+    border-radius: 4px; 
+    margin-bottom: 8px; 
     display: block;
-    font-size: 0.75rem;
-    color: #666;
-    text-transform: capitalize;
 }
 
-.btn-cotizar {
-    margin-top: auto;
-    padding: 15px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 1rem;
+.producto-item p { 
+    font-size: 10px; 
+    color: #ccc; 
+    text-transform: uppercase; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#floor-canvas, #wall-canvas {
+    pointer-events: none;
 }

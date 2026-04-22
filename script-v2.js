@@ -509,56 +509,50 @@ function cambiarHabitacion(habitacion) {
         imgHab.src = "img/habitaciones/" + habitacion;
     }
 }
-/* --- REEMPLAZA TU FUNCIÓN ANTERIOR CON ESTA --- */
 function aplicarTextura(ruta) {
     var canvas = document.getElementById('floor-canvas');
     var ctx = canvas.getContext('2d');
-
     var img = new Image();
     img.src = ruta;
 
     img.onload = function () {
-        // Ajustamos el canvas al tamaño visual del contenedor
+        // Sincronizar tamaño del canvas con el viewport
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
-
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // --- CREAR EL PATRÓN (REPETICIÓN DE LA LOSETA) ---
-        // El valor 0.15 controla qué tan grandes se ven las piezas en el cuarto
-        var escalaDePieza = 0.15; 
+        // 1. CREAR EL PATRÓN (Tiling)
+        // Ajusta 0.12 para que las losetas se vean más grandes o pequeñas
+        var escala = 0.12; 
         var tempCanvas = document.createElement('canvas');
         var tCtx = tempCanvas.getContext('2d');
-        tempCanvas.width = img.width * escalaDePieza;
-        tempCanvas.height = img.height * escalaDePieza;
+        tempCanvas.width = img.width * escala;
+        tempCanvas.height = img.height * escala;
         tCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
-        
         var pattern = ctx.createPattern(tempCanvas, 'repeat');
-        ctx.fillStyle = pattern;
 
-        // --- DIBUJAR EL ÁREA DEL PISO (PERSPECTIVA) ---
+        // 2. DEFINIR EL ÁREA DEL PISO (Coincidiendo con tu diseño original)
         ctx.save();
         ctx.beginPath();
-        
-        // Estos puntos definen el área donde se "pintará" el piso
-        // Puedes mover los números para ajustar la perspectiva a tu foto
-        ctx.moveTo(canvas.width * 0.20, canvas.height * 0.65); // Arriba Izquierda
-        ctx.lineTo(canvas.width * 0.80, canvas.height * 0.65); // Arriba Derecha
-        ctx.lineTo(canvas.width * 1.20, canvas.height * 1.0);  // Abajo Derecha (fuera del canvas para cubrir todo)
-        ctx.lineTo(canvas.width * -0.20, canvas.height * 1.0); // Abajo Izquierda
+        // Estas coordenadas recrean el polígono que tenías en CSS
+        ctx.moveTo(canvas.width * 0.20, canvas.height * 0.70); // Arriba Izq
+        ctx.lineTo(canvas.width * 0.80, canvas.height * 0.70); // Arriba Der
+        ctx.lineTo(canvas.width * 0.95, canvas.height * 1.00); // Abajo Der
+        ctx.lineTo(canvas.width * 0.05, canvas.height * 1.00); // Abajo Izq
         ctx.closePath();
-        
-        ctx.clip(); // Recorta el dibujo para que solo salga en el suelo
+        ctx.clip();
 
-        // --- APLICAR TRANSFORMACIÓN DE INCLINACIÓN ---
-        // Esto "acuesta" la textura en el suelo
-        ctx.transform(1.8, 0, 0, 0.6, -canvas.width * 0.4, 120); 
-        ctx.fillRect(-canvas.width, 0, canvas.width * 4, canvas.height * 2);
+        // 3. APLICAR PERSPECTIVA ARTIFICIAL
+        // Inclinamos y escalamos el patrón para que parezca que está en el suelo
+        ctx.translate(0, canvas.height * 0.70); // Empezar desde la línea del horizonte
+        ctx.transform(1.5, 0, 0, 0.4, -canvas.width * 0.2, 0); 
+        
+        ctx.fillStyle = pattern;
+        ctx.fillRect(-canvas.width, 0, canvas.width * 3, canvas.height * 2);
         
         ctx.restore();
     };
 }
-
 
 /* MOSTRAR PRODUCTOS */
 function mostrarProductos(marca) {

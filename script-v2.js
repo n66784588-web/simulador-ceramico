@@ -554,45 +554,49 @@ function aplicarTextura(ruta) {
 function initDragAndDrop() {
     const canvas = document.getElementById('floor-canvas');
 
-    canvas.onmousedown = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+for (let i = imagenes.length - 1; i >= 0; i--) {
+    const img = imagenes[i];
 
-        imagenActiva = null;
+    // 🔥 convertir coordenadas al sistema de la imagen
+    const dx = x - img.x;
+    const dy = y - img.y;
 
-        for (let i = imagenes.length - 1; i >= 0; i--) {
-            const img = imagenes[i];
+    const cos = Math.cos(-img.rotation);
+    const sin = Math.sin(-img.rotation);
 
-            if (
-                x > img.x - img.width / 2 &&
-                x < img.x + img.width / 2 &&
-                y > img.y - img.height / 2 &&
-                y < img.y + img.height / 2
-            ) {
-                imagenActiva = img;
+    const localX = dx * cos - dy * sin;
+    const localY = dx * sin + dy * cos;
 
-                offsetX = x - img.x;
-                offsetY = y - img.y;
+    if (
+        localX > -img.width / 2 &&
+        localX < img.width / 2 &&
+        localY > -img.height / 2 &&
+        localY < img.height / 2
+    ) {
+        imagenActiva = img;
 
-                break;
-            }
-        }
-    };
+        offsetX = localX;
+        offsetY = localY;
 
-    canvas.onmousemove = (e) => {
-        if (!imagenActiva) return;
+        break;
+    }
+}   
 
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+canvas.onmousemove = (e) => {
+    if (!imagenActiva) return;
 
-        imagenActiva.x = x - offsetX;
-        imagenActiva.y = y - offsetY;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-        dibujarEscena();
-    };
+    const cos = Math.cos(imagenActiva.rotation);
+    const sin = Math.sin(imagenActiva.rotation);
 
+    imagenActiva.x = x - (offsetX * cos - offsetY * sin);
+    imagenActiva.y = y - (offsetX * sin + offsetY * cos);
+
+    dibujarEscena();
+};
     canvas.onmouseup = () => {
         if (imagenActiva) {
             // 🔥 SNAP A GRID (ALINEACIÓN REAL)

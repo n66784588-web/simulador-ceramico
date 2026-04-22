@@ -1,24 +1,26 @@
+/* =========================
+   VARIABLES GLOBALES
+========================= */
 let modoEdicion = 'piso';
-let ultimaRutaPiso = "";
-let ultimaRutaPared = "";
-
-let tileScalePiso = 0.25;
-let tileScalePared = 0.25;
-
-let offsetXPiso = 0;
-let offsetYPiso = 0;
-let offsetXPared = 0;
-let offsetYPared = 0;
-
-let rotacionPiso = 0;
-let rotacionPared = 0;
-
 let puntoActivo = null;
-let arrastrandoTextura = false;
-let startX, startY;
 
-// 🔥 GRID REAL (tamaño de junta)
-const gridSize = 120;
+let ultimaRutaPiso = null;
+let ultimaRutaPared = null;
+
+/* ESCALA */
+let tileScalePiso = 0.3;
+let tileScalePared = 0.3;
+
+/* POSICIÓN (MOVIMIENTO REAL) */
+let offsetX = 0;
+let offsetY = 0;
+
+/* ROTACIÓN */
+let rotation = 0;
+
+/* TIPO DE PATRÓN */
+let patronTipo = 'cuadricula'; 
+// opciones: cuadricula, ladrillo, ajedrez
 
 
 // LISTADO DE TUS PRODUCTOS POR MARCA
@@ -523,15 +525,14 @@ const misProductos = [
 ];   
 
 window.onload = () => {
-    initDragAndDrop();
-    initMoverTextura(); // 🔥 IMPORTANTE
+    initDragPuntos();
+    initMovimientoTextura();
     mostrarProductos('todas');
 };
 
-
-// =========================
-// MODO
-// =========================
+/* =========================
+   MODO
+========================= */
 function setModo(m) {
     modoEdicion = m;
 
@@ -539,18 +540,17 @@ function setModo(m) {
     document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
 }
 
-
-// =========================
-// DRAG PUNTOS (FORMA)
-// =========================
-function initDragAndDrop() {
+/* =========================
+   DRAG DE PUNTOS (FORMA)
+========================= */
+function initDragPuntos() {
     const dots = document.querySelectorAll('.dot');
     const viewport = document.getElementById('viewport');
 
     dots.forEach(dot => {
         dot.onmousedown = (e) => {
             puntoActivo = dot;
-            e.stopPropagation();
+            e.preventDefault();
         };
     });
 
@@ -558,7 +558,6 @@ function initDragAndDrop() {
         if (!puntoActivo) return;
 
         const rect = viewport.getBoundingClientRect();
-
         puntoActivo.style.left = (e.clientX - rect.left) + "px";
         puntoActivo.style.top = (e.clientY - rect.top) + "px";
 
@@ -568,34 +567,28 @@ function initDragAndDrop() {
     window.onmouseup = () => puntoActivo = null;
 }
 
-
-// =========================
-// 🔥 MOVER TEXTURA (PRO)
-// =========================
-function initMoverTextura() {
+/* =========================
+   MOVER TEXTURA (🔥 NUEVO)
+========================= */
+function initMovimientoTextura() {
     const viewport = document.getElementById('viewport');
+
+    let arrastrando = false;
+    let startX, startY;
 
     viewport.addEventListener('mousedown', (e) => {
         if (e.target.classList.contains('dot')) return;
 
-        arrastrandoTextura = true;
+        arrastrando = true;
         startX = e.clientX;
         startY = e.clientY;
     });
 
     window.addEventListener('mousemove', (e) => {
-        if (!arrastrandoTextura) return;
+        if (!arrastrando) return;
 
-        let dx = e.clientX - startX;
-        let dy = e.clientY - startY;
-
-        if (modoEdicion === 'piso') {
-            offsetXPiso += dx;
-            offsetYPiso += dy;
-        } else {
-            offsetXPared += dx;
-            offsetYPared += dy;
-        }
+        offsetX += (e.clientX - startX);
+        offsetY += (e.clientY - startY);
 
         startX = e.clientX;
         startY = e.clientY;
@@ -603,38 +596,34 @@ function initMoverTextura() {
         dibujarEscena();
     });
 
-    window.addEventListener('mouseup', () => {
-        arrastrandoTextura = false;
-    });
+    window.addEventListener('mouseup', () => arrastrando = false);
 }
 
-
-// =========================
-// TEXTURA
-// =========================
+/* =========================
+   APLICAR TEXTURA
+========================= */
 function aplicarTextura(ruta) {
     if (modoEdicion === 'piso') {
         ultimaRutaPiso = ruta;
     } else {
         ultimaRutaPared = ruta;
     }
+
     dibujarEscena();
 }
 
-
-// =========================
-// RENDER PRINCIPAL
-// =========================
+/* =========================
+   RENDER GENERAL
+========================= */
 function dibujarEscena() {
-    renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso, offsetXPiso, offsetYPiso, rotacionPiso);
-    renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared, offsetXPared, offsetYPared, rotacionPared);
+    renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
+    renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
 }
 
-
-// =========================
-// 🔥 RENDER PRO REALISTA
-// =========================
-function renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) {
+/* =========================
+   RENDER PRO 🔥
+========================= */
+function renderizar(canvasId, ruta, puntos, escala) {
     if (!ruta) return;
 
     const canvas = document.getElementById(canvasId);
@@ -644,6 +633,7 @@ function renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) 
     img.src = ruta;
 
     img.onload = () => {
+
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
 
@@ -654,6 +644,7 @@ function renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) 
             return { x: el.offsetLeft, y: el.offsetTop };
         });
 
+        /* CLIP */
         ctx.beginPath();
         ctx.moveTo(pts[0].x, pts[0].y);
         pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
@@ -662,106 +653,85 @@ function renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) 
         ctx.save();
         ctx.clip();
 
-        // 🔥 TAMAÑO REAL SIN DEFORMAR
+        /* TAMAÑO REAL DE LOSA */
         const tileW = img.width * escala;
         const tileH = img.height * escala;
 
-        // 🔥 CONFIGURACIÓN DE PATRÓN
-        const junta = 2; // grosor de junta
+        /* 🔥 PATRÓN PROFESIONAL */
+        for (let x = -tileW * 2; x < canvas.width + tileW * 2; x += tileW) {
+            for (let y = -tileH * 2; y < canvas.height + tileH * 2; y += tileH) {
 
-        ctx.translate(offsetX, offsetY);
-        ctx.rotate(rotacion * Math.PI / 180);
+                let drawX = x + offsetX;
+                let drawY = y + offsetY;
 
-        // 🔥 TIPOS DE COLOCACIÓN
-        const tipoPatron = detectarPatron(img);
-
-        for (let y = -canvas.height; y < canvas.height * 2; y += tileH + junta) {
-            for (let x = -canvas.width; x < canvas.width * 2; x += tileW + junta) {
-
-                let offsetFila = 0;
-
-                // 🔥 DESFASE TIPO LADRILLO (50%)
-                if (tipoPatron === "desfasado") {
-                    if (Math.floor(y / (tileH + junta)) % 2 !== 0) {
-                        offsetFila = tileW / 2;
+                /* PATRÓN LADRILLO */
+                if (patronTipo === 'ladrillo') {
+                    if (Math.floor(y / tileH) % 2 === 0) {
+                        drawX += tileW / 2;
                     }
                 }
 
-                // 🔥 TIPO MADERA (aleatorio suave)
-                if (tipoPatron === "madera") {
-                    offsetFila = (Math.floor(y / (tileH + junta)) % 3) * (tileW * 0.15);
+                ctx.save();
+
+                ctx.translate(drawX + tileW/2, drawY + tileH/2);
+
+                /* ROTACIÓN */
+                if (patronTipo === 'ajedrez') {
+                    const rot = (Math.floor(x / tileW + y / tileH) % 2 === 0) ? 0 : Math.PI/2;
+                    ctx.rotate(rot);
+                } else {
+                    ctx.rotate(rotation);
                 }
 
-                // 🔥 DIBUJAR JUNTA
-                ctx.fillStyle = "#d0d0d0";
-                ctx.fillRect(
-                    x + offsetFila,
-                    y,
-                    tileW + junta,
-                    tileH + junta
-                );
+                ctx.drawImage(img, -tileW/2, -tileH/2, tileW, tileH);
 
-                // 🔥 DIBUJAR CERÁMICA
-                ctx.drawImage(
-                    img,
-                    x + offsetFila + junta/2,
-                    y + junta/2,
-                    tileW - junta,
-                    tileH - junta
-                );
+                ctx.restore();
             }
         }
 
         ctx.restore();
     };
-
-    img.onerror = () => console.error("No carga:", ruta);
 }
 
-function detectarPatron(img) {
-    const ratio = img.width / img.height;
-
-    // 🔥 formatos típicos
-    if (ratio > 2) return "madera";     // 20x120, 15x90 etc
-    if (ratio > 1.2) return "desfasado"; // 30x60, 45x90
-
-    return "normal"; // 60x60, 50x50
-}
-// =========================
-// ZOOM
-// =========================
+/* =========================
+   ZOOM (ESCALA)
+========================= */
 window.addEventListener('wheel', (e) => {
+
     if (modoEdicion === 'piso') {
-        tileScalePiso += e.deltaY > 0 ? -0.01 : 0.01;
-        tileScalePiso = Math.max(0.05, Math.min(1, tileScalePiso));
+        tileScalePiso += e.deltaY > 0 ? -0.02 : 0.02;
+        tileScalePiso = Math.max(0.1, Math.min(1, tileScalePiso));
     } else {
-        tileScalePared += e.deltaY > 0 ? -0.01 : 0.01;
-        tileScalePared = Math.max(0.05, Math.min(1, tileScalePared));
+        tileScalePared += e.deltaY > 0 ? -0.02 : 0.02;
+        tileScalePared = Math.max(0.1, Math.min(1, tileScalePared));
     }
 
     dibujarEscena();
     e.preventDefault();
+
 }, { passive: false });
 
-
-// =========================
-// 🔥 ROTACIÓN (TECLA R)
-// =========================
+/* =========================
+   ROTACIÓN MANUAL
+========================= */
 window.addEventListener('keydown', (e) => {
-    if (e.key.toLowerCase() === 'r') {
-        if (modoEdicion === 'piso') {
-            rotacionPiso += 90;
-        } else {
-            rotacionPared += 90;
-        }
+    if (e.key === 'r') {
+        rotation += Math.PI / 2;
         dibujarEscena();
     }
 });
 
+/* =========================
+   CAMBIAR PATRÓN
+========================= */
+function setPatron(tipo) {
+    patronTipo = tipo;
+    dibujarEscena();
+}
 
-// =========================
-// PRODUCTOS
-// =========================
+/* =========================
+   PRODUCTOS
+========================= */
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('productos-lista');
     contenedor.innerHTML = '';
@@ -786,10 +756,9 @@ function mostrarProductos(marca) {
     });
 }
 
-
-// =========================
-// HABITACIONES
-// =========================
+/* =========================
+   HABITACIÓN
+========================= */
 function cambiarHabitacion(h) {
     document.getElementById('bg-room').src = `img/habitaciones/${h}`;
 }

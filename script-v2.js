@@ -514,6 +514,10 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
+
+/* =========================
+   INICIO
+========================= */
 window.onload = () => {
     initDragAndDrop();
     mostrarProductos('todas');
@@ -521,7 +525,7 @@ window.onload = () => {
 };
 
 /* =========================
-   MODO
+   MODO PISO / PARED
 ========================= */
 function setModo(m) {
     modoEdicion = m;
@@ -531,7 +535,7 @@ function setModo(m) {
 }
 
 /* =========================
-   DRAG PUNTOS (FUNCIONA)
+   DRAG DE PUNTOS
 ========================= */
 function initDragAndDrop() {
     const dots = document.querySelectorAll('.dot');
@@ -561,7 +565,7 @@ function initDragAndDrop() {
 }
 
 /* =========================
-   TEXTURA
+   APLICAR TEXTURA
 ========================= */
 function aplicarTextura(ruta) {
     if (modoEdicion === 'piso') {
@@ -577,17 +581,22 @@ function aplicarTextura(ruta) {
 ========================= */
 window.addEventListener('keydown', (e) => {
     if (e.key.toLowerCase() === 'r') {
-        if (modoEdicion === 'piso') {
-            rotacionPiso += Math.PI / 2;
-        } else {
-            rotacionPared += Math.PI / 2;
-        }
-        dibujarEscena();
+        rotarManual();
     }
 });
 
+/* BOTÓN ROTAR */
+function rotarManual() {
+    if (modoEdicion === 'piso') {
+        rotacionPiso += Math.PI / 2;
+    } else {
+        rotacionPared += Math.PI / 2;
+    }
+    dibujarEscena();
+}
+
 /* =========================
-   ZOOM RUEDA
+   ZOOM CON RUEDA
 ========================= */
 window.addEventListener('wheel', (e) => {
     if (modoEdicion === 'piso') {
@@ -603,7 +612,7 @@ window.addEventListener('wheel', (e) => {
 }, { passive: false });
 
 /* =========================
-   RENDER PRINCIPAL
+   DIBUJAR ESCENA
 ========================= */
 function dibujarEscena() {
     renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso, rotacionPiso);
@@ -611,7 +620,7 @@ function dibujarEscena() {
 }
 
 /* =========================
-   MOTOR PROFESIONAL
+   MOTOR DE RENDER PROFESIONAL
 ========================= */
 function renderizar(canvasId, ruta, puntos, escala, rotacion) {
     if (!ruta) return;
@@ -623,6 +632,7 @@ function renderizar(canvasId, ruta, puntos, escala, rotacion) {
     img.src = ruta;
 
     img.onload = () => {
+
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
 
@@ -630,10 +640,13 @@ function renderizar(canvasId, ruta, puntos, escala, rotacion) {
 
         const pts = puntos.map(id => {
             const el = document.getElementById(id);
-            return { x: el.offsetLeft, y: el.offsetTop };
+            return {
+                x: el.offsetLeft,
+                y: el.offsetTop
+            };
         });
 
-        // RECORTE ÁREA
+        /* RECORTE */
         ctx.beginPath();
         ctx.moveTo(pts[0].x, pts[0].y);
         pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
@@ -642,7 +655,7 @@ function renderizar(canvasId, ruta, puntos, escala, rotacion) {
         ctx.save();
         ctx.clip();
 
-        // 🔥 PATRÓN PROFESIONAL REAL
+        /* 🔥 PATRÓN TIPO TIENDA REAL */
         const size = img.width * escala;
 
         for (let x = -size; x < canvas.width + size; x += size) {
@@ -650,13 +663,13 @@ function renderizar(canvasId, ruta, puntos, escala, rotacion) {
 
                 ctx.save();
 
-                // CENTRAR CADA LOSA
+                /* CENTRAR PIEZA */
                 ctx.translate(x + size/2, y + size/2);
 
-                // ROTACIÓN
+                /* ROTACIÓN */
                 ctx.rotate(rotacion);
 
-                // DIBUJAR PIEZA
+                /* DIBUJO */
                 ctx.drawImage(
                     img,
                     -size/2,
@@ -673,7 +686,7 @@ function renderizar(canvasId, ruta, puntos, escala, rotacion) {
     };
 
     img.onerror = () => {
-        console.error("❌ Error imagen:", ruta);
+        console.error("❌ No se encontró la imagen:", ruta);
     };
 }
 
@@ -683,6 +696,11 @@ function renderizar(canvasId, ruta, puntos, escala, rotacion) {
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('productos-lista');
     contenedor.innerHTML = '';
+
+    if (typeof misProductos === "undefined") {
+        console.error("❌ misProductos no existe");
+        return;
+    }
 
     misProductos.forEach(p => {
         if (marca === 'todas' || p.marca === marca) {
@@ -710,4 +728,3 @@ function mostrarProductos(marca) {
 function cambiarHabitacion(h) {
     document.getElementById('bg-room').src = `img/habitaciones/${h}`;
 }
-

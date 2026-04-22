@@ -1,6 +1,3 @@
-/* =========================
-   VARIABLES GLOBALES
-========================= */
 let modoEdicion = 'piso';
 let puntoActivo = null;
 
@@ -11,17 +8,15 @@ let ultimaRutaPared = null;
 let tileScalePiso = 0.3;
 let tileScalePared = 0.3;
 
-/* POSICIÓN (MOVIMIENTO REAL) */
+/* POSICIÓN */
 let offsetX = 0;
 let offsetY = 0;
 
-/* ROTACIÓN */
-let rotation = 0;
+/* ROTACIÓN (GRADOS) */
+let rotationDeg = 0;
 
-/* TIPO DE PATRÓN */
-let patronTipo = 'cuadricula'; 
-// opciones: cuadricula, ladrillo, ajedrez
-
+/* PATRÓN */
+let patronTipo = 'cuadricula';
 
 // LISTADO DE TUS PRODUCTOS POR MARCA
 const misProductos = [
@@ -541,7 +536,7 @@ function setModo(m) {
 }
 
 /* =========================
-   DRAG DE PUNTOS (FORMA)
+   DRAG DE PUNTOS
 ========================= */
 function initDragPuntos() {
     const dots = document.querySelectorAll('.dot');
@@ -568,7 +563,7 @@ function initDragPuntos() {
 }
 
 /* =========================
-   MOVER TEXTURA (🔥 NUEVO)
+   MOVER TEXTURA (🔥)
 ========================= */
 function initMovimientoTextura() {
     const viewport = document.getElementById('viewport');
@@ -621,7 +616,7 @@ function dibujarEscena() {
 }
 
 /* =========================
-   RENDER PRO 🔥
+   RENDER PROFESIONAL
 ========================= */
 function renderizar(canvasId, ruta, puntos, escala) {
     if (!ruta) return;
@@ -653,18 +648,19 @@ function renderizar(canvasId, ruta, puntos, escala) {
         ctx.save();
         ctx.clip();
 
-        /* TAMAÑO REAL DE LOSA */
         const tileW = img.width * escala;
         const tileH = img.height * escala;
 
-        /* 🔥 PATRÓN PROFESIONAL */
+        const rotRad = rotationDeg * Math.PI / 180;
+
+        /* 🔥 GENERACIÓN DE PATRÓN */
         for (let x = -tileW * 2; x < canvas.width + tileW * 2; x += tileW) {
             for (let y = -tileH * 2; y < canvas.height + tileH * 2; y += tileH) {
 
                 let drawX = x + offsetX;
                 let drawY = y + offsetY;
 
-                /* PATRÓN LADRILLO */
+                /* LADRILLO */
                 if (patronTipo === 'ladrillo') {
                     if (Math.floor(y / tileH) % 2 === 0) {
                         drawX += tileW / 2;
@@ -675,12 +671,12 @@ function renderizar(canvasId, ruta, puntos, escala) {
 
                 ctx.translate(drawX + tileW/2, drawY + tileH/2);
 
-                /* ROTACIÓN */
+                /* AJEDREZ + ROTACIÓN */
                 if (patronTipo === 'ajedrez') {
-                    const rot = (Math.floor(x / tileW + y / tileH) % 2 === 0) ? 0 : Math.PI/2;
-                    ctx.rotate(rot);
+                    const alterno = (Math.floor(x / tileW + y / tileH) % 2 === 0);
+                    ctx.rotate(alterno ? rotRad : rotRad + Math.PI/2);
                 } else {
-                    ctx.rotate(rotation);
+                    ctx.rotate(rotRad);
                 }
 
                 ctx.drawImage(img, -tileW/2, -tileH/2, tileW, tileH);
@@ -691,10 +687,14 @@ function renderizar(canvasId, ruta, puntos, escala) {
 
         ctx.restore();
     };
+
+    img.onerror = () => {
+        console.error("No se encontró:", ruta);
+    };
 }
 
 /* =========================
-   ZOOM (ESCALA)
+   ZOOM
 ========================= */
 window.addEventListener('wheel', (e) => {
 
@@ -712,13 +712,15 @@ window.addEventListener('wheel', (e) => {
 }, { passive: false });
 
 /* =========================
-   ROTACIÓN MANUAL
+   ROTACIÓN CONTROLADA 🔥
 ========================= */
 window.addEventListener('keydown', (e) => {
-    if (e.key === 'r') {
-        rotation += Math.PI / 2;
-        dibujarEscena();
-    }
+
+    if (e.key === 'r') rotationDeg += 90;
+    if (e.key === 'e') rotationDeg -= 90;
+    if (e.key === '0') rotationDeg = 0;
+
+    dibujarEscena();
 });
 
 /* =========================

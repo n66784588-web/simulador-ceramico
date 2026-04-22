@@ -1,24 +1,18 @@
 let modoEdicion = 'piso';
-let puntoActivo = null;
 
 let ultimaRutaPiso = null;
 let ultimaRutaPared = null;
 
-/* ESCALA */
 let tileScalePiso = 0.3;
 let tileScalePared = 0.3;
 
-/* POSICIÓN */
-let offsetX = 0;
-let offsetY = 0;
+let rotacion = 0;
+let patron = "cuadricula";
+let junta = 2;
 
-/* ROTACIÓN (GRADOS) */
-let rotationDeg = 0;
+let puntoActivo = null;
 
-/* PATRÓN */
-let patronTipo = 'cuadricula';
-
-// LISTADO DE TUS PRODUCTOS POR MARCA
+/* PRODUCTOS */
 const misProductos = [
  // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
@@ -519,107 +513,70 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
+/* INIT */
 window.onload = () => {
-    initDragPuntos();
-    initMovimientoTextura();
+    initDrag();
     mostrarProductos('todas');
 };
 
-/* =========================
-   MODO
-========================= */
-function setModo(m) {
+/* MODO */
+function setModo(m){
     modoEdicion = m;
-
-    document.getElementById('btn-piso').classList.toggle('active', m === 'piso');
-    document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
 }
 
-/* =========================
-   DRAG DE PUNTOS
-========================= */
-function initDragPuntos() {
+/* ROTAR */
+function rotarTextura(){
+    rotacion += 90;
+    dibujarEscena();
+}
+
+/* PATRON */
+function setPatron(p){
+    patron = p;
+    dibujarEscena();
+}
+
+/* DRAG */
+function initDrag(){
     const dots = document.querySelectorAll('.dot');
     const viewport = document.getElementById('viewport');
 
-    dots.forEach(dot => {
-        dot.onmousedown = (e) => {
-            puntoActivo = dot;
-            e.preventDefault();
-        };
+    dots.forEach(dot=>{
+        dot.onmousedown = ()=> puntoActivo = dot;
     });
 
-    window.onmousemove = (e) => {
-        if (!puntoActivo) return;
+    window.onmousemove = (e)=>{
+        if(!puntoActivo) return;
 
         const rect = viewport.getBoundingClientRect();
+
         puntoActivo.style.left = (e.clientX - rect.left) + "px";
         puntoActivo.style.top = (e.clientY - rect.top) + "px";
 
         dibujarEscena();
     };
 
-    window.onmouseup = () => puntoActivo = null;
+    window.onmouseup = ()=> puntoActivo = null;
 }
 
-/* =========================
-   MOVER TEXTURA (🔥)
-========================= */
-function initMovimientoTextura() {
-    const viewport = document.getElementById('viewport');
-
-    let arrastrando = false;
-    let startX, startY;
-
-    viewport.addEventListener('mousedown', (e) => {
-        if (e.target.classList.contains('dot')) return;
-
-        arrastrando = true;
-        startX = e.clientX;
-        startY = e.clientY;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-        if (!arrastrando) return;
-
-        offsetX += (e.clientX - startX);
-        offsetY += (e.clientY - startY);
-
-        startX = e.clientX;
-        startY = e.clientY;
-
-        dibujarEscena();
-    });
-
-    window.addEventListener('mouseup', () => arrastrando = false);
-}
-
-/* =========================
-   APLICAR TEXTURA
-========================= */
-function aplicarTextura(ruta) {
-    if (modoEdicion === 'piso') {
+/* TEXTURA */
+function aplicarTextura(ruta){
+    if(modoEdicion === 'piso'){
         ultimaRutaPiso = ruta;
     } else {
         ultimaRutaPared = ruta;
     }
-
     dibujarEscena();
 }
 
-/* =========================
-   RENDER GENERAL
-========================= */
-function dibujarEscena() {
-    renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
-    renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
+/* RENDER */
+function dibujarEscena(){
+    render('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
+    render('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
 }
 
-/* =========================
-   RENDER PROFESIONAL
-========================= */
-function renderizar(canvasId, ruta, puntos, escala) {
-    if (!ruta) return;
+function render(canvasId, ruta, puntos, escala){
+    if(!ruta) return;
 
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
@@ -627,59 +584,72 @@ function renderizar(canvasId, ruta, puntos, escala) {
     const img = new Image();
     img.src = ruta;
 
-    img.onload = () => {
+    img.onload = ()=>{
 
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
 
         ctx.clearRect(0,0,canvas.width,canvas.height);
 
-        const pts = puntos.map(id => {
+        const pts = puntos.map(id=>{
             const el = document.getElementById(id);
-            return { x: el.offsetLeft, y: el.offsetTop };
+            return {x:el.offsetLeft, y:el.offsetTop};
         });
 
-        /* CLIP */
         ctx.beginPath();
         ctx.moveTo(pts[0].x, pts[0].y);
-        pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+        pts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));
         ctx.closePath();
 
         ctx.save();
         ctx.clip();
 
-        const tileW = img.width * escala;
-        const tileH = img.height * escala;
+        const minX = Math.min(...pts.map(p=>p.x));
+        const minY = Math.min(...pts.map(p=>p.y));
 
-        const rotRad = rotationDeg * Math.PI / 180;
+        const size = img.width * escala;
 
-        /* 🔥 GENERACIÓN DE PATRÓN */
-        for (let x = -tileW * 2; x < canvas.width + tileW * 2; x += tileW) {
-            for (let y = -tileH * 2; y < canvas.height + tileH * 2; y += tileH) {
+        for(let x = minX - size; x < canvas.width + size; x += size){
+            for(let y = minY - size; y < canvas.height + size; y += size){
 
-                let drawX = x + offsetX;
-                let drawY = y + offsetY;
+                let drawX = x;
+                let drawY = y;
 
-                /* LADRILLO */
-                if (patronTipo === 'ladrillo') {
-                    if (Math.floor(y / tileH) % 2 === 0) {
-                        drawX += tileW / 2;
+                if(patron === "ladrillo"){
+                    if(Math.floor((y-minY)/size)%2===0){
+                        drawX += size/2;
+                    }
+                }
+
+                if(patron === "desfase30"){
+                    if(Math.floor((y-minY)/size)%2===0){
+                        drawX += size*0.3;
                     }
                 }
 
                 ctx.save();
 
-                ctx.translate(drawX + tileW/2, drawY + tileH/2);
+                ctx.translate(drawX + size/2, drawY + size/2);
 
-                /* AJEDREZ + ROTACIÓN */
-                if (patronTipo === 'ajedrez') {
-                    const alterno = (Math.floor(x / tileW + y / tileH) % 2 === 0);
-                    ctx.rotate(alterno ? rotRad : rotRad + Math.PI/2);
-                } else {
-                    ctx.rotate(rotRad);
+                let angle = rotacion;
+
+                if(patron === "espiga"){
+                    angle += ((Math.floor((x-minX)/size)+Math.floor((y-minY)/size))%2===0)?90:0;
                 }
 
-                ctx.drawImage(img, -tileW/2, -tileH/2, tileW, tileH);
+                ctx.rotate(angle * Math.PI/180);
+
+                // BOQUILLA
+                ctx.fillStyle = "#ccc";
+                ctx.fillRect(-size/2, -size/2, size, size);
+
+                ctx.drawImage(
+                    img,
+                    -size/2 + junta,
+                    -size/2 + junta,
+                    size - junta*2,
+                    size - junta*2
+                );
 
                 ctx.restore();
             }
@@ -687,80 +657,46 @@ function renderizar(canvasId, ruta, puntos, escala) {
 
         ctx.restore();
     };
-
-    img.onerror = () => {
-        console.error("No se encontró:", ruta);
-    };
 }
 
-/* =========================
-   ZOOM
-========================= */
-window.addEventListener('wheel', (e) => {
-
-    if (modoEdicion === 'piso') {
-        tileScalePiso += e.deltaY > 0 ? -0.02 : 0.02;
+/* ZOOM */
+window.addEventListener('wheel',(e)=>{
+    if(modoEdicion==='piso'){
+        tileScalePiso += e.deltaY>0?-0.02:0.02;
         tileScalePiso = Math.max(0.1, Math.min(1, tileScalePiso));
-    } else {
-        tileScalePared += e.deltaY > 0 ? -0.02 : 0.02;
+    }else{
+        tileScalePared += e.deltaY>0?-0.02:0.02;
         tileScalePared = Math.max(0.1, Math.min(1, tileScalePared));
     }
-
-    dibujarEscena();
-    e.preventDefault();
-
-}, { passive: false });
-
-/* =========================
-   ROTACIÓN CONTROLADA 🔥
-========================= */
-window.addEventListener('keydown', (e) => {
-
-    if (e.key === 'r') rotationDeg += 90;
-    if (e.key === 'e') rotationDeg -= 90;
-    if (e.key === '0') rotationDeg = 0;
-
     dibujarEscena();
 });
 
-/* =========================
-   CAMBIAR PATRÓN
-========================= */
-function setPatron(tipo) {
-    patronTipo = tipo;
-    dibujarEscena();
-}
+/* PRODUCTOS */
+function mostrarProductos(marca){
+    const cont = document.getElementById('productos-lista');
+    cont.innerHTML='';
 
-/* =========================
-   PRODUCTOS
-========================= */
-function mostrarProductos(marca) {
-    const contenedor = document.getElementById('productos-lista');
-    contenedor.innerHTML = '';
-
-    misProductos.forEach(p => {
-        if (marca === 'todas' || p.marca === marca) {
+    misProductos.forEach(p=>{
+        if(marca==='todas'||p.marca===marca){
 
             const ruta = `img/ceramicas/${p.nombre}.jpg`;
 
             const div = document.createElement('div');
-            div.className = 'producto-item';
+            div.className='producto-item';
 
-            div.innerHTML = `
-                <img src="${ruta}" onerror="this.src='img/error.jpg'">
+            div.innerHTML=`
+                <img src="${ruta}">
                 <p>${p.nombre}</p>
             `;
 
-            div.onclick = () => aplicarTextura(ruta);
+            div.onclick=()=>aplicarTextura(ruta);
 
-            contenedor.appendChild(div);
+            cont.appendChild(div);
         }
     });
 }
 
-/* =========================
-   HABITACIÓN
-========================= */
-function cambiarHabitacion(h) {
+/* HABITACIONES */
+function cambiarHabitacion(h){
     document.getElementById('bg-room').src = `img/habitaciones/${h}`;
 }

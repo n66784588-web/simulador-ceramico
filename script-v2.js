@@ -634,7 +634,7 @@ function dibujarEscena() {
 // =========================
 // 🔥 RENDER PRO REALISTA
 // =========================
-function renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) {
+unction renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) {
     if (!ruta) return;
 
     const canvas = document.getElementById(canvasId);
@@ -662,24 +662,27 @@ function renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) 
         ctx.save();
         ctx.clip();
 
-        // 🔥 PATRÓN TIPO CERÁMICA REAL
+        // 🔥 ESCALA REAL SIN DEFORMAR
+        const tileW = img.width * escala;
+        const tileH = img.height * escala;
+
+        // 🔥 CANVAS DEL PATRÓN RESPETA PROPORCIÓN
         const patternCanvas = document.createElement('canvas');
+        patternCanvas.width = tileW;
+        patternCanvas.height = tileH;
+
         const pctx = patternCanvas.getContext('2d');
 
-        let size = gridSize * escala;
+        // junta ligera (opcional)
+        pctx.fillStyle = "#e5e5e5";
+        pctx.fillRect(0,0,tileW,tileH);
 
-        patternCanvas.width = size;
-        patternCanvas.height = size;
-
-        // fondo junta
-        pctx.fillStyle = "#dcdcdc";
-        pctx.fillRect(0,0,size,size);
-
-        // cerámica
-        pctx.drawImage(img, 2, 2, size - 4, size - 4);
+        // imagen SIN deformar
+        pctx.drawImage(img, 2, 2, tileW - 4, tileH - 4);
 
         const pattern = ctx.createPattern(patternCanvas, 'repeat');
 
+        // 🔥 MOVIMIENTO + ROTACIÓN
         ctx.translate(offsetX, offsetY);
         ctx.rotate(rotacion * Math.PI / 180);
 

@@ -551,6 +551,9 @@ function aplicarTextura(ruta) {
 /* =========================
    DRAG & SELECT
 ========================= */
+let offsetX = 0;
+let offsetY = 0;
+
 function initDragAndDrop() {
     const canvas = document.getElementById('floor-canvas');
 
@@ -561,7 +564,7 @@ function initDragAndDrop() {
 
         imagenActiva = null;
 
-        // 🔥 Seleccionar la imagen superior
+        // Buscar desde arriba (última imagen)
         for (let i = imagenes.length - 1; i >= 0; i--) {
             const img = imagenes[i];
 
@@ -572,6 +575,11 @@ function initDragAndDrop() {
                 y < img.y + img.height / 2
             ) {
                 imagenActiva = img;
+
+                // 🔥 CLAVE: guardar dónde hiciste clic dentro de la imagen
+                offsetX = x - img.x;
+                offsetY = y - img.y;
+
                 break;
             }
         }
@@ -581,8 +589,12 @@ function initDragAndDrop() {
         if (!imagenActiva) return;
 
         const rect = canvas.getBoundingClientRect();
-        imagenActiva.x = e.clientX - rect.left;
-        imagenActiva.y = e.clientY - rect.top;
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // 🔥 MOVER CON OFFSET (SOLUCIÓN)
+        imagenActiva.x = x - offsetX;
+        imagenActiva.y = y - offsetY;
 
         dibujarEscena();
     };

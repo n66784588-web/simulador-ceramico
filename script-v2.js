@@ -634,7 +634,7 @@ function dibujarEscena() {
 // =========================
 // 🔥 RENDER PRO REALISTA
 // =========================
-unction renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) {
+function renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) {
     if (!ruta) return;
 
     const canvas = document.getElementById(canvasId);
@@ -662,32 +662,55 @@ unction renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) {
         ctx.save();
         ctx.clip();
 
-        // 🔥 ESCALA REAL SIN DEFORMAR
+        // 🔥 TAMAÑO REAL SIN DEFORMAR
         const tileW = img.width * escala;
         const tileH = img.height * escala;
 
-        // 🔥 CANVAS DEL PATRÓN RESPETA PROPORCIÓN
-        const patternCanvas = document.createElement('canvas');
-        patternCanvas.width = tileW;
-        patternCanvas.height = tileH;
+        // 🔥 CONFIGURACIÓN DE PATRÓN
+        const junta = 2; // grosor de junta
 
-        const pctx = patternCanvas.getContext('2d');
-
-        // junta ligera (opcional)
-        pctx.fillStyle = "#e5e5e5";
-        pctx.fillRect(0,0,tileW,tileH);
-
-        // imagen SIN deformar
-        pctx.drawImage(img, 2, 2, tileW - 4, tileH - 4);
-
-        const pattern = ctx.createPattern(patternCanvas, 'repeat');
-
-        // 🔥 MOVIMIENTO + ROTACIÓN
         ctx.translate(offsetX, offsetY);
         ctx.rotate(rotacion * Math.PI / 180);
 
-        ctx.fillStyle = pattern;
-        ctx.fillRect(-canvas.width, -canvas.height, canvas.width * 3, canvas.height * 3);
+        // 🔥 TIPOS DE COLOCACIÓN
+        const tipoPatron = detectarPatron(img);
+
+        for (let y = -canvas.height; y < canvas.height * 2; y += tileH + junta) {
+            for (let x = -canvas.width; x < canvas.width * 2; x += tileW + junta) {
+
+                let offsetFila = 0;
+
+                // 🔥 DESFASE TIPO LADRILLO (50%)
+                if (tipoPatron === "desfasado") {
+                    if (Math.floor(y / (tileH + junta)) % 2 !== 0) {
+                        offsetFila = tileW / 2;
+                    }
+                }
+
+                // 🔥 TIPO MADERA (aleatorio suave)
+                if (tipoPatron === "madera") {
+                    offsetFila = (Math.floor(y / (tileH + junta)) % 3) * (tileW * 0.15);
+                }
+
+                // 🔥 DIBUJAR JUNTA
+                ctx.fillStyle = "#d0d0d0";
+                ctx.fillRect(
+                    x + offsetFila,
+                    y,
+                    tileW + junta,
+                    tileH + junta
+                );
+
+                // 🔥 DIBUJAR CERÁMICA
+                ctx.drawImage(
+                    img,
+                    x + offsetFila + junta/2,
+                    y + junta/2,
+                    tileW - junta,
+                    tileH - junta
+                );
+            }
+        }
 
         ctx.restore();
     };
@@ -695,7 +718,15 @@ unction renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) {
     img.onerror = () => console.error("No carga:", ruta);
 }
 
+function detectarPatron(img) {
+    const ratio = img.width / img.height;
 
+    // 🔥 formatos típicos
+    if (ratio > 2) return "madera";     // 20x120, 15x90 etc
+    if (ratio > 1.2) return "desfasado"; // 30x60, 45x90
+
+    return "normal"; // 60x60, 50x50
+}
 // =========================
 // ZOOM
 // =========================

@@ -1,3 +1,17 @@
+let modoActual = 'piso'; // Por defecto empieza en piso
+
+function setModo(modo) {
+    modoActual = modo;
+    console.log("Cambiado a modo: " + modo);
+    // Aquí puedes agregar lógica para resaltar el botón activo
+}
+function seleccionarProducto(ruta) {
+    if (modoActual === 'piso') {
+        aplicarTexturaPiso(ruta);
+    } else {
+        aplicarTexturaPared(ruta);
+    }
+}
 // --- CONFIGURACION ---
 var modoEdicion = 'piso';
 
@@ -509,8 +523,17 @@ function cambiarHabitacion(habitacion) {
         imgHab.src = "img/habitaciones/" + habitacion;
     }
 }
-
+// --- NUEVA FUNCIÓN MAESTRA (Decide si va a piso o pared) ---
 function aplicarTextura(ruta) {
+    if (modoActual === 'piso') {
+        aplicarPiso(ruta);
+    } else {
+        aplicarPared(ruta);
+    }
+}
+
+// --- LÓGICA PARA EL PISO (Con perspectiva y armado de 4 piezas) ---
+function aplicarPiso(ruta) {
     var canvas = document.getElementById('floor-canvas');
     var ctx = canvas.getContext('2d');
     var img = new Image();
@@ -521,45 +544,74 @@ function aplicarTextura(ruta) {
         canvas.height = canvas.clientHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. TAMAÑO DE LA PIEZA
-        // Ajustamos la escala para que la figura sea grande y legible
-        var escala = 0.4; 
+        // ESCALA Y ARMADO: 0.5 permite que las 4 piezas encajen
+        var escala = 0.5; 
+        var tempCanvas = document.createElement('canvas');
+        var tCtx = tempCanvas.getContext('2d');
+        
+        // Creamos un patrón de 2x2 para que la figura se complete
+        tempCanvas.width = (img.width * escala) * 2;
+        tempCanvas.height = (img.height * escala) * 2;
+        
+        for(let x=0; x<2; x++) {
+            for(let y=0; y<2; y++) {
+                tCtx.drawImage(img, x*(img.width*escala), y*(img.height*escala), img.width*escala, img.height*escala);
+            }
+        }
+
+        var pattern = ctx.createPattern(tempCanvas, 'repeat');
+        ctx.save();
+        ctx.beginPath();
+        // Área del piso
+        ctx.moveTo(0, canvas.height * 0.70);
+        ctx.lineTo(canvas.width, canvas.height * 0.70);
+        ctx.lineTo(canvas.width * 1.3, canvas.height);
+        ctx.lineTo(canvas.width * -0.3, canvas.height);
+        ctx.closePath();
+        ctx.clip();
+
+        ctx.translate(canvas.width / 2, canvas.height * 0.70);
+        ctx.transform(2.8, 0, 0, 0.4, 0, 0); 
+        ctx.fillStyle = pattern;
+        ctx.fillRect(-canvas.width, 0, canvas.width * 2, canvas.height * 2);
+        ctx.restore();
+    };
+}
+
+// --- LÓGICA PARA LA PARED (Sin inclinación) ---
+function aplicarPared(ruta) {
+    var canvas = document.getElementById('wall-canvas');
+    var ctx = canvas.getContext('2d');
+    var img = new Image();
+    img.src = ruta;
+
+    img.onload = function () {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        var escala = 0.5;
         var tempCanvas = document.createElement('canvas');
         var tCtx = tempCanvas.getContext('2d');
         tempCanvas.width = img.width * escala;
         tempCanvas.height = img.height * escala;
         tCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+        
         var pattern = ctx.createPattern(tempCanvas, 'repeat');
-
-        // 2. RECORTE DEL PISO (Según tus puntos azules)
+        
         ctx.save();
         ctx.beginPath();
-        ctx.moveTo(canvas.width * 0.0, canvas.height * 0.70); // Atrás Izquierda
-        ctx.lineTo(canvas.width * 1.0, canvas.height * 0.70); // Atrás Derecha
-        ctx.lineTo(canvas.width * 1.3, canvas.height * 1.0);  // Frente Derecha
-        ctx.lineTo(canvas.width * -0.3, canvas.height * 1.0); // Frente Izquierda
+        // Definimos el área de la pared (ajústala a tu imagen)
+        ctx.rect(canvas.width * 0.1, canvas.height * 0.1, canvas.width * 0.8, canvas.height * 0.6); 
         ctx.closePath();
         ctx.clip();
 
-        // 3. TRANSFORMACIÓN DE PERSPECTIVA
-        // Movemos el origen al centro de la línea del horizonte del suelo
-        ctx.translate(canvas.width / 2, canvas.height * 0.70);
-        
-        /* MATRIZ DE TRANSFORMACIÓN:
-           (Escala Horizontal, Inclinación, Inclinación, Escala Vertical, X, Y)
-           El 2.8 hace que se ensanche al frente. 
-           El 0.4 hace que se comprima hacia el fondo.
-        */
-        ctx.transform(2.8, 0, 0, 0.4, 0, 0); 
-
-        // 4. DIBUJAR
         ctx.fillStyle = pattern;
-        // Dibujamos el patrón desplazado para que las figuras se alineen al centro
-        ctx.fillRect(-canvas.width, 0, canvas.width * 2, canvas.height * 2);
-        
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.restore();
     };
 }
+
 /* MOSTRAR PRODUCTOS */
 function mostrarProductos(marca) {
     var contenedor = document.getElementById('productos-lista');
@@ -571,7 +623,6 @@ function mostrarProductos(marca) {
         var prod = misProductos[i];
 
         if (marca === 'todas' || prod.marca === marca) {
-
             var div = document.createElement('div');
             div.className = 'producto-item';
 
@@ -581,6 +632,7 @@ function mostrarProductos(marca) {
                 '<img src="' + rutaImg + '">' +
                 '<p>' + prod.nombre + '</p>';
 
+            // Al hacer clic, llamamos a la nueva función maestra
             (function(ruta) {
                 div.onclick = function() {
                     aplicarTextura(ruta);
@@ -591,5 +643,4 @@ function mostrarProductos(marca) {
         }
     }
 }
-
 

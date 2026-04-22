@@ -568,17 +568,21 @@ function dibujarEscena() {
     if (ultimaRutaPiso) renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4']);
     if (ultimaRutaPared) renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8']);
 }
-
 function renderizar(idCanvas, ruta, puntos) {
     const canvas = document.getElementById(idCanvas);
+    const viewport = document.getElementById('viewport'); // Agregamos esto
     const ctx = canvas.getContext('2d');
+    
+    // Sincronizar tamaño del canvas con su tamaño visual real
+    canvas.width = viewport.clientWidth;
+    canvas.height = viewport.clientHeight;
+
     const img = new Image();
     img.src = ruta;
 
     img.onload = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Convertir % de los dots a pixeles del canvas
         const pts = puntos.map(id => {
             const el = document.getElementById(id);
             return [
@@ -587,16 +591,16 @@ function renderizar(idCanvas, ruta, puntos) {
             ];
         });
 
-        // Aplicar la transformación
         const p = new Perspective(ctx, img);
         p.draw([
-            [pts[0][0], pts[0][1]], // Sup Izq
-            [pts[1][0], pts[1][1]], // Sup Der
-            [pts[2][0], pts[2][1]], // Inf Der
-            [pts[3][0], pts[3][1]]  // Inf Izq
+            [pts[0][0], pts[0][1]], 
+            [pts[1][0], pts[1][1]], 
+            [pts[2][0], pts[2][1]], 
+            [pts[3][0], pts[3][1]]
         ]);
     };
 }
+
 
 /* =========================
    INTERACCIÓN (DRAG)

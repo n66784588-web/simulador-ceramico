@@ -175,3 +175,6 @@ button.active {
     text-overflow: ellipsis;
 }
 
+#floor-canvas, #wall-canvas {
+    pointer-events: none;
+}

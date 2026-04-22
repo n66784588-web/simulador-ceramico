@@ -1,65 +1,46 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador Cerámico PRO</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Cerámico PRO</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/gh/wanasit/canvas-perspective-transform@master/dist/perspective.min.js"></script>
 </head>
 
 <body>
 
 <div id="main-container">
 
-    <!-- =========================
-         ÁREA VISUAL
-    ========================= -->
     <div id="viewport">
-
-        <!-- Fondo habitación -->
         <img id="bg-room" src="img/habitaciones/sala.jpg">
 
-        <!-- CANVAS -->
         <canvas id="floor-canvas"></canvas>
         <canvas id="wall-canvas"></canvas>
 
-        <!-- PUNTOS PISO -->
         <div class="dot blue" id="p1" style="left:20%; top:70%;"></div>
         <div class="dot blue" id="p2" style="left:80%; top:70%;"></div>
         <div class="dot blue" id="p3" style="left:90%; top:95%;"></div>
         <div class="dot blue" id="p4" style="left:10%; top:95%;"></div>
 
-        <!-- PUNTOS PARED -->
         <div class="dot red" id="p5" style="left:20%; top:20%;"></div>
         <div class="dot red" id="p6" style="left:80%; top:20%;"></div>
         <div class="dot red" id="p7" style="left:80%; top:60%;"></div>
         <div class="dot red" id="p8" style="left:20%; top:60%;"></div>
 
-        <!-- BOTONES SUPERIORES -->
-        <div class="controls">
-            <button onclick="rotarManual()">🔄 Rotar</button>
-        </div>
-
-        <!-- MODO -->
         <div class="mode-selector">
             <button id="btn-piso" class="active" onclick="setModo('piso')">PISO</button>
             <button id="btn-pared" onclick="setModo('pared')">PARED</button>
+            <button onclick="rotarManual()" style="background:#555;">🔄 Rotar</button>
         </div>
-
     </div>
 
-    <!-- =========================
-         PANEL DERECHO
-    ========================= -->
     <div class="side-panel">
-
         <h3>Habitaciones</h3>
         <div class="brand-filters">
             <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
             <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
-            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
             <button onclick="cambiarHabitacion('baño.jpg')">Baño</button>
-            <button onclick="cambiarHabitacion('fachada.jpg')">Fachada</button>
             <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
         </div>
 
@@ -68,20 +49,19 @@
             <button onclick="mostrarProductos('todas')">Todas</button>
             <button onclick="mostrarProductos('daltile')">Daltile</button>
             <button onclick="mostrarProductos('vitromex')">Vitromex</button>
-            <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
             <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
             <button onclick="mostrarProductos('mise')">Mise</button>
-            <button onclick="mostrarProductos('benadresa')">Benadresa</button>
         </div>
 
         <h3>Catálogo</h3>
-        <div id="productos-lista"></div>
+        <div id="productos-lista" class="grid-productos">
+            </div>
 
-        <button style="margin-top:15px;">💰 Cotizar</button>
-
+        <button class="btn-cotizar">💰 Cotizar Proyecto</button>
     </div>
 
 </div>
+
 <script src="./script-v2.js" defer></script>
 </body>
 </html>

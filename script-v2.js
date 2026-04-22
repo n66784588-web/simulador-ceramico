@@ -1,12 +1,25 @@
 let modoEdicion = 'piso';
 let ultimaRutaPiso = "";
 let ultimaRutaPared = "";
+
 let tileScalePiso = 0.25;
 let tileScalePared = 0.25;
-let puntoActivo = null;
 
-// 🔥 NUEVO: tamaño de junta (boquilla)
-let junta = 2;
+let offsetXPiso = 0;
+let offsetYPiso = 0;
+let offsetXPared = 0;
+let offsetYPared = 0;
+
+let rotacionPiso = 0;
+let rotacionPared = 0;
+
+let puntoActivo = null;
+let arrastrandoTextura = false;
+let startX, startY;
+
+// 🔥 GRID REAL (tamaño de junta)
+const gridSize = 120;
+
 
 // LISTADO DE TUS PRODUCTOS POR MARCA
 const misProductos = [
@@ -509,18 +522,16 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-
-/* =========================
-   INICIO
-========================= */
 window.onload = () => {
     initDragAndDrop();
+    initMoverTextura(); // 🔥 IMPORTANTE
     mostrarProductos('todas');
 };
 
-/* =========================
-   MODO
-========================= */
+
+// =========================
+// MODO
+// =========================
 function setModo(m) {
     modoEdicion = m;
 
@@ -528,9 +539,10 @@ function setModo(m) {
     document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
 }
 
-/* =========================
-   DRAG PUNTOS (PERSPECTIVA)
-========================= */
+
+// =========================
+// DRAG PUNTOS (FORMA)
+// =========================
 function initDragAndDrop() {
     const dots = document.querySelectorAll('.dot');
     const viewport = document.getElementById('viewport');
@@ -538,7 +550,7 @@ function initDragAndDrop() {
     dots.forEach(dot => {
         dot.onmousedown = (e) => {
             puntoActivo = dot;
-            e.preventDefault();
+            e.stopPropagation();
         };
     });
 
@@ -546,20 +558,60 @@ function initDragAndDrop() {
         if (!puntoActivo) return;
 
         const rect = viewport.getBoundingClientRect();
+
         puntoActivo.style.left = (e.clientX - rect.left) + "px";
         puntoActivo.style.top = (e.clientY - rect.top) + "px";
 
         dibujarEscena();
     };
 
-    window.onmouseup = () => {
-        puntoActivo = null;
-    };
+    window.onmouseup = () => puntoActivo = null;
 }
 
-/* =========================
-   APLICAR TEXTURA
-========================= */
+
+// =========================
+// 🔥 MOVER TEXTURA (PRO)
+// =========================
+function initMoverTextura() {
+    const viewport = document.getElementById('viewport');
+
+    viewport.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('dot')) return;
+
+        arrastrandoTextura = true;
+        startX = e.clientX;
+        startY = e.clientY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!arrastrandoTextura) return;
+
+        let dx = e.clientX - startX;
+        let dy = e.clientY - startY;
+
+        if (modoEdicion === 'piso') {
+            offsetXPiso += dx;
+            offsetYPiso += dy;
+        } else {
+            offsetXPared += dx;
+            offsetYPared += dy;
+        }
+
+        startX = e.clientX;
+        startY = e.clientY;
+
+        dibujarEscena();
+    });
+
+    window.addEventListener('mouseup', () => {
+        arrastrandoTextura = false;
+    });
+}
+
+
+// =========================
+// TEXTURA
+// =========================
 function aplicarTextura(ruta) {
     if (modoEdicion === 'piso') {
         ultimaRutaPiso = ruta;
@@ -569,18 +621,20 @@ function aplicarTextura(ruta) {
     dibujarEscena();
 }
 
-/* =========================
-   DIBUJO GENERAL
-========================= */
+
+// =========================
+// RENDER PRINCIPAL
+// =========================
 function dibujarEscena() {
-    renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
-    renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
+    renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso, offsetXPiso, offsetYPiso, rotacionPiso);
+    renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared, offsetXPared, offsetYPared, rotacionPared);
 }
 
-/* =========================
-   RENDER PRO (CON JUNTA REAL)
-========================= */
-function renderizar(canvasId, ruta, puntos, escala) {
+
+// =========================
+// 🔥 RENDER PRO REALISTA
+// =========================
+function renderizar(canvasId, ruta, puntos, escala, offsetX, offsetY, rotacion) {
     if (!ruta) return;
 
     const canvas = document.getElementById(canvasId);
@@ -593,7 +647,7 @@ function renderizar(canvasId, ruta, puntos, escala) {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
 
         const pts = puntos.map(id => {
             const el = document.getElementById(id);
@@ -608,39 +662,40 @@ function renderizar(canvasId, ruta, puntos, escala) {
         ctx.save();
         ctx.clip();
 
-        // 🔥 CREAR PATRÓN CON JUNTA
+        // 🔥 PATRÓN TIPO CERÁMICA REAL
         const patternCanvas = document.createElement('canvas');
         const pctx = patternCanvas.getContext('2d');
 
-        const w = img.width * escala;
-        const h = img.height * escala;
+        let size = gridSize * escala;
 
-        patternCanvas.width = w + junta;
-        patternCanvas.height = h + junta;
+        patternCanvas.width = size;
+        patternCanvas.height = size;
 
-        // fondo de junta
-        pctx.fillStyle = "#dcdcdc"; // color de boquilla
-        pctx.fillRect(0, 0, patternCanvas.width, patternCanvas.height);
+        // fondo junta
+        pctx.fillStyle = "#dcdcdc";
+        pctx.fillRect(0,0,size,size);
 
-        // imagen encima dejando espacio de junta
-        pctx.drawImage(img, 0, 0, w, h);
+        // cerámica
+        pctx.drawImage(img, 2, 2, size - 4, size - 4);
 
         const pattern = ctx.createPattern(patternCanvas, 'repeat');
-        ctx.fillStyle = pattern;
 
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.translate(offsetX, offsetY);
+        ctx.rotate(rotacion * Math.PI / 180);
+
+        ctx.fillStyle = pattern;
+        ctx.fillRect(-canvas.width, -canvas.height, canvas.width * 3, canvas.height * 3);
 
         ctx.restore();
     };
 
-    img.onerror = () => {
-        console.error("No se encontró:", ruta);
-    };
+    img.onerror = () => console.error("No carga:", ruta);
 }
 
-/* =========================
-   ZOOM (ESCALA REAL)
-========================= */
+
+// =========================
+// ZOOM
+// =========================
 window.addEventListener('wheel', (e) => {
     if (modoEdicion === 'piso') {
         tileScalePiso += e.deltaY > 0 ? -0.01 : 0.01;
@@ -654,9 +709,25 @@ window.addEventListener('wheel', (e) => {
     e.preventDefault();
 }, { passive: false });
 
-/* =========================
-   PRODUCTOS
-========================= */
+
+// =========================
+// 🔥 ROTACIÓN (TECLA R)
+// =========================
+window.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'r') {
+        if (modoEdicion === 'piso') {
+            rotacionPiso += 90;
+        } else {
+            rotacionPared += 90;
+        }
+        dibujarEscena();
+    }
+});
+
+
+// =========================
+// PRODUCTOS
+// =========================
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('productos-lista');
     contenedor.innerHTML = '';
@@ -681,9 +752,10 @@ function mostrarProductos(marca) {
     });
 }
 
-/* =========================
-   HABITACIONES
-========================= */
+
+// =========================
+// HABITACIONES
+// =========================
 function cambiarHabitacion(h) {
     document.getElementById('bg-room').src = `img/habitaciones/${h}`;
 }

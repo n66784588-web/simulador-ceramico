@@ -1,19 +1,11 @@
 /* =========================
-   VARIABLES GLOBALES
+    VARIABLES GLOBALES
 ========================= */
 let modoEdicion = 'piso';
 let puntoActivo = null;
-
 let ultimaRutaPiso = null;
-let ultimaRutaPared = null;
+let tileScalePiso = 0.5; // Ajustado para que se vea mejor al inicio
 
-let tileScalePiso = 0.3;
-let tileScalePared = 0.3;
-
-let rotacionPiso = 0;
-let rotacionPared = 0;
-
-/* PRODUCTOS */
 const misProductos = [
  // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
@@ -514,28 +506,89 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-
 /* =========================
-   INICIO
+    INICIO
 ========================= */
 window.onload = () => {
     initDragAndDrop();
     mostrarProductos('todas');
-    dibujarEscena();
+    // Si quieres una imagen por defecto al cargar:
+    // aplicarTextura('img/ceramicas/acatlan-30x60.jpg'); 
 };
 
 /* =========================
-   MODO PISO / PARED
+    MOSTRAR PRODUCTOS (CORREGIDO)
 ========================= */
-function setModo(m) {
-    modoEdicion = m;
+function mostrarProductos(marcaFiltro) {
+    const grid = document.getElementById('grid-productos');
+    if (!grid) return;
+    grid.innerHTML = "";
 
-    document.getElementById('btn-piso').classList.toggle('active', m === 'piso');
-    document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
+    const filtrados = (marcaFiltro === 'todas') 
+        ? misProductos 
+        : misProductos.filter(p => p.marca === marcaFiltro);
+
+    filtrados.forEach(p => {
+        // CORRECCIÓN DE RUTA: Ajusta a tu carpeta y extensión
+        const rutaCompleta = `img/ceramicas/${p.nombre}.jpg`; 
+
+        const div = document.createElement('div');
+        div.className = "producto-card";
+        div.innerHTML = `
+            <img src="${rutaCompleta}" alt="${p.nombre}" 
+                 onerror="this.src='img/placeholder.png'"
+                 onclick="aplicarTextura('${rutaCompleta}')">
+            <p>${p.nombre.replace(/-/g, ' ')}</p>
+        `;
+        grid.appendChild(div);
+    });
+}
+
+function aplicarTextura(ruta) {
+    ultimaRutaPiso = ruta;
+    dibujarEscena();
 }
 
 /* =========================
-   DRAG DE PUNTOS
+    LÓGICA DE PERSPECTIVA (PROFUNDIDAD)
+========================= */
+function dibujarEscena() {
+    const canvas = document.getElementById('floor-canvas');
+    if (!ultimaRutaPiso || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = ultimaRutaPiso;
+
+    img.onload = () => {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        // 1. Obtener coordenadas de los 4 puntos de control (dots)
+        // Asegúrate que tus IDs sean p1, p2, p3, p4 en el HTML
+        const pts = ['p1', 'p2', 'p3', 'p4'].map(id => {
+            const el = document.getElementById(id);
+            return { x: parseFloat(el.style.left), y: parseFloat(el.style.top) };
+        });
+
+        // 2. Crear el transformador de perspectiva
+        // Origen: La imagen cuadrada (0,0 a img.width, img.height)
+        // Destino: Los 4 puntos que mueves con el mouse
+        const p = new Perspective(ctx, img);
+        
+        // Dibujar la imagen deformada según los puntos
+        p.draw([
+            [pts[0].x, pts[0].y], // Superior Izquierda
+            [pts[1].x, pts[1].y], // Superior Derecha
+            [pts[2].x, pts[2].y], // Inferior Derecha
+            [pts[3].x, pts[3].y]  // Inferior Izquierda
+        ]);
+    };
+}
+
+/* =========================
+    DRAG DE PUNTOS (CORREGIDO)
 ========================= */
 function initDragAndDrop() {
     const dots = document.querySelectorAll('.dot');
@@ -550,181 +603,18 @@ function initDragAndDrop() {
 
     window.addEventListener('mousemove', (e) => {
         if (!puntoActivo) return;
-
         const rect = viewport.getBoundingClientRect();
+        
+        // Limitar movimiento dentro del viewport
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
 
-        puntoActivo.style.left = (e.clientX - rect.left) + "px";
-        puntoActivo.style.top = (e.clientY - rect.top) + "px";
+        puntoActivo.style.left = x + "px";
+        puntoActivo.style.top = y + "px";
 
-        dibujarEscena();
+        dibujarEscena(); // Redibuja mientras arrastras
     });
 
-    window.addEventListener('mouseup', () => {
-        puntoActivo = null;
-    });
+    window.addEventListener('mouseup', () => puntoActivo = null);
 }
 
-/* =========================
-   APLICAR TEXTURA
-========================= */
-function aplicarTextura(ruta) {
-    if (modoEdicion === 'piso') {
-        ultimaRutaPiso = ruta;
-    } else {
-        ultimaRutaPared = ruta;
-    }
-    dibujarEscena();
-}
-
-/* =========================
-   ROTACIÓN (TECLA R)
-========================= */
-window.addEventListener('keydown', (e) => {
-    if (e.key.toLowerCase() === 'r') {
-        rotarManual();
-    }
-});
-
-/* BOTÓN ROTAR */
-function rotarManual() {
-    if (modoEdicion === 'piso') {
-        rotacionPiso += Math.PI / 2;
-    } else {
-        rotacionPared += Math.PI / 2;
-    }
-    dibujarEscena();
-}
-
-/* =========================
-   ZOOM CON RUEDA
-========================= */
-window.addEventListener('wheel', (e) => {
-    if (modoEdicion === 'piso') {
-        tileScalePiso += e.deltaY > 0 ? -0.02 : 0.02;
-        tileScalePiso = Math.max(0.1, Math.min(1, tileScalePiso));
-    } else {
-        tileScalePared += e.deltaY > 0 ? -0.02 : 0.02;
-        tileScalePared = Math.max(0.1, Math.min(1, tileScalePared));
-    }
-
-    dibujarEscena();
-    e.preventDefault();
-}, { passive: false });
-
-/* =========================
-   DIBUJAR ESCENA
-========================= */
-function dibujarEscena() {
-    renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso, rotacionPiso);
-    renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared, rotacionPared);
-}
-
-/* =========================
-   MOTOR DE RENDER PROFESIONAL
-========================= */
-function renderizar(canvasId, ruta, puntos, escala, rotacion) {
-    if (!ruta) return;
-
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext('2d');
-
-    const img = new Image();
-    img.src = ruta;
-
-    img.onload = () => {
-
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        const pts = puntos.map(id => {
-            const el = document.getElementById(id);
-            return {
-                x: el.offsetLeft,
-                y: el.offsetTop
-            };
-        });
-
-        /* RECORTE */
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
-        ctx.closePath();
-
-        ctx.save();
-        ctx.clip();
-
-        /* 🔥 PATRÓN TIPO TIENDA REAL */
-        const size = img.width * escala;
-
-        for (let x = -size; x < canvas.width + size; x += size) {
-            for (let y = -size; y < canvas.height + size; y += size) {
-
-                ctx.save();
-
-                /* CENTRAR PIEZA */
-                ctx.translate(x + size/2, y + size/2);
-
-                /* ROTACIÓN */
-                ctx.rotate(rotacion);
-
-                /* DIBUJO */
-                ctx.drawImage(
-                    img,
-                    -size/2,
-                    -size/2,
-                    size,
-                    size
-                );
-
-                ctx.restore();
-            }
-        }
-
-        ctx.restore();
-    };
-
-    img.onerror = () => {
-        console.error("❌ No se encontró la imagen:", ruta);
-    };
-}
-
-/* =========================
-   PRODUCTOS
-========================= */
-function mostrarProductos(marca) {
-    const contenedor = document.getElementById('productos-lista');
-    contenedor.innerHTML = '';
-
-    if (typeof misProductos === "undefined") {
-        console.error("❌ misProductos no existe");
-        return;
-    }
-
-    misProductos.forEach(p => {
-        if (marca === 'todas' || p.marca === marca) {
-
-            const ruta = `img/ceramicas/${p.nombre}.jpg`;
-
-            const div = document.createElement('div');
-            div.className = 'producto-item';
-
-            div.innerHTML = `
-                <img src="${ruta}" onerror="this.src='img/error.jpg'">
-                <p>${p.nombre}</p>
-            `;
-
-            div.onclick = () => aplicarTextura(ruta);
-
-            contenedor.appendChild(div);
-        }
-    });
-}
-
-/* =========================
-   HABITACIONES
-========================= */
-function cambiarHabitacion(h) {
-    document.getElementById('bg-room').src = `img/habitaciones/${h}`;
-}

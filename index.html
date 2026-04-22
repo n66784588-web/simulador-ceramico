@@ -4,35 +4,58 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulador Cerámico</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
 <div id="main-container">
 
-  <div id="viewport">
-    <img id="bg-room" src="img/habitaciones/default.jpg">
+    <!-- VISOR -->
+    <div id="viewport">
 
-    <canvas id="floor-canvas"></canvas>
-    <canvas id="wall-canvas"></canvas>
+        <!-- Fondo -->
+        <img id="bg-room" src="img/habitaciones/sala.jpg">
 
-    <div id="interaction-layer"></div>
-  </div>
+        <!-- CANVAS -->
+        <canvas id="floor-canvas"></canvas>
+        <canvas id="wall-canvas"></canvas>
 
-  <div id="panel">
-    <button onclick="mostrarProductos('todas')">TODAS</button>
-    <button onclick="mostrarProductos('nitropiso')">NITROPISO</button>
-    <button onclick="mostrarProductos('porcelanite')">PORCELANITE</button>
-    <button onclick="mostrarProductos('vitromex')">VITROMEX</button>
-    <button onclick="mostrarProductos('daltile')">DALTILE</button>
+        <!-- PUNTOS PISO -->
+        <div class="dot" id="p1"></div>
+        <div class="dot" id="p2"></div>
+        <div class="dot" id="p3"></div>
+        <div class="dot" id="p4"></div>
 
-    <div id="productos-lista"></div>
-  </div>
+        <!-- PUNTOS PARED -->
+        <div class="dot red" id="p5"></div>
+        <div class="dot red" id="p6"></div>
+        <div class="dot red" id="p7"></div>
+        <div class="dot red" id="p8"></div>
+
+        <!-- CONTROLES -->
+        <div id="controls">
+            <button id="btn-piso" onclick="setModo('piso')">Editar Piso</button>
+            <button id="btn-pared" onclick="setModo('pared')">Editar Pared</button>
+        </div>
+
+    </div>
+
+    <!-- PANEL -->
+    <div id="panel">
+        <h3>Marcas</h3>
+
+        <button onclick="mostrarProductos('todas')">Todas</button>
+        <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
+        <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
+
+        <div id="productos-lista"></div>
+    </div>
 
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
+
+

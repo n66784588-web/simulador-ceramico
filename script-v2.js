@@ -1,11 +1,15 @@
-let modoActual = 'piso'; // Esta es la única variable que necesitamos
 
+// 1. VARIABLE DE CONTROL ÚNICA
+let modoActual = 'piso'; 
+
+// 2. FUNCIÓN PARA LOS BOTONES (QUITAR EL ERROR DE CONSOLA)
 function setModo(modo) {
     modoActual = modo;
     console.log("Cambiado a modo: " + modo);
-    
-    // Esto quita el error de la consola y permite que los botones funcionen
 }
+
+/* --- LISTA DE PRODUCTOS --- */
+var misProductos = [
  // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
@@ -505,7 +509,8 @@ function setModo(modo) {
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-/* --- FUNCIONES DE CONTROL --- */
+/* --- FUNCIONES DE DIBUJO --- */
+
 function cambiarHabitacion(habitacion) {
     var imgHab = document.getElementById('bg-room');
     if (imgHab) {
@@ -513,7 +518,7 @@ function cambiarHabitacion(habitacion) {
     }
 }
 
-// Función Maestra que decide qué pintar
+// FUNCIÓN MAESTRA: Esta es la que llaman tus productos al hacer clic
 function aplicarTextura(ruta) {
     if (modoActual === 'piso') {
         dibujarPiso(ruta);
@@ -522,7 +527,6 @@ function aplicarTextura(ruta) {
     }
 }
 
-/* --- DIBUJO DEL PISO (Con perspectiva y armado 2x2) --- */
 function dibujarPiso(ruta) {
     var canvas = document.getElementById('floor-canvas');
     var ctx = canvas.getContext('2d');
@@ -538,10 +542,9 @@ function dibujarPiso(ruta) {
         var tempCanvas = document.createElement('canvas');
         var tCtx = tempCanvas.getContext('2d');
         
-        // Armado de 4 piezas para que el diseño (como Alhambra) no se corte
+        // Armado 2x2 para que los patrones circulares encajen
         tempCanvas.width = (img.width * escala) * 2;
         tempCanvas.height = (img.height * escala) * 2;
-        
         for(let x=0; x<2; x++) {
             for(let y=0; y<2; y++) {
                 tCtx.drawImage(img, x*(img.width*escala), y*(img.height*escala), img.width*escala, img.height*escala);
@@ -551,23 +554,22 @@ function dibujarPiso(ruta) {
         var pattern = ctx.createPattern(tempCanvas, 'repeat');
         ctx.save();
         ctx.beginPath();
-        // Área del piso (Trapecio para la perspectiva)
+        // Área del piso
         ctx.moveTo(0, canvas.height * 0.70);
         ctx.lineTo(canvas.width, canvas.height * 0.70);
-        ctx.lineTo(canvas.width * 1.5, canvas.height); 
+        ctx.lineTo(canvas.width * 1.5, canvas.height);
         ctx.lineTo(canvas.width * -0.5, canvas.height);
         ctx.closePath();
         ctx.clip();
 
         ctx.translate(canvas.width / 2, canvas.height * 0.70);
-        ctx.transform(3.2, 0, 0, 0.45, 0, 0); // Ajuste de inclinación real
+        ctx.transform(3.2, 0, 0, 0.45, 0, 0); 
         ctx.fillStyle = pattern;
         ctx.fillRect(-canvas.width, 0, canvas.width * 2, canvas.height * 2);
         ctx.restore();
     };
 }
 
-/* --- DIBUJO DE LA PARED --- */
 function dibujarPared(ruta) {
     var canvas = document.getElementById('wall-canvas');
     var ctx = canvas.getContext('2d');
@@ -590,7 +592,7 @@ function dibujarPared(ruta) {
         
         ctx.save();
         ctx.beginPath();
-        // Área de la pared (usando tus puntos rojos de referencia)
+        // Área de la pared (puntos rojos)
         ctx.rect(canvas.width * 0.2, canvas.height * 0.2, canvas.width * 0.6, canvas.height * 0.5);
         ctx.closePath();
         ctx.clip();
@@ -601,7 +603,7 @@ function dibujarPared(ruta) {
     };
 }
 
-/* --- GENERACIÓN DE PRODUCTOS --- */
+/* --- MOSTRAR PRODUCTOS --- */
 function mostrarProductos(marca) {
     var contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
@@ -617,11 +619,12 @@ function mostrarProductos(marca) {
             div.innerHTML = '<img src="' + rutaImg + '"><p>' + prod.nombre + '</p>';
 
             (function(ruta) {
-                div.onclick = function() { aplicarTextura(ruta); };
+                div.onclick = function() {
+                    aplicarTextura(ruta); // Llama a la maestra
+                };
             })(rutaImg);
 
             contenedor.appendChild(div);
         }
     }
 }
-

@@ -20,6 +20,11 @@
     flex: 3; 
     background: #000; 
     overflow: hidden; 
+    cursor: grab; /* 🔥 sensación PRO */
+}
+
+#viewport:active {
+    cursor: grabbing; /* 🔥 cuando arrastras textura */
 }
 
 #bg-room { 
@@ -30,28 +35,21 @@
     z-index: 1; 
 }
 
-/* CANVASES: Corregidos para no bloquear el mouse */
-#floor-canvas { 
-    position: absolute; 
-    width: 100%; 
-    height: 100%; 
-    top: 0; 
-    left: 0; 
-    z-index: 5; 
-    pointer-events: none; 
-}
-
+/* CANVAS (CORRECTO) */
+#floor-canvas, 
 #wall-canvas { 
     position: absolute; 
     width: 100%; 
     height: 100%; 
     top: 0; 
     left: 0; 
-    z-index: 6; 
-    pointer-events: none; 
+    pointer-events: none; /* 🔥 CLAVE: deja pasar el mouse */
 }
 
-/* CONTROLES FLOTANTES */
+#floor-canvas { z-index: 5; }
+#wall-canvas { z-index: 6; }
+
+/* CONTROLES */
 .controls { 
     position: absolute; 
     top: 10px; 
@@ -63,7 +61,7 @@
 
 .mode-selector { 
     position: absolute; 
-    top: 60px; /* Bajado un poco para no chocar con botones de arriba */
+    top: 60px; 
     left: 10px; 
     z-index: 100; 
     display: flex; 
@@ -97,24 +95,24 @@ button.active {
     font-weight: bold;
 }
 
-/* PUNTOS DE ARRASTRE: Prioridad máxima */
+/* 🔥 PUNTOS (IMPORTANTE) */
 .dot {
     position: absolute; 
-    width: 22px; /* Más grandes para que sean fáciles de agarrar */
+    width: 22px; 
     height: 22px; 
     border-radius: 50%;
-    z-index: 150 !important; /* Por encima de todo */
+    z-index: 150 !important;
     cursor: move; 
     border: 3px solid #fff;
     transform: translate(-50%, -50%);
     box-shadow: 0 0 15px rgba(0,0,0,0.8);
-    pointer-events: auto; /* IMPORTANTE: Activa el clic/arrastre */
+    pointer-events: auto; /* 🔥 CLAVE */
 }
 
 .blue { background: #007bff; }
 .red { background: #ff4757; }
 
-/* PANEL LATERAL */
+/* PANEL */
 .side-panel { 
     flex: 1; 
     background: #1a1a1a; 
@@ -141,7 +139,6 @@ button.active {
     padding-right: 5px;
 }
 
-/* Estilo de barra de desplazamiento (Scrollbar) */
 #productos-lista::-webkit-scrollbar { width: 6px; }
 #productos-lista::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
 
@@ -173,8 +170,4 @@ button.active {
     text-transform: uppercase; 
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-#floor-canvas, #wall-canvas {
-    pointer-events: none;
 }

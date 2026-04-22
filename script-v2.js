@@ -1,10 +1,10 @@
 /* =========================
-    VARIABLES GLOBALES
+   VARIABLES Y ESTADO
 ========================= */
 let modoEdicion = 'piso';
 let puntoActivo = null;
 let ultimaRutaPiso = null;
-let tileScalePiso = 0.5; // Ajustado para que se vea mejor al inicio
+let ultimaRutaPared = null;
 
 const misProductos = [
  // NITROPISO
@@ -506,115 +506,129 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-/* =========================
-    INICIO
 ========================= */
 window.onload = () => {
     initDragAndDrop();
     mostrarProductos('todas');
-    // Si quieres una imagen por defecto al cargar:
-    // aplicarTextura('img/ceramicas/acatlan-30x60.jpg'); 
+    configurarCanvases();
 };
 
+function configurarCanvases() {
+    const viewport = document.getElementById('viewport');
+    const fCanvas = document.getElementById('floor-canvas');
+    const wCanvas = document.getElementById('wall-canvas');
+    
+    fCanvas.width = wCanvas.width = viewport.clientWidth;
+    fCanvas.height = wCanvas.height = viewport.clientHeight;
+}
+
 /* =========================
-    MOSTRAR PRODUCTOS (CORREGIDO)
+   CATÁLOGO
 ========================= */
 function mostrarProductos(marcaFiltro) {
-    const grid = document.getElementById('grid-productos');
-    if (!grid) return;
-    grid.innerHTML = "";
+    const lista = document.getElementById('productos-lista');
+    lista.innerHTML = "";
 
     const filtrados = (marcaFiltro === 'todas') 
         ? misProductos 
         : misProductos.filter(p => p.marca === marcaFiltro);
 
     filtrados.forEach(p => {
-        // CORRECCIÓN DE RUTA: Ajusta a tu carpeta y extensión
-        const rutaCompleta = `img/ceramicas/${p.nombre}.jpg`; 
-
-        const div = document.createElement('div');
-        div.className = "producto-card";
-        div.innerHTML = `
-            <img src="${rutaCompleta}" alt="${p.nombre}" 
-                 onerror="this.src='img/placeholder.png'"
-                 onclick="aplicarTextura('${rutaCompleta}')">
-            <p>${p.nombre.replace(/-/g, ' ')}</p>
+        const ruta = `img/ceramicas/${p.nombre}.jpg`;
+        const item = document.createElement('div');
+        item.className = "producto-item";
+        item.innerHTML = `
+            <img src="${ruta}" alt="${p.nombre}" onclick="aplicarTextura('${ruta}')" onerror="this.src='https://via.placeholder.com/150?text=Error+Imagen'">
+            <small>${p.nombre.substring(0, 12)}</small>
         `;
-        grid.appendChild(div);
+        lista.appendChild(item);
     });
 }
 
-function aplicarTextura(ruta) {
-    ultimaRutaPiso = ruta;
-    dibujarEscena();
+function setModo(m) {
+    modoEdicion = m;
+    document.getElementById('btn-piso').classList.toggle('active', m === 'piso');
+    document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
+}
+
+function cambiarHabitacion(archivo) {
+    document.getElementById('bg-room').src = `img/habitaciones/${archivo}`;
 }
 
 /* =========================
-    LÓGICA DE PERSPECTIVA (PROFUNDIDAD)
+   MOTOR DE PERSPECTIVA
 ========================= */
-function dibujarEscena() {
-    const canvas = document.getElementById('floor-canvas');
-    if (!ultimaRutaPiso || !canvas) return;
+function aplicarTextura(ruta) {
+    if (modoEdicion === 'piso') ultimaRutaPiso = ruta;
+    else ultimaRutaPared = ruta;
+    dibujarEscena();
+}
 
+function dibujarEscena() {
+    if (ultimaRutaPiso) renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4']);
+    if (ultimaRutaPared) renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8']);
+}
+
+function renderizar(idCanvas, ruta, puntos) {
+    const canvas = document.getElementById(idCanvas);
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    img.src = ultimaRutaPiso;
+    img.src = ruta;
 
     img.onload = () => {
-        const w = canvas.width;
-        const h = canvas.height;
-        ctx.clearRect(0, 0, w, h);
-
-        // 1. Obtener coordenadas de los 4 puntos de control (dots)
-        // Asegúrate que tus IDs sean p1, p2, p3, p4 en el HTML
-        const pts = ['p1', 'p2', 'p3', 'p4'].map(id => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Convertir % de los dots a pixeles del canvas
+        const pts = puntos.map(id => {
             const el = document.getElementById(id);
-            return { x: parseFloat(el.style.left), y: parseFloat(el.style.top) };
+            return [
+                (parseFloat(el.style.left) / 100) * canvas.width,
+                (parseFloat(el.style.top) / 100) * canvas.height
+            ];
         });
 
-        // 2. Crear el transformador de perspectiva
-        // Origen: La imagen cuadrada (0,0 a img.width, img.height)
-        // Destino: Los 4 puntos que mueves con el mouse
+        // Aplicar la transformación
         const p = new Perspective(ctx, img);
-        
-        // Dibujar la imagen deformada según los puntos
         p.draw([
-            [pts[0].x, pts[0].y], // Superior Izquierda
-            [pts[1].x, pts[1].y], // Superior Derecha
-            [pts[2].x, pts[2].y], // Inferior Derecha
-            [pts[3].x, pts[3].y]  // Inferior Izquierda
+            [pts[0][0], pts[0][1]], // Sup Izq
+            [pts[1][0], pts[1][1]], // Sup Der
+            [pts[2][0], pts[2][1]], // Inf Der
+            [pts[3][0], pts[3][1]]  // Inf Izq
         ]);
     };
 }
 
 /* =========================
-    DRAG DE PUNTOS (CORREGIDO)
+   INTERACCIÓN (DRAG)
 ========================= */
 function initDragAndDrop() {
     const dots = document.querySelectorAll('.dot');
     const viewport = document.getElementById('viewport');
 
     dots.forEach(dot => {
-        dot.addEventListener('mousedown', (e) => {
-            puntoActivo = dot;
-            e.preventDefault();
-        });
+        dot.addEventListener('mousedown', e => { puntoActivo = dot; e.preventDefault(); });
     });
 
-    window.addEventListener('mousemove', (e) => {
+    window.addEventListener('mousemove', e => {
         if (!puntoActivo) return;
         const rect = viewport.getBoundingClientRect();
         
-        // Limitar movimiento dentro del viewport
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
+        let x = ((e.clientX - rect.left) / rect.width) * 100;
+        let y = ((e.clientY - rect.top) / rect.height) * 100;
 
-        puntoActivo.style.left = x + "px";
-        puntoActivo.style.top = y + "px";
+        // Limites
+        puntoActivo.style.left = Math.max(0, Math.min(100, x)) + "%";
+        puntoActivo.style.top = Math.max(0, Math.min(100, y)) + "%";
 
-        dibujarEscena(); // Redibuja mientras arrastras
+        dibujarEscena();
     });
 
     window.addEventListener('mouseup', () => puntoActivo = null);
 }
+
+function rotarManual() {
+    // Aquí puedes añadir lógica para rotar el canvas 90 grados si lo deseas
+    console.log("Rotando textura...");
+}
+
 

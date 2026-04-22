@@ -3,8 +3,8 @@ let modoEdicion = 'piso';
 let ultimaRutaPiso = null;
 let ultimaRutaPared = null;
 
-let tileScalePiso = 0.3;
-let tileScalePared = 0.3;
+let tileScalePiso = 0.6;
+let tileScalePared = 0.6;
 
 let rotacion = 0;
 let patron = "cuadricula";
@@ -12,6 +12,9 @@ let junta = 2;
 
 let puntoActivo = null;
 
+/* DATOS VENTA */
+let precioM2 = 250;
+let m2Area = 10;
 /* PRODUCTOS */
 const misProductos = [
  // NITROPISO
@@ -517,6 +520,10 @@ const misProductos = [
 window.onload = () => {
     initDrag();
     mostrarProductos('todas');
+
+    // 🔥 ASEGURA QUE SIEMPRE SE VEA ALGO
+    ultimaRutaPiso = "img/ceramicas/modelo1.jpg";
+    dibujarEscena();
 };
 
 /* MODO */
@@ -639,7 +646,7 @@ function render(canvasId, ruta, puntos, escala){
 
                 ctx.rotate(angle * Math.PI/180);
 
-                // BOQUILLA
+                // JUNTA
                 ctx.fillStyle = "#ccc";
                 ctx.fillRect(-size/2, -size/2, size, size);
 
@@ -657,16 +664,20 @@ function render(canvasId, ruta, puntos, escala){
 
         ctx.restore();
     };
+
+    img.onerror = ()=>{
+        console.error("ERROR IMAGEN:", ruta);
+    };
 }
 
 /* ZOOM */
 window.addEventListener('wheel',(e)=>{
     if(modoEdicion==='piso'){
         tileScalePiso += e.deltaY>0?-0.02:0.02;
-        tileScalePiso = Math.max(0.1, Math.min(1, tileScalePiso));
+        tileScalePiso = Math.max(0.2, Math.min(1, tileScalePiso));
     }else{
         tileScalePared += e.deltaY>0?-0.02:0.02;
-        tileScalePared = Math.max(0.1, Math.min(1, tileScalePared));
+        tileScalePared = Math.max(0.2, Math.min(1, tileScalePared));
     }
     dibujarEscena();
 });
@@ -685,7 +696,7 @@ function mostrarProductos(marca){
             div.className='producto-item';
 
             div.innerHTML=`
-                <img src="${ruta}">
+                <img src="${ruta}" onerror="this.src='img/error.jpg'">
                 <p>${p.nombre}</p>
             `;
 
@@ -700,3 +711,17 @@ function mostrarProductos(marca){
 function cambiarHabitacion(h){
     document.getElementById('bg-room').src = `img/habitaciones/${h}`;
 }
+
+/* COTIZACIÓN */
+function calcularCotizacion(){
+
+    let cajas = Math.ceil(m2Area / 1.44);
+    let total = m2Area * precioM2;
+
+    alert(`
+Área: ${m2Area} m²
+Cajas: ${cajas}
+Total: $${total}
+    `);
+}
+

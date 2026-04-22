@@ -519,6 +519,7 @@ function cambiarHabitacion(habitacion) {
         imgHab.src = "img/habitaciones/" + habitacion;
     }
 }
+
 // FUNCIÓN MAESTRA: Decide si pintar piso o pared
 function aplicarTextura(ruta) {
     if (modoActual === 'piso') {
@@ -526,85 +527,6 @@ function aplicarTextura(ruta) {
     } else {
         aplicarPared(ruta);
     }
-}
-
-function aplicarPiso(ruta) {
-    var canvas = document.getElementById('floor-canvas');
-    var ctx = canvas.getContext('2d');
-    var img = new Image();
-    img.src = ruta;
-
-    img.onload = function () {
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        var escala = 0.5; 
-        var tempCanvas = document.createElement('canvas');
-        var tCtx = tempCanvas.getContext('2d');
-        
-        // Armado 2x2 para completar la figura circular
-        tempCanvas.width = (img.width * escala) * 2;
-        tempCanvas.height = (img.height * escala) * 2;
-        for(let x=0; x<2; x++) {
-            for(let y=0; y<2; y++) {
-                tCtx.drawImage(img, x*(img.width*escala), y*(img.height*escala), img.width*escala, img.height*escala);
-            }
-        }
-
-        var pattern = ctx.createPattern(tempCanvas, 'repeat');
-        ctx.save();
-        ctx.beginPath();
-        // Ajustado para que el piso sea más ancho al frente como en tu imagen
-        ctx.moveTo(0, canvas.height * 0.70);
-        ctx.lineTo(canvas.width, canvas.height * 0.70);
-        ctx.lineTo(canvas.width * 1.5, canvas.height);
-        ctx.lineTo(canvas.width * -0.5, canvas.height);
-        ctx.closePath();
-        ctx.clip();
-
-        ctx.translate(canvas.width / 2, canvas.height * 0.70);
-        ctx.transform(3.2, 0, 0, 0.45, 0, 0); // Un poco más de perspectiva
-        ctx.fillStyle = pattern;
-        ctx.fillRect(-canvas.width, 0, canvas.width * 2, canvas.height * 2);
-        ctx.restore();
-    };
-}
-
-function aplicarPared(ruta) {
-    var canvas = document.getElementById('wall-canvas');
-    var ctx = canvas.getContext('2d');
-    var img = new Image();
-    img.src = ruta;
-
-    img.onload = function () {
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        var escala = 0.5;
-        var tempCanvas = document.createElement('canvas');
-        var tCtx = tempCanvas.getContext('2d');
-        tempCanvas.width = img.width * escala;
-        tempCanvas.height = img.height * escala;
-        tCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
-        
-        var pattern = ctx.createPattern(tempCanvas, 'repeat');
-        
-        ctx.save();
-        ctx.beginPath();
-        // Esta es el área de tu pared (los puntos rojos de tu imagen)
-        ctx.moveTo(canvas.width * 0.2, canvas.height * 0.2);
-        ctx.lineTo(canvas.width * 0.8, canvas.height * 0.2);
-        ctx.lineTo(canvas.width * 0.8, canvas.height * 0.7);
-        ctx.lineTo(canvas.width * 0.2, canvas.height * 0.7);
-        ctx.closePath();
-        ctx.clip();
-
-        ctx.fillStyle = pattern;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.restore();
-    };
 }
 
 // --- LÓGICA PARA EL PISO (Con perspectiva y armado de 4 piezas) ---
@@ -619,12 +541,11 @@ function aplicarPiso(ruta) {
         canvas.height = canvas.clientHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // ESCALA Y ARMADO: 0.5 permite que las 4 piezas encajen
+        // ESCALA Y ARMADO: 0.5 con bucle para formar el tapete de 2x2
         var escala = 0.5; 
         var tempCanvas = document.createElement('canvas');
         var tCtx = tempCanvas.getContext('2d');
         
-        // Creamos un patrón de 2x2 para que la figura se complete
         tempCanvas.width = (img.width * escala) * 2;
         tempCanvas.height = (img.height * escala) * 2;
         
@@ -637,23 +558,24 @@ function aplicarPiso(ruta) {
         var pattern = ctx.createPattern(tempCanvas, 'repeat');
         ctx.save();
         ctx.beginPath();
-        // Área del piso
+        // Área del piso (Trapecio para la perspectiva)
         ctx.moveTo(0, canvas.height * 0.70);
         ctx.lineTo(canvas.width, canvas.height * 0.70);
-        ctx.lineTo(canvas.width * 1.3, canvas.height);
-        ctx.lineTo(canvas.width * -0.3, canvas.height);
+        ctx.lineTo(canvas.width * 1.5, canvas.height); // Abre hacia afuera
+        ctx.lineTo(canvas.width * -0.5, canvas.height); // Abre hacia afuera
         ctx.closePath();
         ctx.clip();
 
+        // Transformación para que el piso se "acueste"
         ctx.translate(canvas.width / 2, canvas.height * 0.70);
-        ctx.transform(2.8, 0, 0, 0.4, 0, 0); 
+        ctx.transform(3.2, 0, 0, 0.45, 0, 0); 
         ctx.fillStyle = pattern;
         ctx.fillRect(-canvas.width, 0, canvas.width * 2, canvas.height * 2);
         ctx.restore();
     };
 }
 
-// --- LÓGICA PARA LA PARED (Sin inclinación) ---
+// --- LÓGICA PARA LA PARED (Basada en tus puntos rojos) ---
 function aplicarPared(ruta) {
     var canvas = document.getElementById('wall-canvas');
     var ctx = canvas.getContext('2d');
@@ -676,8 +598,11 @@ function aplicarPared(ruta) {
         
         ctx.save();
         ctx.beginPath();
-        // Definimos el área de la pared (ajústala a tu imagen)
-        ctx.rect(canvas.width * 0.1, canvas.height * 0.1, canvas.width * 0.8, canvas.height * 0.6); 
+        // Área de la pared (Rectángulo central)
+        ctx.moveTo(canvas.width * 0.2, canvas.height * 0.2);
+        ctx.lineTo(canvas.width * 0.8, canvas.height * 0.2);
+        ctx.lineTo(canvas.width * 0.8, canvas.height * 0.7);
+        ctx.lineTo(canvas.width * 0.2, canvas.height * 0.7);
         ctx.closePath();
         ctx.clip();
 
@@ -707,7 +632,6 @@ function mostrarProductos(marca) {
                 '<img src="' + rutaImg + '">' +
                 '<p>' + prod.nombre + '</p>';
 
-            // Al hacer clic, llamamos a la nueva función maestra
             (function(ruta) {
                 div.onclick = function() {
                     aplicarTextura(ruta);
@@ -718,4 +642,3 @@ function mostrarProductos(marca) {
         }
     }
 }
-

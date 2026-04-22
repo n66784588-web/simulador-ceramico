@@ -2,72 +2,65 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <title>Simulador de Cerámicos Profesional</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Cerámico PRO</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/gh/wanasit/canvas-perspective-transform@master/dist/perspective.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-
 <body>
 
 <div id="main-container">
-
     <div id="viewport">
         <img id="bg-room" src="img/habitaciones/sala.jpg">
-
+        
         <canvas id="floor-canvas"></canvas>
         <canvas id="wall-canvas"></canvas>
 
-        <div class="dot blue" id="p1" style="left:20%; top:70%;"></div>
-        <div class="dot blue" id="p2" style="left:80%; top:70%;"></div>
-        <div class="dot blue" id="p3" style="left:90%; top:95%;"></div>
-        <div class="dot blue" id="p4" style="left:10%; top:95%;"></div>
-
-        <div class="dot red" id="p5" style="left:20%; top:20%;"></div>
-        <div class="dot red" id="p6" style="left:80%; top:20%;"></div>
-        <div class="dot red" id="p7" style="left:80%; top:60%;"></div>
-        <div class="dot red" id="p8" style="left:20%; top:60%;"></div>
+        <div class="controls">
+            <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
+            <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
+            <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
+            <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
+            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
+            <button onclick="cambiarHabitacion('fachada.jpg')">Fachada</button>
+        </div>
 
         <div class="mode-selector">
-            <button id="btn-piso" class="active" onclick="setModo('piso')">PISO</button>
-            <button id="btn-pared" onclick="setModo('pared')">PARED</button>
-            <button onclick="rotarManual()" style="background:#555;">🔄 Rotar</button>
+            <button id="btn-piso" class="active" onclick="setModo('piso')">Editar Piso</button>
+            <button id="btn-pared" onclick="setModo('pared')">Editar Pared</button>
+            <small style="color: white;">Rueda del mouse: Tamaño</small>
         </div>
+
+        <!-- PUNTOS -->
+        <div id="p1" class="dot blue" style="top:70%; left:20%"></div>
+        <div id="p2" class="dot blue" style="top:70%; left:80%"></div>
+        <div id="p3" class="dot blue" style="top:90%; left:90%"></div>
+        <div id="p4" class="dot blue" style="top:90%; left:10%"></div>
+
+        <div id="p5" class="dot red" style="top:20%; left:30%"></div>
+        <div id="p6" class="dot red" style="top:20%; left:70%"></div>
+        <div id="p7" class="dot red" style="top:60%; left:70%"></div>
+        <div id="p8" class="dot red" style="top:60%; left:30%"></div>
     </div>
 
     <div class="side-panel">
-        <h3>Habitaciones</h3>
-        <div class="brand-filters">
-            <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
-            <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
-            <button onclick="cambiarHabitacion('baño.jpg')">Baño</button>
-            <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
-            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
-            <button onclick="cambiarHabitacion('fachada.jpg')">Fachada</button>
-
-        </div>
-
         <h3>Marcas</h3>
+
         <div class="brand-filters">
             <button onclick="mostrarProductos('todas')">Todas</button>
-            <button onclick="mostrarProductos('daltile')">Daltile</button>
-            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
             <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
-            <button onclick="mostrarProductos('mise')">Mise</button>
             <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
+            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
+            <button onclick="mostrarProductos('daltile')">Daltile</button>
+            <button onclick="mostrarProductos('mise')">Mise</button>
             <button onclick="mostrarProductos('benadresa')">Benadresa</button>
         </div>
 
-     <h3>Catálogo</h3>
-        <div id="productos-lista" class="grid-productos">
-            </div>
-
-        <button class="btn-cotizar">💰 Cotizar Proyecto</button>
+        <div id="productos-lista"></div>
     </div>
-
 </div>
 
-<script src="./script-v2.js" defer></script>
+<script src="script-v2.js"></script>
 </body>
-</html>  
+</html>
+
 

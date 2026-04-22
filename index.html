@@ -2,16 +2,17 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Simulador de Cerámicos Profesional</title>
+    <title>Simulador de Cerámicos</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
 <div id="main-container">
+
+    <!-- AREA VISUAL -->
     <div id="viewport">
         <img id="bg-room" src="img/habitaciones/sala.jpg">
-        
         <canvas id="floor-canvas"></canvas>
         <canvas id="wall-canvas"></canvas>
 
@@ -21,13 +22,11 @@
             <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
             <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
             <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
-            <button onclick="cambiarHabitacion('fachada.jpg')">Fachada</button>
         </div>
 
         <div class="mode-selector">
-            <button id="btn-piso" class="active" onclick="setModo('piso')">Editar Piso</button>
-            <button id="btn-pared" onclick="setModo('pared')">Editar Pared</button>
-            <small style="color: white;">Rueda del mouse: Tamaño</small>
+            <button onclick="setModo('piso')">Editar Piso</button>
+            <button onclick="setModo('pared')">Editar Pared</button>
         </div>
 
         <!-- PUNTOS -->
@@ -42,24 +41,31 @@
         <div id="p8" class="dot red" style="top:60%; left:30%"></div>
     </div>
 
+    <!-- PANEL DERECHO -->
     <div class="side-panel">
+
         <h3>Marcas</h3>
 
+        <!-- BOTONES -->
         <div class="brand-filters">
             <button onclick="mostrarProductos('todas')">Todas</button>
             <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
-            <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
-            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
             <button onclick="mostrarProductos('daltile')">Daltile</button>
+            <button onclick="mostrarProductos('vitromex')">Vitromex</button>
+            <button onclick="mostrarProductos('porcelanite')">Porcelanite</button>
             <button onclick="mostrarProductos('mise')">Mise</button>
             <button onclick="mostrarProductos('benadresa')">Benadresa</button>
         </div>
 
+        <!-- 🔥 AQUI VA SOLO -->
         <div id="productos-lista"></div>
+
     </div>
+
 </div>
 
 <script src="script-v2.js"></script>
+
 </body>
 </html>
 

@@ -19,19 +19,18 @@
             <button onclick="cambiarHabitacion('sala.jpg')">Sala</button>
             <button onclick="cambiarHabitacion('cocina.jpg')">Cocina</button>
             <button onclick="cambiarHabitacion('bano.jpg')">Baño</button>
-            <button onclick="cambiarHabitacion('recamara.jpg')">recamara</button>
-             <button onclick="cambiarHabitacion('terraza.jpg')">terraza</button>
-            <button onclick="cambiarHabitacion('fachada.jpg')">fachada</button>
-
-
+            <button onclick="cambiarHabitacion('recamara.jpg')">Recámara</button>
+            <button onclick="cambiarHabitacion('terraza.jpg')">Terraza</button>
+            <button onclick="cambiarHabitacion('fachada.jpg')">Fachada</button>
         </div>
 
         <div class="mode-selector">
-            <button id="btn-piso" class="active" onclick="setModo('piso')">Editar Piso (Puntos Azules)</button>
-            <button id="btn-pared" onclick="setModo('pared')">Editar Pared (Puntos Rojos)</button>
-            <small style="color: white; margin-top: 5px;">Rueda del mouse: Cambiar tamaño de pieza</small>
+            <button id="btn-piso" class="active" onclick="setModo('piso')">Editar Piso</button>
+            <button id="btn-pared" onclick="setModo('pared')">Editar Pared</button>
+            <small style="color: white;">Rueda del mouse: Tamaño</small>
         </div>
 
+        <!-- PUNTOS -->
         <div id="p1" class="dot blue" style="top:70%; left:20%"></div>
         <div id="p2" class="dot blue" style="top:70%; left:80%"></div>
         <div id="p3" class="dot blue" style="top:90%; left:90%"></div>
@@ -45,6 +44,7 @@
 
     <div class="side-panel">
         <h3>Marcas</h3>
+
         <div class="brand-filters">
             <button onclick="mostrarProductos('todas')">Todas</button>
             <button onclick="mostrarProductos('nitropiso')">Nitropiso</button>
@@ -54,8 +54,8 @@
             <button onclick="mostrarProductos('mise')">Mise</button>
             <button onclick="mostrarProductos('benadresa')">Benadresa</button>
         </div>
-        <div id="productos-lista">
-            </div>
+
+        <div id="productos-lista"></div>
     </div>
 </div>
 

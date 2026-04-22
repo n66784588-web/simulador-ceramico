@@ -2,8 +2,8 @@
 let modoEdicion = 'piso';
 let ultimaRutaPiso = "";
 let ultimaRutaPared = "";
-let tileScalePiso = 0.25;  
-let tileScalePared = 0.25; 
+let tileScalePiso = 0.3;  
+let tileScalePared = 0.3; 
 let puntoActivo = null;
 
 // LISTADO DE TUS PRODUCTOS POR MARCA
@@ -516,6 +516,7 @@ window.onload = () => {
 /* =========================
    CAMBIO DE MODO
 ========================= */
+
 function setModo(m) {
     modoEdicion = m;
 
@@ -523,9 +524,10 @@ function setModo(m) {
     document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
 }
 
-/* =========================
-   DRAG PUNTOS
-========================= */
+
+// =========================
+// DRAG PUNTOS
+// =========================
 function initDragAndDrop() {
     const dots = document.querySelectorAll('.dot');
     const viewport = document.getElementById('viewport');
@@ -541,6 +543,7 @@ function initDragAndDrop() {
         if (!puntoActivo) return;
 
         const rect = viewport.getBoundingClientRect();
+
         puntoActivo.style.left = (e.clientX - rect.left) + "px";
         puntoActivo.style.top = (e.clientY - rect.top) + "px";
 
@@ -550,9 +553,10 @@ function initDragAndDrop() {
     window.onmouseup = () => { puntoActivo = null; };
 }
 
-/* =========================
-   TEXTURA
-========================= */
+
+// =========================
+// TEXTURA
+// =========================
 function aplicarTextura(ruta) {
     if (modoEdicion === 'piso') {
         ultimaRutaPiso = ruta;
@@ -562,13 +566,15 @@ function aplicarTextura(ruta) {
     dibujarEscena();
 }
 
-/* =========================
-   RENDER
-========================= */
+
+// =========================
+// RENDER
+// =========================
 function dibujarEscena() {
     renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
     renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
 }
+
 function renderizar(canvasId, ruta, puntos, escala) {
     if (!ruta) return;
 
@@ -597,7 +603,7 @@ function renderizar(canvasId, ruta, puntos, escala) {
         ctx.save();
         ctx.clip();
 
-        // 🔥 AQUÍ ESTÁ LA CLAVE
+        // 🔥 TEXTURA ESCALADA CORRECTAMENTE
         const patternCanvas = document.createElement('canvas');
         const pctx = patternCanvas.getContext('2d');
 
@@ -619,25 +625,29 @@ function renderizar(canvasId, ruta, puntos, escala) {
     };
 }
 
-/* =========================
-   ZOOM
-========================= */
+
+// =========================
+// ZOOM (ARREGLADO)
+// =========================
 window.addEventListener('wheel', (e) => {
+    const cambio = 0.05; // 🔥 MÁS FUERTE
+
     if (modoEdicion === 'piso') {
-        tileScalePiso += e.deltaY > 0 ? -0.01 : 0.01;
-        tileScalePiso = Math.max(0.05, Math.min(1, tileScalePiso));
+        tileScalePiso += e.deltaY > 0 ? -cambio : cambio;
+        tileScalePiso = Math.max(0.1, Math.min(2, tileScalePiso));
     } else {
-        tileScalePared += e.deltaY > 0 ? -0.01 : 0.01;
-        tileScalePared = Math.max(0.05, Math.min(1, tileScalePared));
+        tileScalePared += e.deltaY > 0 ? -cambio : cambio;
+        tileScalePared = Math.max(0.1, Math.min(2, tileScalePared));
     }
 
     dibujarEscena();
     e.preventDefault();
 }, { passive: false });
 
-/* =========================
-   PRODUCTOS
-========================= */
+
+// =========================
+// PRODUCTOS
+// =========================
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('productos-lista');
     contenedor.innerHTML = '';
@@ -662,13 +672,10 @@ function mostrarProductos(marca) {
     });
 }
 
-/* =========================
-   HABITACIONES
-========================= */
-function cambiarHabitacion(h) {
-    document.getElementById('bg-room').src = `img/habitaciones/${h}`;
-}
-function cambiarHabitacion(h) {
-    document.getElementById('bg-room').src = `img/habitaciones/${h}`;
-}
 
+// =========================
+// HABITACIONES
+// =========================
+function cambiarHabitacion(h) {
+    document.getElementById('bg-room').src = `img/habitaciones/${h}`;
+}

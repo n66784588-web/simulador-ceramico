@@ -35,14 +35,11 @@
     left: 0;
     pointer-events: none; /* 🔥 evita bloquear clicks */
 }
-/* --- PISO (ACTUALIZADO) --- */
 #floor-canvas {
     z-index: 2;
-    /* Eliminamos el clip-path de aquí para manejarlo en JS */
-    
-    /* 🔥 ESTO LE DA EL REALISMO: permite que las sombras de la foto original se vean */
-    mix-blend-mode: multiply; 
-    opacity: 0.9;
+    mix-blend-mode: multiply; /* Esto es vital para que la figura no parezca una calcomanía */
+    opacity: 0.85;
+    pointer-events: none;
 }
 
 

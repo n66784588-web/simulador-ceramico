@@ -1,18 +1,11 @@
-// 1. Variables de estado
-let modoActual = 'piso'; 
+let modoActual = 'piso'; // Esta es la única variable que necesitamos
 
-// 2. Esta es la función que te falta y marca error
 function setModo(modo) {
     modoActual = modo;
     console.log("Cambiado a modo: " + modo);
     
-    // Opcional: Esto ayuda visualmente a saber qué botón está activo
-    document.querySelectorAll('.controls button').forEach(btn => btn.style.border = "none");
-    event.target.style.border = "2px solid yellow";
+    // Esto quita el error de la consola y permite que los botones funcionen
 }
-
-// --- LISTA DE PRODUCTOS ---
-var misProductos = [
  // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
@@ -512,7 +505,7 @@ var misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-/* CAMBIAR HABITACION */
+/* --- FUNCIONES DE CONTROL --- */
 function cambiarHabitacion(habitacion) {
     var imgHab = document.getElementById('bg-room');
     if (imgHab) {
@@ -520,17 +513,17 @@ function cambiarHabitacion(habitacion) {
     }
 }
 
-// FUNCIÓN MAESTRA: Decide si pintar piso o pared
+// Función Maestra que decide qué pintar
 function aplicarTextura(ruta) {
     if (modoActual === 'piso') {
-        aplicarPiso(ruta);
+        dibujarPiso(ruta);
     } else {
-        aplicarPared(ruta);
+        dibujarPared(ruta);
     }
 }
 
-// --- LÓGICA PARA EL PISO (Con perspectiva y armado de 4 piezas) ---
-function aplicarPiso(ruta) {
+/* --- DIBUJO DEL PISO (Con perspectiva y armado 2x2) --- */
+function dibujarPiso(ruta) {
     var canvas = document.getElementById('floor-canvas');
     var ctx = canvas.getContext('2d');
     var img = new Image();
@@ -541,11 +534,11 @@ function aplicarPiso(ruta) {
         canvas.height = canvas.clientHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // ESCALA Y ARMADO: 0.5 con bucle para formar el tapete de 2x2
         var escala = 0.5; 
         var tempCanvas = document.createElement('canvas');
         var tCtx = tempCanvas.getContext('2d');
         
+        // Armado de 4 piezas para que el diseño (como Alhambra) no se corte
         tempCanvas.width = (img.width * escala) * 2;
         tempCanvas.height = (img.height * escala) * 2;
         
@@ -561,22 +554,21 @@ function aplicarPiso(ruta) {
         // Área del piso (Trapecio para la perspectiva)
         ctx.moveTo(0, canvas.height * 0.70);
         ctx.lineTo(canvas.width, canvas.height * 0.70);
-        ctx.lineTo(canvas.width * 1.5, canvas.height); // Abre hacia afuera
-        ctx.lineTo(canvas.width * -0.5, canvas.height); // Abre hacia afuera
+        ctx.lineTo(canvas.width * 1.5, canvas.height); 
+        ctx.lineTo(canvas.width * -0.5, canvas.height);
         ctx.closePath();
         ctx.clip();
 
-        // Transformación para que el piso se "acueste"
         ctx.translate(canvas.width / 2, canvas.height * 0.70);
-        ctx.transform(3.2, 0, 0, 0.45, 0, 0); 
+        ctx.transform(3.2, 0, 0, 0.45, 0, 0); // Ajuste de inclinación real
         ctx.fillStyle = pattern;
         ctx.fillRect(-canvas.width, 0, canvas.width * 2, canvas.height * 2);
         ctx.restore();
     };
 }
 
-// --- LÓGICA PARA LA PARED (Basada en tus puntos rojos) ---
-function aplicarPared(ruta) {
+/* --- DIBUJO DE LA PARED --- */
+function dibujarPared(ruta) {
     var canvas = document.getElementById('wall-canvas');
     var ctx = canvas.getContext('2d');
     var img = new Image();
@@ -598,11 +590,8 @@ function aplicarPared(ruta) {
         
         ctx.save();
         ctx.beginPath();
-        // Área de la pared (Rectángulo central)
-        ctx.moveTo(canvas.width * 0.2, canvas.height * 0.2);
-        ctx.lineTo(canvas.width * 0.8, canvas.height * 0.2);
-        ctx.lineTo(canvas.width * 0.8, canvas.height * 0.7);
-        ctx.lineTo(canvas.width * 0.2, canvas.height * 0.7);
+        // Área de la pared (usando tus puntos rojos de referencia)
+        ctx.rect(canvas.width * 0.2, canvas.height * 0.2, canvas.width * 0.6, canvas.height * 0.5);
         ctx.closePath();
         ctx.clip();
 
@@ -612,33 +601,27 @@ function aplicarPared(ruta) {
     };
 }
 
-/* MOSTRAR PRODUCTOS */
+/* --- GENERACIÓN DE PRODUCTOS --- */
 function mostrarProductos(marca) {
     var contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
-
     contenedor.innerHTML = '';
 
     for (var i = 0; i < misProductos.length; i++) {
         var prod = misProductos[i];
-
         if (marca === 'todas' || prod.marca === marca) {
             var div = document.createElement('div');
             div.className = 'producto-item';
-
             var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg";
 
-            div.innerHTML =
-                '<img src="' + rutaImg + '">' +
-                '<p>' + prod.nombre + '</p>';
+            div.innerHTML = '<img src="' + rutaImg + '"><p>' + prod.nombre + '</p>';
 
             (function(ruta) {
-                div.onclick = function() {
-                    aplicarTextura(ruta);
-                };
+                div.onclick = function() { aplicarTextura(ruta); };
             })(rutaImg);
 
             contenedor.appendChild(div);
         }
     }
 }
+

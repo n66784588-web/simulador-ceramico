@@ -506,16 +506,26 @@ const misProductos = [
     { nombre: "newbury-white-30x60", marca: "benadresa" },
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
+
+
+window.onload = () => {
+    initDragAndDrop();
+    mostrarProductos('todas');
+};
+
+/* =========================
+   CAMBIO DE MODO
+========================= */
 function setModo(m) {
     modoEdicion = m;
-    // Esto ayuda visualmente a saber qué estás editando
-    document.getElementById('btn-piso').style.backgroundColor = (m === 'piso') ? '#007bff' : '#222';
-    document.getElementById('btn-pared').style.backgroundColor = (m === 'pared') ? '#ff4757' : '#222';
-    
-    console.log("Cambiado a modo: " + modoEdicion);
+
+    document.getElementById('btn-piso').classList.toggle('active', m === 'piso');
+    document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
 }
 
-
+/* =========================
+   DRAG PUNTOS
+========================= */
 function initDragAndDrop() {
     const dots = document.querySelectorAll('.dot');
     const viewport = document.getElementById('viewport');
@@ -529,16 +539,20 @@ function initDragAndDrop() {
 
     window.onmousemove = (e) => {
         if (!puntoActivo) return;
+
         const rect = viewport.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
-        puntoActivo.style.left = x + "px";
-        puntoActivo.style.top = y + "px";
-        dibujarEscena(); 
+        puntoActivo.style.left = (e.clientX - rect.left) + "px";
+        puntoActivo.style.top = (e.clientY - rect.top) + "px";
+
+        dibujarEscena();
     };
 
     window.onmouseup = () => { puntoActivo = null; };
 }
+
+/* =========================
+   TEXTURA
+========================= */
 function aplicarTextura(ruta) {
     if (modoEdicion === 'piso') {
         ultimaRutaPiso = ruta;
@@ -548,74 +562,105 @@ function aplicarTextura(ruta) {
     dibujarEscena();
 }
 
-
+/* =========================
+   RENDER
+========================= */
 function dibujarEscena() {
-    renderizar('piso', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
-    renderizar('pared', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
+    renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
+    renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
 }
 
-function renderizar(tipo, ruta, dotIds, escala) {
+function renderizar(canvasId, ruta, puntos, escala) {
     if (!ruta) return;
-    const canvas = document.getElementById(tipo === 'piso' ? 'floor-canvas' : 'wall-canvas');
+
+    const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
+
     const img = new Image();
     img.src = ruta;
 
     img.onload = () => {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        const pts = dotIds.map(id => {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        const pts = puntos.map(id => {
             const el = document.getElementById(id);
             return { x: el.offsetLeft, y: el.offsetTop };
         });
 
         ctx.beginPath();
         ctx.moveTo(pts[0].x, pts[0].y);
-        ctx.lineTo(pts[1].x, pts[1].y);
-        ctx.lineTo(pts[2].x, pts[2].y);
-        ctx.lineTo(pts[3].x, pts[3].y);
+        pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
         ctx.closePath();
 
         ctx.save();
         ctx.clip();
 
-        // AQUÍ ESTÁ EL TRUCO PARA QUE NO SEA SOLO UNA IMAGEN
         const pattern = ctx.createPattern(img, 'repeat');
         ctx.scale(escala, escala);
         ctx.fillStyle = pattern;
-        ctx.fillRect(0, 0, canvas.width / escala, canvas.height / escala);
+        ctx.fillRect(0, 0, canvas.width/escala, canvas.height/escala);
+
         ctx.restore();
+    };
+
+    /* 🔥 IMPORTANTE: ERROR DE IMAGEN */
+    img.onerror = () => {
+        console.error("❌ NO SE ENCONTRÓ:", ruta);
     };
 }
 
-// PARA QUE LAS IMÁGENES NO SE VEAN GIGANTES (Usa la rueda del mouse)
+/* =========================
+   ZOOM
+========================= */
 window.addEventListener('wheel', (e) => {
     if (modoEdicion === 'piso') {
-        tileScalePiso = e.deltaY > 0 ? Math.max(0.05, tileScalePiso - 0.01) : Math.min(1, tileScalePiso + 0.01);
+        tileScalePiso += e.deltaY > 0 ? -0.01 : 0.01;
+        tileScalePiso = Math.max(0.05, Math.min(1, tileScalePiso));
     } else {
-        tileScalePared = e.deltaY > 0 ? Math.max(0.05, tileScalePared - 0.01) : Math.min(1, tileScalePared + 0.01);
+        tileScalePared += e.deltaY > 0 ? -0.01 : 0.01;
+        tileScalePared = Math.max(0.05, Math.min(1, tileScalePared));
     }
+
     dibujarEscena();
     e.preventDefault();
 }, { passive: false });
 
+/* =========================
+   PRODUCTOS
+========================= */
 function mostrarProductos(marca) {
     const contenedor = document.getElementById('productos-lista');
     contenedor.innerHTML = '';
+
     misProductos.forEach(p => {
         if (marca === 'todas' || p.marca === marca) {
+
+            const ruta = `img/ceramicas/${p.nombre}.jpg`;
+
             const div = document.createElement('div');
             div.className = 'producto-item';
-            const ruta = `img/ceramicas/${p.nombre}.jpg`;
-            div.innerHTML = `<img src="${ruta}"><p>${p.nombre}</p>`;
+
+            div.innerHTML = `
+                <img src="${ruta}" onerror="this.src='img/error.jpg'">
+                <p>${p.nombre}</p>
+            `;
+
             div.onclick = () => aplicarTextura(ruta);
+
             contenedor.appendChild(div);
         }
     });
 }
 
+/* =========================
+   HABITACIONES
+========================= */
+function cambiarHabitacion(h) {
+    document.getElementById('bg-room').src = `img/habitaciones/${h}`;
+}
 function cambiarHabitacion(h) {
     document.getElementById('bg-room').src = `img/habitaciones/${h}`;
 }

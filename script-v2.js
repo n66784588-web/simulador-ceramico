@@ -1,11 +1,12 @@
-/* =========================
-   VARIABLES Y ESTADO
-========================= */
+// CONFIGURACIÓN INICIAL
 let modoEdicion = 'piso';
+let ultimaRutaPiso = "";
+let ultimaRutaPared = "";
+let tileScalePiso = 0.3;  
+let tileScalePared = 0.3; 
 let puntoActivo = null;
-let ultimaRutaPiso = null;
-let ultimaRutaPared = null;
 
+// LISTADO DE TUS PRODUCTOS POR MARCA
 const misProductos = [
  // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
@@ -506,133 +507,178 @@ const misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-========================= */
+
 window.onload = () => {
     initDragAndDrop();
     mostrarProductos('todas');
-    configurarCanvases();
 };
 
-function configurarCanvases() {
-    const viewport = document.getElementById('viewport');
-    const fCanvas = document.getElementById('floor-canvas');
-    const wCanvas = document.getElementById('wall-canvas');
-    
-    fCanvas.width = wCanvas.width = viewport.clientWidth;
-    fCanvas.height = wCanvas.height = viewport.clientHeight;
-}
-
 /* =========================
-   CATÁLOGO
+   CAMBIO DE MODO
 ========================= */
-function mostrarProductos(marcaFiltro) {
-    const lista = document.getElementById('productos-lista');
-    lista.innerHTML = "";
-
-    const filtrados = (marcaFiltro === 'todas') 
-        ? misProductos 
-        : misProductos.filter(p => p.marca === marcaFiltro);
-
-    filtrados.forEach(p => {
-        const ruta = `img/ceramicas/${p.nombre}.jpg`;
-        const item = document.createElement('div');
-        item.className = "producto-item";
-        item.innerHTML = `
-            <img src="${ruta}" alt="${p.nombre}" onclick="aplicarTextura('${ruta}')" onerror="this.src='https://via.placeholder.com/150?text=Error+Imagen'">
-            <small>${p.nombre.substring(0, 12)}</small>
-        `;
-        lista.appendChild(item);
-    });
-}
 
 function setModo(m) {
     modoEdicion = m;
+
     document.getElementById('btn-piso').classList.toggle('active', m === 'piso');
     document.getElementById('btn-pared').classList.toggle('active', m === 'pared');
 }
 
-function cambiarHabitacion(archivo) {
-    document.getElementById('bg-room').src = `img/habitaciones/${archivo}`;
-}
 
-/* =========================
-   MOTOR DE PERSPECTIVA
-========================= */
-function aplicarTextura(ruta) {
-    if (modoEdicion === 'piso') ultimaRutaPiso = ruta;
-    else ultimaRutaPared = ruta;
-    dibujarEscena();
-}
-
-function dibujarEscena() {
-    if (ultimaRutaPiso) renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4']);
-    if (ultimaRutaPared) renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8']);
-}
-function renderizar(idCanvas, ruta, puntos) {
-    const canvas = document.getElementById(idCanvas);
-    const viewport = document.getElementById('viewport'); // Agregamos esto
-    const ctx = canvas.getContext('2d');
-    
-    // Sincronizar tamaño del canvas con su tamaño visual real
-    canvas.width = viewport.clientWidth;
-    canvas.height = viewport.clientHeight;
-
-    const img = new Image();
-    img.src = ruta;
-
-    img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const pts = puntos.map(id => {
-            const el = document.getElementById(id);
-            return [
-                (parseFloat(el.style.left) / 100) * canvas.width,
-                (parseFloat(el.style.top) / 100) * canvas.height
-            ];
-        });
-
-        const p = new Perspective(ctx, img);
-        p.draw([
-            [pts[0][0], pts[0][1]], 
-            [pts[1][0], pts[1][1]], 
-            [pts[2][0], pts[2][1]], 
-            [pts[3][0], pts[3][1]]
-        ]);
-    };
-}
-
-
-/* =========================
-   INTERACCIÓN (DRAG)
-========================= */
+// =========================
+// DRAG PUNTOS
+// =========================
 function initDragAndDrop() {
     const dots = document.querySelectorAll('.dot');
     const viewport = document.getElementById('viewport');
 
     dots.forEach(dot => {
-        dot.addEventListener('mousedown', e => { puntoActivo = dot; e.preventDefault(); });
+        dot.onmousedown = (e) => { 
+            puntoActivo = dot; 
+            e.preventDefault(); 
+        };
     });
 
-    window.addEventListener('mousemove', e => {
+    window.onmousemove = (e) => {
         if (!puntoActivo) return;
-        const rect = viewport.getBoundingClientRect();
-        
-        let x = ((e.clientX - rect.left) / rect.width) * 100;
-        let y = ((e.clientY - rect.top) / rect.height) * 100;
 
-        // Limites
-        puntoActivo.style.left = Math.max(0, Math.min(100, x)) + "%";
-        puntoActivo.style.top = Math.max(0, Math.min(100, y)) + "%";
+        const rect = viewport.getBoundingClientRect();
+
+        puntoActivo.style.left = (e.clientX - rect.left) + "px";
+        puntoActivo.style.top = (e.clientY - rect.top) + "px";
 
         dibujarEscena();
+    };
+
+    window.onmouseup = () => { puntoActivo = null; };
+}
+
+
+// =========================
+// TEXTURA
+// =========================
+function aplicarTextura(ruta) {
+    if (modoEdicion === 'piso') {
+        ultimaRutaPiso = ruta;
+    } else {
+        ultimaRutaPared = ruta;
+    }
+    dibujarEscena();
+}
+
+
+// =========================
+// RENDER
+// =========================
+function dibujarEscena() {
+    renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
+    renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
+}
+
+function renderizar(canvasId, ruta, puntos, escala) {
+    if (!ruta) return;
+
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.src = ruta;
+
+    img.onload = () => {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        const pts = puntos.map(id => {
+            const el = document.getElementById(id);
+            return { x: el.offsetLeft, y: el.offsetTop };
+        });
+
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.closePath();
+
+        ctx.save();
+        ctx.clip();
+
+        // 🔥 TEXTURA ESCALADA CORRECTAMENTE
+        const patternCanvas = document.createElement('canvas');
+        const pctx = patternCanvas.getContext('2d');
+
+        patternCanvas.width = img.width * escala;
+        patternCanvas.height = img.height * escala;
+
+        pctx.drawImage(img, 0, 0, patternCanvas.width, patternCanvas.height);
+
+        const pattern = ctx.createPattern(patternCanvas, 'repeat');
+        ctx.fillStyle = pattern;
+
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.restore();
+    };
+
+    img.onerror = () => {
+        console.error("No se encontró:", ruta);
+    };
+}
+
+
+// =========================
+// ZOOM (ARREGLADO)
+// =========================
+window.addEventListener('wheel', (e) => {
+    const cambio = 0.05; // 🔥 MÁS FUERTE
+
+    if (modoEdicion === 'piso') {
+        tileScalePiso += e.deltaY > 0 ? -cambio : cambio;
+        tileScalePiso = Math.max(0.1, Math.min(2, tileScalePiso));
+    } else {
+        tileScalePared += e.deltaY > 0 ? -cambio : cambio;
+        tileScalePared = Math.max(0.1, Math.min(2, tileScalePared));
+    }
+
+    dibujarEscena();
+    e.preventDefault();
+}, { passive: false });
+
+
+// =========================
+// PRODUCTOS
+// =========================
+function mostrarProductos(marca) {
+    const contenedor = document.getElementById('productos-lista');
+    contenedor.innerHTML = '';
+
+    misProductos.forEach(p => {
+        if (marca === 'todas' || p.marca === marca) {
+
+            const ruta = `img/ceramicas/${p.nombre}.jpg`;
+
+            const div = document.createElement('div');
+            div.className = 'producto-item';
+
+            div.innerHTML = `
+                <img src="${ruta}" onerror="this.src='img/error.jpg'">
+                <p>${p.nombre}</p>
+            `;
+
+            div.onclick = () => aplicarTextura(ruta);
+
+            contenedor.appendChild(div);
+        }
     });
-
-    window.addEventListener('mouseup', () => puntoActivo = null);
 }
 
-function rotarManual() {
-    // Aquí puedes añadir lógica para rotar el canvas 90 grados si lo deseas
-    console.log("Rotando textura...");
+
+// =========================
+// HABITACIONES
+// =========================
+function cambiarHabitacion(h) {
+    document.getElementById('bg-room').src = `img/habitaciones/${h}`;
 }
+
 
 

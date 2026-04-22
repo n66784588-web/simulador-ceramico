@@ -569,7 +569,6 @@ function dibujarEscena() {
     renderizar('floor-canvas', ultimaRutaPiso, ['p1','p2','p3','p4'], tileScalePiso);
     renderizar('wall-canvas', ultimaRutaPared, ['p5','p6','p7','p8'], tileScalePared);
 }
-
 function renderizar(canvasId, ruta, puntos, escala) {
     if (!ruta) return;
 
@@ -598,17 +597,25 @@ function renderizar(canvasId, ruta, puntos, escala) {
         ctx.save();
         ctx.clip();
 
-        const pattern = ctx.createPattern(img, 'repeat');
-        ctx.scale(escala, escala);
+        // 🔥 AQUÍ ESTÁ LA CLAVE
+        const patternCanvas = document.createElement('canvas');
+        const pctx = patternCanvas.getContext('2d');
+
+        patternCanvas.width = img.width * escala;
+        patternCanvas.height = img.height * escala;
+
+        pctx.drawImage(img, 0, 0, patternCanvas.width, patternCanvas.height);
+
+        const pattern = ctx.createPattern(patternCanvas, 'repeat');
         ctx.fillStyle = pattern;
-        ctx.fillRect(0, 0, canvas.width/escala, canvas.height/escala);
+
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.restore();
     };
 
-    /* 🔥 IMPORTANTE: ERROR DE IMAGEN */
     img.onerror = () => {
-        console.error("❌ NO SE ENCONTRÓ:", ruta);
+        console.error("No se encontró:", ruta);
     };
 }
 

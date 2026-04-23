@@ -508,44 +508,46 @@ var misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-// 3. FUNCIÓN MAESTRA (La única que deben llamar los productos)
-function aplicarTextura(ruta) {
+// 3. FUNCIÓN MAESTRA DE SELECCIÓN
+function seleccionarProducto(ruta) {
+    console.log("Aplicando a: " + modoActual);
     if (modoActual === 'piso') {
-        dibujarPiso(ruta);
+        aplicarTexturaPiso(ruta);
     } else {
-        dibujarPared(ruta);
+        aplicarTexturaPared(ruta);
     }
 }
 
-// 4. LÓGICA DE DIBUJO DEL PISO
-function dibujarPiso(ruta) {
-    var canvas = document.getElementById('floor-canvas');
-    var ctx = canvas.getContext('2d');
-    var img = new Image();
+// 4. LÓGICA PARA EL PISO (Con perspectiva y patrón 2x2)
+function aplicarTexturaPiso(ruta) {
+    const canvas = document.getElementById('floor-canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
     img.src = ruta;
 
-    img.onload = function () {
+    img.onload = function() {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        var escala = 0.5; 
-        var tempCanvas = document.createElement('canvas');
-        var tCtx = tempCanvas.getContext('2d');
+        const escala = 0.5;
+        const tempCanvas = document.createElement('canvas');
+        const tCtx = tempCanvas.getContext('2d');
         
-        // Armado 2x2 para que los patrones encajen perfectamente
+        // Crea bloque de 2x2 para que los diseños complejos encajen
         tempCanvas.width = (img.width * escala) * 2;
         tempCanvas.height = (img.height * escala) * 2;
+        
         for(let x=0; x<2; x++) {
             for(let y=0; y<2; y++) {
                 tCtx.drawImage(img, x*(img.width*escala), y*(img.height*escala), img.width*escala, img.height*escala);
             }
         }
 
-        var pattern = ctx.createPattern(tempCanvas, 'repeat');
+        const pattern = ctx.createPattern(tempCanvas, 'repeat');
         ctx.save();
         ctx.beginPath();
-        // Máscara del piso (basada en tus puntos azules)
+        // Área del piso basada en tus puntos azules
         ctx.moveTo(0, canvas.height * 0.70);
         ctx.lineTo(canvas.width, canvas.height * 0.70);
         ctx.lineTo(canvas.width * 1.5, canvas.height);
@@ -553,7 +555,6 @@ function dibujarPiso(ruta) {
         ctx.closePath();
         ctx.clip();
 
-        // Perspectiva real para que el piso se vea "acostado"
         ctx.translate(canvas.width / 2, canvas.height * 0.70);
         ctx.transform(3.2, 0, 0, 0.45, 0, 0); 
         ctx.fillStyle = pattern;
@@ -562,30 +563,29 @@ function dibujarPiso(ruta) {
     };
 }
 
-// 5. LÓGICA DE DIBUJO DE LA PARED
-function dibujarPared(ruta) {
-    var canvas = document.getElementById('wall-canvas');
-    var ctx = canvas.getContext('2d');
-    var img = new Image();
+// 5. LÓGICA PARA LA PARED
+function aplicarTexturaPared(ruta) {
+    const canvas = document.getElementById('wall-canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
     img.src = ruta;
 
-    img.onload = function () {
+    img.onload = function() {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        var escala = 0.5;
-        var tempCanvas = document.createElement('canvas');
-        var tCtx = tempCanvas.getContext('2d');
+        const escala = 0.5;
+        const tempCanvas = document.createElement('canvas');
+        const tCtx = tempCanvas.getContext('2d');
         tempCanvas.width = img.width * escala;
         tempCanvas.height = img.height * escala;
         tCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
         
-        var pattern = ctx.createPattern(tempCanvas, 'repeat');
-        
+        const pattern = ctx.createPattern(tempCanvas, 'repeat');
         ctx.save();
         ctx.beginPath();
-        // Área de la pared (basada en tus puntos rojos)
+        // Área de la pared basada en tus puntos rojos
         ctx.rect(canvas.width * 0.2, canvas.height * 0.2, canvas.width * 0.6, canvas.height * 0.5);
         ctx.closePath();
         ctx.clip();
@@ -596,31 +596,33 @@ function dibujarPared(ruta) {
     };
 }
 
-// 6. RENDERIZADO DE PRODUCTOS
+// 6. LISTA DE PRODUCTOS (Asegúrate de que los nombres coincidan con tus imágenes)
+var misProductos = [
+    { nombre: "alhambra-rojo-44x44", marca: "Nitropiso" },
+    { nombre: "altamira-33x33", marca: "Nitropiso" },
+    { nombre: "antigua-44x44", marca: "Nitropiso" }
+    // Agrega el resto aquí...
+];
+
+// 7. RENDERIZADO EN EL MENÚ
 function mostrarProductos(marca) {
-    var contenedor = document.getElementById('productos-lista');
+    const contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
     contenedor.innerHTML = '';
 
-    for (var i = 0; i < misProductos.length; i++) {
-        var prod = misProductos[i];
+    misProductos.forEach(prod => {
         if (marca === 'todas' || prod.marca === marca) {
-            var div = document.createElement('div');
+            const div = document.createElement('div');
             div.className = 'producto-item';
-            var rutaImg = "img/ceramicas/" + prod.nombre + ".jpg";
+            const rutaImg = "img/ceramicas/" + prod.nombre + ".jpg";
 
-            div.innerHTML = '<img src="' + rutaImg + '"><p>' + prod.nombre + '</p>';
-
-            // Evento de clic corregido
-            (function(ruta) {
-                div.onclick = function() {
-                    aplicarTextura(ruta);
-                };
-            })(rutaImg);
-
+            div.innerHTML = `<img src="${rutaImg}"><p>${prod.nombre}</p>`;
+            div.onclick = () => seleccionarProducto(rutaImg);
             contenedor.appendChild(div);
         }
-    }
+    });
 }
 
-        
+// Iniciar cargando todos los productos
+window.onload = () => mostrarProductos('todas');
+  

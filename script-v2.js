@@ -1,12 +1,11 @@
-
-// 1. VARIABLE DE CONTROL ÚNICA
+// 1. CONFIGURACIÓN INICIAL
 let modoActual = 'piso'; 
 
-// 2. FUNCIÓN PARA LOS BOTONES (QUITAR EL ERROR DE CONSOLA)
 function setModo(modo) {
     modoActual = modo;
     console.log("Cambiado a modo: " + modo);
 }
+
 
 /* --- LISTA DE PRODUCTOS --- */
 var misProductos = [
@@ -509,16 +508,7 @@ var misProductos = [
     { nombre: "stryn-30x90", marca: "benadresa" }
 ];   
 
-/* --- FUNCIONES DE DIBUJO --- */
-
-function cambiarHabitacion(habitacion) {
-    var imgHab = document.getElementById('bg-room');
-    if (imgHab) {
-        imgHab.src = "img/habitaciones/" + habitacion;
-    }
-}
-
-// FUNCIÓN MAESTRA: Esta es la que llaman tus productos al hacer clic
+// 3. FUNCIÓN MAESTRA (La única que deben llamar los productos)
 function aplicarTextura(ruta) {
     if (modoActual === 'piso') {
         dibujarPiso(ruta);
@@ -527,6 +517,7 @@ function aplicarTextura(ruta) {
     }
 }
 
+// 4. LÓGICA DE DIBUJO DEL PISO
 function dibujarPiso(ruta) {
     var canvas = document.getElementById('floor-canvas');
     var ctx = canvas.getContext('2d');
@@ -542,7 +533,7 @@ function dibujarPiso(ruta) {
         var tempCanvas = document.createElement('canvas');
         var tCtx = tempCanvas.getContext('2d');
         
-        // Armado 2x2 para que los patrones circulares encajen
+        // Armado 2x2 para que los patrones encajen perfectamente
         tempCanvas.width = (img.width * escala) * 2;
         tempCanvas.height = (img.height * escala) * 2;
         for(let x=0; x<2; x++) {
@@ -554,7 +545,7 @@ function dibujarPiso(ruta) {
         var pattern = ctx.createPattern(tempCanvas, 'repeat');
         ctx.save();
         ctx.beginPath();
-        // Área del piso
+        // Máscara del piso (basada en tus puntos azules)
         ctx.moveTo(0, canvas.height * 0.70);
         ctx.lineTo(canvas.width, canvas.height * 0.70);
         ctx.lineTo(canvas.width * 1.5, canvas.height);
@@ -562,6 +553,7 @@ function dibujarPiso(ruta) {
         ctx.closePath();
         ctx.clip();
 
+        // Perspectiva real para que el piso se vea "acostado"
         ctx.translate(canvas.width / 2, canvas.height * 0.70);
         ctx.transform(3.2, 0, 0, 0.45, 0, 0); 
         ctx.fillStyle = pattern;
@@ -570,6 +562,7 @@ function dibujarPiso(ruta) {
     };
 }
 
+// 5. LÓGICA DE DIBUJO DE LA PARED
 function dibujarPared(ruta) {
     var canvas = document.getElementById('wall-canvas');
     var ctx = canvas.getContext('2d');
@@ -592,7 +585,7 @@ function dibujarPared(ruta) {
         
         ctx.save();
         ctx.beginPath();
-        // Área de la pared (puntos rojos)
+        // Área de la pared (basada en tus puntos rojos)
         ctx.rect(canvas.width * 0.2, canvas.height * 0.2, canvas.width * 0.6, canvas.height * 0.5);
         ctx.closePath();
         ctx.clip();
@@ -603,7 +596,7 @@ function dibujarPared(ruta) {
     };
 }
 
-/* --- MOSTRAR PRODUCTOS --- */
+// 6. RENDERIZADO DE PRODUCTOS
 function mostrarProductos(marca) {
     var contenedor = document.getElementById('productos-lista');
     if (!contenedor) return;
@@ -618,9 +611,10 @@ function mostrarProductos(marca) {
 
             div.innerHTML = '<img src="' + rutaImg + '"><p>' + prod.nombre + '</p>';
 
+            // Evento de clic corregido
             (function(ruta) {
                 div.onclick = function() {
-                    aplicarTextura(ruta); // Llama a la maestra
+                    aplicarTextura(ruta);
                 };
             })(rutaImg);
 
@@ -628,3 +622,5 @@ function mostrarProductos(marca) {
         }
     }
 }
+
+        

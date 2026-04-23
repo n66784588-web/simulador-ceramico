@@ -34,21 +34,35 @@
     top: 0;
     left: 0;
     pointer-events: none; /* 🔥 evita bloquear clicks */
+     image-rendering: -webkit-optimize-contrast;
+    background-repeat: repeat;
+    background-size: 200px 200px; 
 }
-/* --- PISO (RECORTADO) --- */
+
+/* --- PISO (CORREGIDO) --- */
 #floor-canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
     z-index: 2;
-    
-    /* Agrega estas dos líneas aquí: */
-    mix-blend-mode: multiply; 
-    opacity: 0.9;
 
-    /* Puedes comentar o borrar el clip-path si usas la versión de JS 
-       que te pasé, para que no choquen */
-    /* clip-path: polygon(20% 70%, 80% 70%, 90% 90%, 10% 90%); */
+    pointer-events: none;
+
+    /* ❌ QUITAMOS esto porque arruina la textura */
+    /* mix-blend-mode: multiply; */
+    /* opacity: 0.9; */
+
+    /* ✅ MEJORA DE CALIDAD */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+
+    /* ✅ AJUSTE BASE */
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    background-position: 0 0;
 }
-
-
 /* --- PARED (OPCIONAL) --- */
 #wall-canvas {
     z-index: 3;

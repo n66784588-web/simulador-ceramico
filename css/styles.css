@@ -50,29 +50,12 @@
 
     pointer-events: none;
 
-    /* ❌ QUITAMOS esto porque arruina la textura */
-    /* mix-blend-mode: multiply; */
-    /* opacity: 0.9; */
-
-    /* ✅ MEJORA DE CALIDAD */
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-
-    /* ✅ AJUSTE BASE */
+    /* 🔥 CLAVE */
     background-repeat: repeat;
-    background-size: 200px 200px;
-    background-position: 0 0;
-}
-/* --- PARED (OPCIONAL) --- */
-#wall-canvas {
-    z-index: 3;
+    background-size: contain; /* 👈 CAMBIO IMPORTANTE */
+    background-position: center;
 
-    clip-path: polygon(
-        30% 20%,
-        70% 20%,
-        70% 60%,
-        30% 60%
-    );
+    image-rendering: -webkit-optimize-contrast;
 }
 
 /* --- CONTROLES --- */

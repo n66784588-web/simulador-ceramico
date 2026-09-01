@@ -561,7 +561,7 @@ function aplicarTexturaPiso(ruta) {
     };
 }
 
-// 5. LÓGICA PARA LA PARED (Completada y cerrada correctamente)
+// 5. LÓGICA PARA LA PARED
 function aplicarTexturaPared(ruta) {
     const canvas = document.getElementById('wall-canvas');
     if (!canvas) return;
@@ -617,4 +617,18 @@ function renderizarCatalogo(productosAMostrar = misProductos) {
 window.onload = function() {
     renderizarCatalogo();
 };
-     
+  
+  
+   
+    
+
+   
+    
+   
+  
+   
+   
+  
+   
+
+    

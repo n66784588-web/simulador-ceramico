@@ -6,7 +6,6 @@ function setModo(modo) {
     console.log("Cambiado a modo: " + modo);
 }
 
-
 /* --- LISTA DE PRODUCTOS --- */
 var misProductos = [
  // NITROPISO
@@ -521,6 +520,7 @@ function seleccionarProducto(ruta) {
 // 4. LÓGICA PARA EL PISO (Con perspectiva y patrón 2x2)
 function aplicarTexturaPiso(ruta) {
     const canvas = document.getElementById('floor-canvas');
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.src = ruta;
@@ -538,16 +538,16 @@ function aplicarTexturaPiso(ruta) {
         tempCanvas.width = (img.width * escala) * 2;
         tempCanvas.height = (img.height * escala) * 2;
         
-        for(let x=0; x<2; x++) {
-            for(let y=0; y<2; y++) {
-                tCtx.drawImage(img, x*(img.width*escala), y*(img.height*escala), img.width*escala, img.height*escala);
+        for(let x = 0; x < 2; x++) {
+            for(let y = 0; y < 2; y++) {
+                tCtx.drawImage(img, x * (img.width * escala), y * (img.height * escala), img.width * escala, img.height * escala);
             }
         }
 
         const pattern = ctx.createPattern(tempCanvas, 'repeat');
         ctx.save();
         ctx.beginPath();
-        // Área del piso basada en tus puntos azules
+        // Área del piso basada en tus puntos
         ctx.moveTo(0, canvas.height * 0.70);
         ctx.lineTo(canvas.width, canvas.height * 0.70);
         ctx.lineTo(canvas.width * 1.5, canvas.height);
@@ -563,9 +563,10 @@ function aplicarTexturaPiso(ruta) {
     };
 }
 
-// 5. LÓGICA PARA LA PARED
+// 5. LÓGICA PARA LA PARED (Completada)
 function aplicarTexturaPared(ruta) {
     const canvas = document.getElementById('wall-canvas');
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.src = ruta;
@@ -584,45 +585,8 @@ function aplicarTexturaPared(ruta) {
         
         const pattern = ctx.createPattern(tempCanvas, 'repeat');
         ctx.save();
-        ctx.beginPath();
-        // Área de la pared basada en tus puntos rojos
-        ctx.rect(canvas.width * 0.2, canvas.height * 0.2, canvas.width * 0.6, canvas.height * 0.5);
-        ctx.closePath();
-        ctx.clip();
-
         ctx.fillStyle = pattern;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.restore();
     };
 }
-
-// 6. LISTA DE PRODUCTOS (Asegúrate de que los nombres coincidan con tus imágenes)
-var misProductos = [
-    { nombre: "alhambra-rojo-44x44", marca: "Nitropiso" },
-    { nombre: "altamira-33x33", marca: "Nitropiso" },
-    { nombre: "antigua-44x44", marca: "Nitropiso" }
-    // Agrega el resto aquí...
-];
-
-// 7. RENDERIZADO EN EL MENÚ
-function mostrarProductos(marca) {
-    const contenedor = document.getElementById('productos-lista');
-    if (!contenedor) return;
-    contenedor.innerHTML = '';
-
-    misProductos.forEach(prod => {
-        if (marca === 'todas' || prod.marca === marca) {
-            const div = document.createElement('div');
-            div.className = 'producto-item';
-            const rutaImg = "img/ceramicas/" + prod.nombre + ".jpg";
-
-            div.innerHTML = `<img src="${rutaImg}"><p>${prod.nombre}</p>`;
-            div.onclick = () => seleccionarProducto(rutaImg);
-            contenedor.appendChild(div);
-        }
-    });
-}
-
-// Iniciar cargando todos los productos
-window.onload = () => mostrarProductos('todas');
-  

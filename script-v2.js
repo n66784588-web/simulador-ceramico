@@ -8,7 +8,7 @@ function setModo(modo) {
 
 /* --- LISTA DE PRODUCTOS --- */
 var misProductos = [
- // NITROPISO
+    // NITROPISO
     { nombre: "acatlan-30x60", marca: "nitropiso" },
     { nombre: "alameda-60x60", marca: "nitropiso" },
     { nombre: "alhambra-gris-44x44", marca: "nitropiso" },
@@ -505,7 +505,7 @@ var misProductos = [
     { nombre: "leaves-stryn-30x90", marca: "benadresa" },
     { nombre: "newbury-white-30x60", marca: "benadresa" },
     { nombre: "stryn-30x90", marca: "benadresa" }
-];   
+];    
 
 // 3. FUNCIÓN MAESTRA DE SELECCIÓN
 function seleccionarProducto(ruta) {
@@ -534,7 +534,6 @@ function aplicarTexturaPiso(ruta) {
         const tempCanvas = document.createElement('canvas');
         const tCtx = tempCanvas.getContext('2d');
         
-        // Crea bloque de 2x2 para que los diseños complejos encajen
         tempCanvas.width = (img.width * escala) * 2;
         tempCanvas.height = (img.height * escala) * 2;
         
@@ -547,7 +546,6 @@ function aplicarTexturaPiso(ruta) {
         const pattern = ctx.createPattern(tempCanvas, 'repeat');
         ctx.save();
         ctx.beginPath();
-        // Área del piso basada en tus puntos
         ctx.moveTo(0, canvas.height * 0.70);
         ctx.lineTo(canvas.width, canvas.height * 0.70);
         ctx.lineTo(canvas.width * 1.5, canvas.height);
@@ -563,7 +561,7 @@ function aplicarTexturaPiso(ruta) {
     };
 }
 
-// 5. LÓGICA PARA LA PARED (Completada)
+// 5. LÓGICA PARA LA PARED (Completada y cerrada correctamente)
 function aplicarTexturaPared(ruta) {
     const canvas = document.getElementById('wall-canvas');
     if (!canvas) return;
@@ -590,3 +588,33 @@ function aplicarTexturaPared(ruta) {
         ctx.restore();
     };
 }
+
+// 6. RENDERIZAR EL CATÁLOGO AUTOMÁTICAMENTE
+function renderizarCatalogo(productosAMostrar = misProductos) {
+    const contenedor = document.getElementById('contenedor-productos');
+    if (!contenedor) return;
+    contenedor.innerHTML = '';
+
+    productosAMostrar.forEach(prod => {
+        let ruta = `img/${prod.marca}/${prod.nombre}.jpg`; 
+        
+        let card = document.createElement('div');
+        card.style.cssText = "width: 120px; cursor: pointer; text-align: center; border: 1px solid #ddd; padding: 5px; background: #fff;";
+        card.innerHTML = `
+            <img src="${ruta}" style="width: 100px; height: 100px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/100'">
+            <p style="font-size: 11px; margin: 5px 0 0 0; word-break: break-word;">${prod.nombre}</p>
+        `;
+        
+        card.onclick = function() {
+            seleccionarProducto(ruta);
+        };
+        
+        contenedor.appendChild(card);
+    });
+}
+
+// Inicializar al cargar la página
+window.onload = function() {
+    renderizarCatalogo();
+};
+     

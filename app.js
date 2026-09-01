@@ -596,7 +596,7 @@ function renderizarCatalogo(productosAMostrar = misProductos) {
     contenedor.innerHTML = '';
 
     productosAMostrar.forEach(prod => {
-        let ruta = `img/${prod.marca}/${prod.nombre}.jpg`; 
+     let ruta = `img/ceramicas/${prod.nombre}.jpg`;
         
         let card = document.createElement('div');
         card.style.cssText = "width: 120px; cursor: pointer; text-align: center; border: 1px solid #ddd; padding: 5px; background: #fff; color: #000;";

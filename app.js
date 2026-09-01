@@ -589,7 +589,7 @@ function aplicarTexturaPared(ruta) {
     };
 }
 
-// 6. RENDERIZAR EL CATÁLOGO AUTOMÁTICAMENTE
+// RENDERIZAR EL CATÁLOGO AUTOMÁTICAMENTE (Con depuración de errores)
 function renderizarCatalogo(productosAMostrar = misProductos) {
     const contenedor = document.getElementById('contenedor-productos');
     if (!contenedor) return;
@@ -599,9 +599,10 @@ function renderizarCatalogo(productosAMostrar = misProductos) {
         let ruta = `img/${prod.marca}/${prod.nombre}.jpg`; 
         
         let card = document.createElement('div');
-        card.style.cssText = "width: 120px; cursor: pointer; text-align: center; border: 1px solid #ddd; padding: 5px; background: #fff;";
+        card.style.cssText = "width: 120px; cursor: pointer; text-align: center; border: 1px solid #ddd; padding: 5px; background: #fff; color: #000;";
         card.innerHTML = `
-            <img src="${ruta}" style="width: 100px; height: 100px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/100'">
+            <img src="${ruta}" style="width: 100px; height: 100px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display:none; font-size:9px; color:red; width:100px; height:100px; word-break:break-word;">No se encontró: ${prod.nombre}.jpg</div>
             <p style="font-size: 11px; margin: 5px 0 0 0; word-break: break-word;">${prod.nombre}</p>
         `;
         
